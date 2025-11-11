@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Archive</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+  <div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md p-4 flex flex-col justify-between">
+      <div>
+        <div class="bg-green-200 text-center py-3 rounded-md font-semibold mb-6">
+          VBK Sponsor System
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <button class="bg-gray-200 py-2 rounded hover:bg-gray-300">Homepage</button>
+          <button class="bg-gray-200 py-2 rounded hover:bg-gray-300">Change log</button>
+          <button class="bg-green-200 py-2 rounded hover:bg-green-300">Archive</button>
+          <button class="bg-gray-200 py-2 rounded hover:bg-gray-300">Admin panel</button>
+        </div>
+      </div>
+
+      <button class="bg-gray-200 py-2 rounded hover:bg-gray-300 mt-6">Log out</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+
+      <div class="relative">
+
+        <!-- Column headers -->
+        <div class="bg-gray-200 rounded-t-lg shadow-md text-sm font-semibold grid grid-cols-4">
+          <div class="px-6 py-3 border-r">Sponsor name ▾</div>
+          <div class="px-6 py-3 border-r">Description ▾</div>
+          <div class="px-6 py-3 border-r">Payment ▾</div>
+          <div class="px-6 py-3">Active periods ▾</div>
+        </div>
+
+        <!-- Sponsor cards -->
+        <div class="space-y-4 mt-0">
+
+          <!-- Card 1 -->
+          <div class="bg-white shadow-md rounded-b-lg overflow-hidden">
+            <div class="grid grid-cols-4 text-sm">
+
+              <div class="border-r p-4 flex items-stretch">
+                <div class="bg-gray-200 rounded px-4 py-6 w-full text-center">
+                  Spar Nord
+                </div>
+              </div>
+
+              <div class="border-r p-4 flex items-stretch">
+                <div class="bg-gray-200 rounded px-4 py-6 w-full leading-snug">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras gravida dictum diam.
+                  Suspendisse bibendum purus eros, sed cursus arcu venenatis non.
+                </div>
+              </div>
+
+              <div class="border-r p-4 flex items-stretch">
+                <div class="flex flex-col gap-2 w-full">
+                  <div class="bg-gray-200 rounded px-4 py-3 text-center">25.000 kr.</div>
+                  <div class="bg-gray-200 rounded px-4 py-3 text-center">15.000 kr.</div>
+                  <div class="bg-gray-200 rounded px-4 py-3 text-center">35.000 kr.</div>
+                </div>
+              </div>
+
+              <div class="p-4 flex items-stretch">
+                <div class="flex flex-col gap-2 w-full">
+                  <div class="bg-gray-200 rounded px-4 py-3 text-center">
+                    15/09/2025 - 02/02/2026
+                  </div>
+                  <div class="bg-gray-200 rounded px-4 py-3 text-center">
+                    15/09/2025 - 02/02/2026
+                  </div>
+                  <div class="bg-gray-200 rounded px-4 py-3 text-center">
+                    15/09/2025 - 02/02/2026
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="grid grid-cols-4 text-sm">
+
+              <div class="border-r p-4 flex items-stretch">
+                <div class="bg-gray-200 rounded px-4 py-6 w-full text-center">
+                  Spar Syd
+                </div>
+              </div>
+
+              <div class="border-r p-4 flex items-stretch">
+                <div class="bg-gray-200 rounded px-4 py-6 w-full leading-snug">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse luctus sem
+                  quis velit aliquam, non porta neque cursus.
+                </div>
+              </div>
+
+              <div class="border-r p-4 flex items-stretch">
+                <div class="bg-gray-200 rounded px-4 py-6 w-full text-center">
+                  50.000 kr.
+                </div>
+              </div>
+
+              <div class="p-4 flex items-stretch">
+                <div class="bg-gray-200 rounded px-4 py-6 w-full text-center">
+                  29/11/2025 - 11/05/2026
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+</body>
+</html>
