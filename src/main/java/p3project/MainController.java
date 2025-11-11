@@ -52,6 +52,21 @@ public class MainController {
 		return "test";
 	}
 
+	@GetMapping("/homepage")
+	public String showHomePage() {
+		return "homepage";
+	}
+
+	@GetMapping("/archive")
+	public String showArchivePage() {
+		return "archive";
+	}
+
+	@GetMapping("/AdminPanel")
+	public String showAdminPanelPage() {
+		return "AdminPanel";
+	}
+
 	// Missing validation, error handling (try-catch), and security measures
 	@PostMapping("/users/add")
 	public String addUserFromWeb(@RequestParam String name, @RequestParam String email) {
