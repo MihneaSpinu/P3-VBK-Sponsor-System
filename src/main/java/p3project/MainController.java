@@ -47,6 +47,11 @@ public class MainController {
 		return "users";
 	}
 
+	@GetMapping("/test")
+	public String showTestPage() {
+		return "test";
+	}
+
 	// Missing validation, error handling (try-catch), and security measures
 	@PostMapping("/users/add")
 	public String addUserFromWeb(@RequestParam String name, @RequestParam String email) {
