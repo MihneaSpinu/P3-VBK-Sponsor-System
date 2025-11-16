@@ -3,14 +3,15 @@ package p3project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import p3project.classes.User;
+import p3project.classes.Eventlog;
+import p3project.classes.Changelog;
 import p3project.repositories.UserRepository;
 import p3project.repositories.LogRepository;
+
+import java.lang.reflect.Field;
 
 @Controller	// This means that this class is a Controller
 public class MainController {
@@ -50,11 +51,42 @@ public class MainController {
 		return "users";
 	}
 
+
+    @PostMapping("/addChangelog") // PUT i stedet?
+    public @ResponseStatus String addChangelog(@RequestBody Eventlog log) { // ikke eventlog, ændres til generic
+        Eventlog storedLog = logRepository.findById(log.getId()); // ??
+        Field[] fields = log.getClass().getDeclaredFields(); // får alle variablerne i klassen (ikke værdier)
+        for(Field field : fields) {
+            field.setAccessible(true); // gør private
+            try {
+                Object before = field.get(storedLog); // old, stored...?
+                Object after = field.get(log); // new, current...?
+                if(!before.equals(after)) {
+                    logRepository.save((Eventlog)after); // er 'object', typecast til logrepo type (eventlog)
+                    /*
+                    if(after instanceof Changelog) relevantRepository.save((Changelog)after);
+                    changelog.create(...);
+                    logRepository.save((Changelog)after);
+                    else relevantRepository.save((Eventlog)after);
+                    eventlog.create(...);
+                    logRepository.save((Eventlog)after);
+                    */
+                }
+
+            } catch (IllegalAccessException e) { // skal være der for field.get kan bruges, burde ikke aktivere: setAccessible(true)
+                throw new RuntimeException(e);
+            }
+        }
+
+        return "200"; // returnér HTTP kode, på en måde
+    }
+
+
+    // Changelog page request (HTML)
     @GetMapping("/changelog")
     public String changelogPage(Model page) {
-        page.addAttribute("0", logRepository.findAll()); // måske lave noget med sider / dynamisk?
-
-        return "0"; // side
+        page.addAttribute("changelog", logRepository.findAll()); // måske lave noget med sider / dynamisk?
+        return "changelog"; // side
     }
 
 	// Missing validation, error handling (try-catch), and security measures

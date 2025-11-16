@@ -32,11 +32,15 @@ public class Eventlog {
     }
     */
 
+    public Integer getId() {
+        return this.id;
+    }
+
 
     public static Eventlog create(User user, String objectType, String objectName, Action action) {
         Eventlog log = new Eventlog();
         log.username = user.getName();
-        log.objectType = objectType.getClass().getSimpleName(); // oversæt til dansk xd
+        log.objectType = objectType.getClass().getSimpleName(); // oversæt til dansk på frontend xd
         log.objectName = objectName;
         log.timestamp = new Date();
         log.action = action;
