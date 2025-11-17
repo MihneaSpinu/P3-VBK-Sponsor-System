@@ -19,14 +19,14 @@ public class Eventlog {
     private String objectType; // .getClass().getSimpleName();
     private String objectName;
     private Date timestamp;
-    private Action action; // String måske?
+    private int action; // String måske?
 
-    protected Eventlog() {} // lav private constructor, med method som wrapper så changelog kan bruge samme, .create måske
+    protected Eventlog() {}
     /*
     public Eventlog(User user, String objectType, String objectName, Action action) {
         this.username = user.getName();
-        this.objectType = objectType.getClass().getSimpleName(); // oversæt til dansk xd
-        this.objectName = objectName; // object.getName(); i stedet hvis generisk klasse
+        this.objectType = objectType.getClass().getSimpleName();
+        this.objectName = objectName;
         this.timestamp = new Date();
         this.action = action;
     }
@@ -37,7 +37,7 @@ public class Eventlog {
     }
 
 
-    public static Eventlog create(User user, String objectType, String objectName, Action action) {
+    public static Eventlog create(User user, Object objectType, String objectName, int action) {
         Eventlog log = new Eventlog();
         log.username = user.getName();
         log.objectType = objectType.getClass().getSimpleName(); // oversæt til dansk på frontend xd
