@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Archive</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="filter.js"></script>
 </head>
 <body class="bg-gray-100 text-gray-900">
 
@@ -36,10 +37,25 @@
 
         <!-- Column headers -->
         <div class="bg-gray-200 rounded-t-lg shadow-md text-sm font-semibold grid grid-cols-4">
-          <div class="px-6 py-3 border-r">Sponsor name ▾</div>
-          <div class="px-6 py-3 border-r">Description ▾</div>
-          <div class="px-6 py-3 border-r">Payment ▾</div>
-          <div class="px-6 py-3">Active periods ▾</div>
+          <div class="px-6 py-3 border-r flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span>Sponsor name</span>
+              <label for="sortSelect" class="sr-only">Sort</label>
+              <select id="sortSelect" class="bg-white border text-xs rounded px-2 py-1">
+                <option value="">Sort</option>
+                <option value="name-asc">Name A→Z</option>
+                <option value="name-desc">Name Z→A</option>
+                <option value="payment-desc">Max payment ↓</option>
+                <option value="date-asc">Earliest start ↑</option>
+              </select>
+            </div>
+            <div class="flex items-center">
+              <button id="openFilterBtn" class="ml-4 bg-white border px-2 py-1 text-xs rounded hover:bg-gray-100">Filter</button>
+            </div>
+          </div>
+          <div class="px-6 py-3 border-r">Description</div>
+          <div class="px-6 py-3 border-r">Payment</div>
+          <div class="px-6 py-3">Active periods</div>
         </div>
 
         <!-- Sponsor cards -->
@@ -126,4 +142,55 @@
   </div>
 
 </body>
+  <!-- Filter Modal -->
+  <div id="filterModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg w-11/12 max-w-2xl p-6 shadow-lg">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">Filter sponsors</h2>
+        <button id="closeFilterBtn" class="text-gray-600 hover:text-gray-900">✕</button>
+      </div>
+
+      <form id="filterForm" class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Name contains</label>
+          <input id="filterName" type="text" class="mt-1 block w-full rounded border-gray-300 shadow-sm" placeholder="e.g. Spar">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Description contains</label>
+          <input id="filterDescription" type="text" class="mt-1 block w-full rounded border-gray-300 shadow-sm" placeholder="e.g. ipsum">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Min payment (kr)</label>
+          <input id="filterMinPayment" type="number" min="0" class="mt-1 block w-full rounded border-gray-300 shadow-sm" placeholder="0">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Max payment (kr)</label>
+          <input id="filterMaxPayment" type="number" min="0" class="mt-1 block w-full rounded border-gray-300 shadow-sm" placeholder="e.g. 50000">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Active start (from)</label>
+          <input id="filterDateFrom" type="date" class="mt-1 block w-full rounded border-gray-300 shadow-sm">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Active end (to)</label>
+          <input id="filterDateTo" type="date" class="mt-1 block w-full rounded border-gray-300 shadow-sm">
+        </div>
+
+        <div class="col-span-2 flex justify-between mt-4">
+          <div>
+            <button id="applyFilterBtn" type="button" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Apply</button>
+            <button id="clearFilterBtn" type="button" class="ml-2 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Clear</button>
+          </div>
+          <div>
+            <button id="closeFilterBtnBottom" type="button" class="bg-white border px-3 py-2 rounded hover:bg-gray-50">Close</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
 </html>
