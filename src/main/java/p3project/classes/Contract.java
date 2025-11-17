@@ -1,16 +1,25 @@
 package p3project.classes;
-
 import java.time.LocalDate;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 
+
+@Entity
 public class Contract {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private LocalDate startDate;
     private LocalDate endDate;
     private int payment;
     private boolean status;
-    private Type type;
+    private String type;
 
     @Lob
     @Column(name = "pdf_data")
@@ -23,7 +32,11 @@ public class Contract {
         this.endDate = endDate;
         this.payment = payment;
         this.status = status;
-          this.type = new Type(typeName);
+        this.type = typeName;
+    }
+
+    public Contract() {
+    // required by JPA
     }
 
     public LocalDate getStartDate() {
@@ -65,10 +78,10 @@ public class Contract {
     public void setStatus(boolean status) {
         this.status = status;
     }
-        public Type getType() {
+    public String getType() {
         return type;
     }
-    public void setType(Type type)
+    public void setType(String type)
     {
         this.type = type;
     }

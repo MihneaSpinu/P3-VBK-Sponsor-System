@@ -131,9 +131,10 @@
             </form>
         </div>
         <div >
-            <form action="/uploadFile" method="post">
+            <form action="/uploadFile" method="post" enctype="multipart/form-data">
                 <label for="fileyesyes">Get THis?</label>
-                <input type="file" id="fileyesyes">
+                <input type="file" id="fileyesyes" name = "pdffile">
+                <button type="submit">Upload</button>
             </form>    
         </div>
         <a href="/users" class="refresh-btn button">Refresh List</a>
