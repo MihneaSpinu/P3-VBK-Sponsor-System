@@ -3,13 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
     <!-- <link rel="stylesheet" href="/style.css"> -->
 </head>
 
 <style>
-
     header {
         position: fixed;
         top: 0;
@@ -28,7 +27,7 @@
         margin: 10px;
         padding: 10px 20px;
         border: none;
-        font-size : 20px;
+        font-size: 20px;
         background-color: darkgrey;
         transition-duration: 0.3s;
         cursor: pointer;
@@ -104,7 +103,7 @@
         align-items: center;
     }
 
-        .UserList ul {
+    .UserList ul {
         list-style: none;
         padding: 0;
         margin: 0;
@@ -152,56 +151,63 @@
     }
 </style>
 
-<body> 
-    <header> 
-        <h1 class="NavBarTitle">VBK Sponsor System</h1>
-        <div class="NavBox">
-        <nav>
-            <button class="Button NavBtn" id="HomePageBtn" onclick="window.location.href='/HomePage.html'">Forside</button>
-            <button class="Button NavBtn" id="ChangeLogBtn" onclick="window.location.href='/ChangeLog.html'">Change log</button>
-            <button class="Button NavBtn" id="Archive" onclick="window.location.href='/Archive.html'">Arkiv</button>
-            <button class="Button NavBtn" id="AdminPanelBtn" onclick="window.location.href='/AdminPanel.html'">Admin panel</button>
-            <button class="Button LogOutBtn" id="LogOutBtn" onclick="window.location.href='/LogIn.html'">Log ud</button>
-        </nav>
-        </div>
-    </header>
-    <main> 
+<body>
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md p-4 flex flex-col justify-between">
         <div>
-        <h2 class="FontTitle">Brugere</h2>
-        <div class="UserList">
-            <ul>
-                <button class="Button UserBtn" id="UserBtn1" onclick="">Bruger 1</button>
-                <button class="Button UserBtn" id="UserBtn2" onclick="">Bruger 2</button>
-                <button class="Button UserBtn" id="UserBtn3" onclick="">Bruger 3</button>
-                <button class="Button UserBtn" id="UserBtn4" onclick="">Bruger 4</button>
-                <button class="Button UserBtn" id="UserBtn5" onclick="">Bruger 5</button>
-                <button class="Button UserBtn" id="UserBtn6" onclick="">Bruger 6</button>
-                <button class="Button UserBtn" id="UserBtn7" onclick="">Bruger 7</button>
-                <button class="Button UserBtn" id="UserBtn8" onclick="">Bruger 8</button>
-                <button class="Button UserBtn" id="UserBtn9" onclick="">Bruger 9</button>
-                <button class="Button UserBtn" id="UserBtn10" onclick="">Bruger 10</button>
-                <button class="Button UserBtn" id="UserBtn11" onclick="">Bruger 11</button>
-                <button class="Button UserBtn" id="UserBtn12" onclick="">Bruger 12</button>
-                <button class="Button UserBtn" id="UserBtn13" onclick="">Bruger 13</button>
-                <button class="Button UserBtn" id="UserBtn14" onclick="">Bruger 14</button>
-                <button class="Button UserBtn" id="UserBtn15" onclick="">Bruger 15</button>
-                <button class="Button UserBtn" id="UserBtn16" onclick="">Bruger 16</button>
-                <button class="Button UserBtn" id="UserBtn17" onclick="">Bruger 17</button>
-                <button class="Button UserBtn" id="UserBtn18" onclick="">Bruger 18</button>
-                <button class="Button UserBtn" id="UserBtn19" onclick="">Bruger 19</button>
+            <div class="bg-green-200 text-center py-3 rounded-md font-semibold mb-6">
+                VBK Sponsor System
+            </div>
 
-            </ul>
-        </div>
+            <div class="flex flex-col gap-4">
+                <button class="bg-gray-200 py-2 rounded hover:bg-gray-300">Homepage</button>
+                <button class="bg-gray-200 py-2 rounded hover:bg-gray-300">Change log</button>
+                <button class="bg-green-200 py-2 rounded hover:bg-green-300">Archive</button>
+                <button class="bg-gray-200 py-2 rounded hover:bg-gray-300">Admin panel</button>
+            </div>
         </div>
 
+        <button class="bg-gray-200 py-2 rounded hover:bg-gray-300 mt-6">Log out</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main>
         <div>
-        <h3 class="FontTitle">Opret bruger</h3>
-        <div class="CreateUser">
-            <input type="text" id="UserName" placeholder="Skriv brugernavn" style="margin: 10px">
-            <input type="text" id="UserPassword" placeholder="Skriv adgangskode" style="margin: 10px">
-            <input type="text" id="UserPasswordRepeat" placeholder="Gentag adgangskode" style="margin: 10px">
-            <button id="createProjectBtn">Opret bruger</button>
+            <h2 class="FontTitle">Brugere</h2>
+            <div class="UserList">
+                <ul>
+                    <button class="Button UserBtn" id="UserBtn1" onclick="">Bruger 1</button>
+                    <button class="Button UserBtn" id="UserBtn2" onclick="">Bruger 2</button>
+                    <button class="Button UserBtn" id="UserBtn3" onclick="">Bruger 3</button>
+                    <button class="Button UserBtn" id="UserBtn4" onclick="">Bruger 4</button>
+                    <button class="Button UserBtn" id="UserBtn5" onclick="">Bruger 5</button>
+                    <button class="Button UserBtn" id="UserBtn6" onclick="">Bruger 6</button>
+                    <button class="Button UserBtn" id="UserBtn7" onclick="">Bruger 7</button>
+                    <button class="Button UserBtn" id="UserBtn8" onclick="">Bruger 8</button>
+                    <button class="Button UserBtn" id="UserBtn9" onclick="">Bruger 9</button>
+                    <button class="Button UserBtn" id="UserBtn10" onclick="">Bruger 10</button>
+                    <button class="Button UserBtn" id="UserBtn11" onclick="">Bruger 11</button>
+                    <button class="Button UserBtn" id="UserBtn12" onclick="">Bruger 12</button>
+                    <button class="Button UserBtn" id="UserBtn13" onclick="">Bruger 13</button>
+                    <button class="Button UserBtn" id="UserBtn14" onclick="">Bruger 14</button>
+                    <button class="Button UserBtn" id="UserBtn15" onclick="">Bruger 15</button>
+                    <button class="Button UserBtn" id="UserBtn16" onclick="">Bruger 16</button>
+                    <button class="Button UserBtn" id="UserBtn17" onclick="">Bruger 17</button>
+                    <button class="Button UserBtn" id="UserBtn18" onclick="">Bruger 18</button>
+                    <button class="Button UserBtn" id="UserBtn19" onclick="">Bruger 19</button>
+
+                </ul>
+            </div>
         </div>
+
+        <div>
+            <h3 class="FontTitle">Opret bruger</h3>
+            <div class="CreateUser">
+                <input type="text" id="UserName" placeholder="Skriv brugernavn" style="margin: 10px">
+                <input type="text" id="UserPassword" placeholder="Skriv adgangskode" style="margin: 10px">
+                <input type="text" id="UserPasswordRepeat" placeholder="Gentag adgangskode" style="margin: 10px">
+                <button id="createProjectBtn">Opret bruger</button>
+            </div>
         </div>
 
     </main>
