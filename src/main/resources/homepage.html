@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,8 +9,10 @@
   <style>
     body {
       margin: 0;
-      background-color: #f3f4f6; /* gray-100 */
-      color: #111827; /* gray-900 */
+      background-color: #f3f4f6;
+      /* gray-100 */
+      color: #111827;
+      /* gray-900 */
       font-family: system-ui, sans-serif;
       display: flex;
       min-height: 100vh;
@@ -22,7 +25,8 @@
 
     /* Sidebar */
     .sidebar {
-      width: 16rem; /* 64 in Tailwind */
+      width: 16rem;
+      /* 64 in Tailwind */
       background-color: #fff;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       padding: 1rem;
@@ -32,7 +36,8 @@
     }
 
     .logo {
-      background-color: #bbf7d0; /* green-200 */
+      background-color: #bbf7d0;
+      /* green-200 */
       text-align: center;
       padding: 0.75rem;
       border-radius: 0.375rem;
@@ -47,7 +52,8 @@
     }
 
     .menu-btn {
-      background-color: #e5e7eb; /* gray-200 */
+      background-color: #e5e7eb;
+      /* gray-200 */
       padding: 0.5rem;
       border: none;
       border-radius: 0.375rem;
@@ -56,7 +62,8 @@
     }
 
     .menu-btn:hover {
-      background-color: #d1d5db; /* gray-300 */
+      background-color: #d1d5db;
+      /* gray-300 */
     }
 
     .logout-btn {
@@ -127,255 +134,260 @@
     }
 
     .status.red {
-      background-color: #f87171; /* red-400 */
+      background-color: #f87171;
+      /* red-400 */
     }
 
     .status.yellow {
-      background-color: #fde68a; /* yellow-300 */
+      background-color: #fde68a;
+      /* yellow-300 */
       color: #111827;
     }
 
     .status.green {
-      background-color: #4ade80; /* green-400 */
+      background-color: #4ade80;
+      /* green-400 */
     }
 
-  .sponsor-clickable {
-    color: inherit;
-    text-decoration: none;
-    display: inline-block;
-    width: 100%;
-    cursor: pointer;
-    padding: 0;
-  }
+    .sponsor-clickable {
+      color: inherit;
+      text-decoration: none;
+      display: inline-block;
+      width: 100%;
+      cursor: pointer;
+      padding: 0;
+    }
 
-  .contract-clickable {
-    color: inherit;
-    text-decoration: none;
-    display: inline-block;
-    width: 100%;
-    cursor: pointer;
-    padding: 0;
-  }
-  .sponsor-link:hover {
-    text-decoration: underline;
-  }
+    .contract-clickable {
+      color: inherit;
+      text-decoration: none;
+      display: inline-block;
+      width: 100%;
+      cursor: pointer;
+      padding: 0;
+    }
 
-  .contract-link:hover {
-    text-decoration: underline;
-  }
+    .sponsor-link:hover {
+      text-decoration: underline;
+    }
 
-   #Smodal {
-   position: fixed;
-   top: 0;
-   left: 0;
-   height: 100%;
-   width: 100%;
-   background-color: rgba(0,0,0,.5);
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   }
+    .contract-link:hover {
+      text-decoration: underline;
+    }
 
-   #Smodal:not(:target) {
-   visibility: hidden;
-   opacity: 0;
-   }
-  
-   #Cmodal {
-   position: fixed;
-   top: 0;
-   left: 0;
-   height: 100%;
-   width: 100%;
-   background-color: rgba(0,0,0,.5);
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   }
+    #Smodal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(0, 0, 0, .5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-   #Cmodal:not(:target) {
-   visibility: hidden;
-   opacity: 0;
-   }
+    #Smodal:not(:target) {
+      visibility: hidden;
+      opacity: 0;
+    }
 
-  .ModalBox {
-  background-color:#d1d5db;
-  padding: 10px;
-  border-radius: 10px;
-  max-width: 90vw;
-  width: min(600px, 90vw);
-  max-height: 90vh;
-  height: auto;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  }
+    #Cmodal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(0, 0, 0, .5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-  .ModalRow {
-  display: flex;
-  flex-direction: row;
-  gap: 30px;
-  margin-top: 10px;
-  width: 100%;
-  justify-content: center;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  }
+    #Cmodal:not(:target) {
+      visibility: hidden;
+      opacity: 0;
+    }
 
-  .SponsorContract {
-  background-color:#e5e7eb;
-  padding: 20px;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  max-width: fit-content;
-  width: 200px;
-  min-height: 0;
-  flex: 0 0 200px;
-  align-items: center;
-  }
+    .ModalBox {
+      background-color: #d1d5db;
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 90vw;
+      width: min(600px, 90vw);
+      max-height: 90vh;
+      height: auto;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
 
-   .ContractInfo {
-  background-color:#e5e7eb;
-  padding: 10px;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  max-width: fit-content;
-  width: 200px;
-  min-height: 0;
-  flex: 0 0 200px;
-  align-items: center;
-  }
+    .ModalRow {
+      display: flex;
+      flex-direction: row;
+      gap: 30px;
+      margin-top: 10px;
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
 
-  .ContractStatus {
-  background-color: #e5e7eb;
-  padding: 10px;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  max-width: fit-content;
-  width: 200px;
-  min-height: 0;
-  flex: 0 0 200px;
-  }
+    .SponsorContract {
+      background-color: #e5e7eb;
+      padding: 20px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      max-width: fit-content;
+      width: 200px;
+      min-height: 0;
+      flex: 0 0 200px;
+      align-items: center;
+    }
 
-  .SponsorStatus {
-  background-color: #e5e7eb;
-  padding: 10px;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  max-width: fit-content;
-  width: 200px;
-  min-height: 0;
-  flex: 0 0 200px;
-  }
+    .ContractInfo {
+      background-color: #e5e7eb;
+      padding: 10px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      max-width: fit-content;
+      width: 200px;
+      min-height: 0;
+      flex: 0 0 200px;
+      align-items: center;
+    }
 
-  .SponsorContactInfo {
-  background-color: #e5e7eb;
-  padding: 10px;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  max-width: fit-content;
-  width: 200px;
-  min-height: 0;
-  flex: 0 0 200px;
-  }
+    .ContractStatus {
+      background-color: #e5e7eb;
+      padding: 10px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: fit-content;
+      width: 200px;
+      min-height: 0;
+      flex: 0 0 200px;
+    }
 
-  .ModalTitle {
-  font-size: 24px;
-  padding: 10px;
-  border-radius: 10px;
-  max-width: fit-content;
-  max-height: fit-content;
-  font-weight: bold;
-  margin-bottom: 10px;
-  background-color: #e5e7eb;
-  }
+    .SponsorStatus {
+      background-color: #e5e7eb;
+      padding: 10px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: fit-content;
+      width: 200px;
+      min-height: 0;
+      flex: 0 0 200px;
+    }
 
-  .title {
-  font-size: 18px; 
-  background-color: #fff;
-  padding: 10px;
-  border-radius: 10px;
-  }
+    .SponsorContactInfo {
+      background-color: #e5e7eb;
+      padding: 10px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: fit-content;
+      width: 200px;
+      min-height: 0;
+      flex: 0 0 200px;
+    }
 
-  .CloseModal {
-  position: absolute; 
-  top: 8px; right: 8px;
-  text-decoration: none;
-  font-size: 18px;
-  font-weight: bold;
-  color: #111827;
-  background-color: #e5e7eb;
-  padding: 5px 10px;
-  border-radius: 5px;
-  }
+    .ModalTitle {
+      font-size: 24px;
+      padding: 10px;
+      border-radius: 10px;
+      max-width: fit-content;
+      max-height: fit-content;
+      font-weight: bold;
+      margin-bottom: 10px;
+      background-color: #e5e7eb;
+    }
 
-  .ModalTag {
-  display: flex;
-  background-color: #fff;
-  padding: 10px;
-  margin: 10px;
-  border-radius: 10px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  }
+    .title {
+      font-size: 18px;
+      background-color: #fff;
+      padding: 10px;
+      border-radius: 10px;
+    }
 
-  .ModalTagRed {
-  display: flex;
-  background-color: #f87171;
-  padding: 10px;
-  margin: 10px;
-  border-radius: 10px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  }
+    .CloseModal {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: bold;
+      color: #111827;
+      background-color: #e5e7eb;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
 
-  .ModalTagYellow {
-  display: flex;
-  background-color: #fde68a;
-  padding: 10px;
-  margin: 10px;
-  border-radius: 10px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  }
+    .ModalTag {
+      display: flex;
+      background-color: #fff;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 10px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
 
-  .ModalTagGreen {
-  display: flex;
-  background-color: #4ade80;
-  padding: 10px;
-  margin: 10px;
-  border-radius: 10px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  }
+    .ModalTagRed {
+      display: flex;
+      background-color: #f87171;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 10px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
 
+    .ModalTagYellow {
+      display: flex;
+      background-color: #fde68a;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 10px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .ModalTagGreen {
+      display: flex;
+      background-color: #4ade80;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 10px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
   </style>
   <link rel="stylesheet" href="style.css" />
-  
+
 </head>
+
 <body class="bg-gray-100 text-gray-900">
 
   <div class="container">
@@ -397,7 +409,7 @@
     </aside>
 
     <!-- Sponsor Modal-->
-        <!-- Sponsor Modal-->
+    <!-- Sponsor Modal-->
     <div id="Smodal">
       <div class="ModalBox">
         <h1 class="ModalTitle">Indsæt sponsor navn</h1>
@@ -407,26 +419,26 @@
         <div class="ModalRow">
           <div class="SponsorContract">
             <h2 class="title">Kontrakter</h2>
-              <a class="ModalTag contract-clickable" href="#Cmodal">Kontrakt #1</a>
-              <a class="ModalTag contract-clickable" href="#Cmodal">Kontrakt #2</a>
-              <a class="ModalTag contract-clickable" href="#Cmodal">Kontrakt #3</a>
+            <a class="ModalTag contract-clickable" href="#Cmodal">Kontrakt #1</a>
+            <a class="ModalTag contract-clickable" href="#Cmodal">Kontrakt #2</a>
+            <a class="ModalTag contract-clickable" href="#Cmodal">Kontrakt #3</a>
           </div>
           <div class="SponsorContactInfo">
             <h2 class="title">Kontakt information</h2>
-              <p><span id="SponsorCity" class="ModalTag">By og postnummer</span></p>
-              <p><span id="SponsorAdress" class="ModalTag">Adresse</span></p>
-              <p><span id="SponsorCVR" class="ModalTag">CVR nummer</span></p>
-              <p><span id="SponsorContactPerson" class="ModalTag">Kontaktperson</span></p>
-              <p><span id="SponsorEmail" class="ModalTag">Email</span></p>
-              <p><span id="SponsorPhoneNumber" class="ModalTag">Telefonnummer</span></p>
-              <button class="ModalTag">Opdater info</button>
+            <p><span id="SponsorCity" class="ModalTag">By og postnummer</span></p>
+            <p><span id="SponsorAdress" class="ModalTag">Adresse</span></p>
+            <p><span id="SponsorCVR" class="ModalTag">CVR nummer</span></p>
+            <p><span id="SponsorContactPerson" class="ModalTag">Kontaktperson</span></p>
+            <p><span id="SponsorEmail" class="ModalTag">Email</span></p>
+            <p><span id="SponsorPhoneNumber" class="ModalTag">Telefonnummer</span></p>
+            <button class="ModalTag">Opdater info</button>
 
           </div>
           <div class="SponsorStatus">
             <h2 class="title">Status</h2>
-              <div class="ModalTagRed">Inaktiv</div>
-              <div class="ModalTagYellow">Igang</div>
-              <div class="ModalTagGreen">Aktiv</div>
+            <div class="ModalTagRed">Inaktiv</div>
+            <div class="ModalTagYellow">Igang</div>
+            <div class="ModalTagGreen">Aktiv</div>
           </div>
         </div>
       </div>
@@ -442,97 +454,96 @@
         <div class="ModalRow">
           <div class="ContractInfo">
             <h3 class="title">Kontrakt type</h3>
-              <div class="ModalTag">Guld kontrakt</div>
+            <div class="ModalTag">Guld kontrakt</div>
           </div>
           <div class="ContractStatus">
             <h3 class="title">Status</h3>
-              <div class="ModalTagRed">Inaktiv</div>
+            <div class="ModalTagRed">Inaktiv</div>
           </div>
           <div class="ContractInfo">
             <h3 class="title">Dato</h3>
-              <div class="ModalTag">02/02/2025 - 02/02/2026</div>
+            <div class="ModalTag">02/02/2025 - 02/02/2026</div>
           </div>
           <div class="ContractInfo">
             <h3 class="title">Ydelser</h3>
-              <div class="ModalTag">Logo på hold trøje</div>
-              <div class="ModalTag">Logo på bande</div>
-              <div class="ModalTag">10 gratis billeter per sæson</div>
-              <div class="ModalTag">Logo i klubhus</div>
-              <div class="ModalTag">3 gratis hotdog per kamp</div>
+            <div class="ModalTag">Logo på hold trøje</div>
+            <div class="ModalTag">Logo på bande</div>
+            <div class="ModalTag">10 gratis billeter per sæson</div>
+            <div class="ModalTag">Logo i klubhus</div>
+            <div class="ModalTag">3 gratis hotdog per kamp</div>
           </div>
           <div class="ContractInfo">
             <h3 class="title">Betaling</h3>
-              <div class="ModalTag">25.000 kr</div>
+            <div class="ModalTag">25.000 kr</div>
           </div>
         </div>
         <div class="ModalRow">
           <div>
-            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank"><button class="ModalTag">Åben PDF</button></a>
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank"><button class="ModalTag">Åben
+                PDF</button></a>
           </div>
-            <label class="ModalTag" style="cursor:pointer;">
-              Vedhæft PDF
-              <input type="file" accept="application/pdf" style="display:none;">
-            </label>
+          <label class="ModalTag" style="cursor:pointer;">
+            Vedhæft PDF
+            <input type="file" accept="application/pdf" style="display:none;">
+          </label>
         </div>
       </div>
     </div>
 
     <!-- Main Content -->
     <main class="main-content">
-  <div class="table-wrapper">
-    <table class="sponsor-table">
-      <thead>
-        <tr>
-          <th>Sponsor name ▾</th>
-          <th>Services ▾</th>
-          <th>Status ▾</th>
-          <th>Date ▾</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr th:each="sponsor : ${sponsors}">
-          <td>
-            <a class="sponsor-clickable" href="#Smodal"
-              th:attr="data-name=${sponsor.sponsorName}, 
+      <div class="table-wrapper">
+        <table class="sponsor-table">
+          <thead>
+            <tr>
+              <th>Sponsor name ▾</th>
+              <th>Services ▾</th>
+              <th>Status ▾</th>
+              <th>Date ▾</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="sponsor : ${sponsors}">
+              <td>
+                <a class="sponsor-clickable" href="#Smodal" th:attr="data-name=${sponsor.sponsorName}, 
                         data-contact=${sponsor.contactPerson}, 
                         data-email=${sponsor.email},
                         data-phone=${sponsor.phoneNumber},
                         data-cvr=${sponsor.cvrNumber},
                         data-status=${sponsor.status},
-                        data-comments=${sponsor.comments}"
-              th:text="${sponsor.sponsorName}">Sponsor Name</a>
-          </td>
-          <td>
-            <div class="col-list">
-              <div class="tag" th:text="${sponsor.contactPerson}">Contact</div>
-            </div>
-          </td>
-          <td>
-            <div class="col-list">
-              <div th:text="${sponsor.status ? 'Aktiv' : 'Inaktiv'}" 
-                  th:classappend="${sponsor.status ? 'status green' : 'status red'}">Status</div>
-            </div>
-          </td>
-          <td>
-            <div class="col-list">
-              <div class="tag" th:text="${sponsor.comments}">Comments</div>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</main>
+                        data-comments=${sponsor.comments}" th:text="${sponsor.sponsorName}">Sponsor Name</a>
+              </td>
+              <td>
+                <div class="col-list">
+                  <div class="tag" th:text="${sponsor.contactPerson}">Contact</div>
+                </div>
+              </td>
+              <td>
+                <div class="col-list">
+                  <div th:text="${sponsor.status ? 'Aktiv' : 'Inaktiv'}"
+                    th:classappend="${sponsor.status ? 'status green' : 'status red'}">Status</div>
+                </div>
+              </td>
+              <td>
+                <div class="col-list">
+                  <div class="tag" th:text="${sponsor.comments}">Comments</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
   </div>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const sponsorLinks = document.querySelectorAll('.sponsor-clickable');
-      
+
       sponsorLinks.forEach(link => {
-        link.addEventListener('click', function(event){
+        link.addEventListener('click', function (event) {
 
           event.preventDefault();
-          
+
           // Get data attributes
           const name = this.getAttribute('data-name')
           const contact = this.getAttribute('data-contact');
@@ -553,4 +564,5 @@
     })
   </script>
 </body>
+
 </html>
