@@ -1,3 +1,4 @@
+package p3project.classes;
 import java.time.LocalDate;
 
 public class Contract {

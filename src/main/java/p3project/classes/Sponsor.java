@@ -1,3 +1,4 @@
+package p3project.classes;
 public class Sponsor {
     private String sponsorName;
     private String contactPerson;

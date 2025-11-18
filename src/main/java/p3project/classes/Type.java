@@ -1,3 +1,4 @@
+package p3project.classes;
 public class Type {
     private String name; 
 

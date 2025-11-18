@@ -1,3 +1,4 @@
+package p3project.classes;
 public class Service {
     
     private ServiceType type;
