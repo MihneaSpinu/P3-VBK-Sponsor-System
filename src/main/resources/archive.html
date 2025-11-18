@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Archive</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="filter.js"></script>
+  <script th:src="@{/js/filter.js}"></script>
 </head>
 
 <body class="bg-gray-100 text-gray-900">
@@ -18,7 +18,7 @@
       <div>
         <div class="bg-green-200 text-center py-3 rounded-md font-semibold mb-6 flex flex-col items-center">
           VBK Sponsor System
-          <img src="Vejgaard_BK_logo.png" alt="Vejgaard_BK_logo" class="h-20 w-20 mt-2">
+          <img th:src="@{/images/Vejgaard_BK_logo.png}" alt="Vejgaard_BK_logo" class="h-20 w-20 mt-2">
         </div>
 
         <div class="flex flex-col gap-4">
@@ -144,7 +144,6 @@
   </div>
 
 </body>
-<<<<<<< HEAD
   <!-- Filter Modal -->
   <div id="filterModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
     <div class="bg-white rounded-lg w-11/12 max-w-2xl p-6 shadow-lg">
@@ -197,7 +196,3 @@
     </div>
   </div>
 </html>
-=======
-
-</html>
->>>>>>> Mihnea
