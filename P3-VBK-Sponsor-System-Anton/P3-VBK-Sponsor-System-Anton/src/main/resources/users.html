@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,27 +10,23 @@
             margin: 40px;
             background-color: #f5f5f5;
         }
-
         .container {
             max-width: 800px;
             margin: 0 auto;
             background-color: white;
             padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-
         h1 {
             color: #333;
             text-align: center;
             margin-bottom: 30px;
         }
-
         .user-list {
             list-style: none;
             padding: 0;
         }
-
         .user-item {
             background-color: #f9f9f9;
             margin: 10px 0;
@@ -39,56 +34,46 @@
             border-radius: 5px;
             border-left: 4px solid #007bff;
         }
-
         .user-name {
             font-weight: bold;
             font-size: 18px;
             color: #333;
         }
-
         .user-email {
             color: #666;
             margin-top: 5px;
         }
-
         .user-id {
             color: #999;
             font-size: 12px;
         }
-
         .no-users {
             text-align: center;
             color: #666;
             font-style: italic;
             margin-top: 50px;
         }
-
         .add-user-form {
             margin-top: 40px;
             padding: 20px;
             background-color: #e9ecef;
             border-radius: 5px;
         }
-
         .form-group {
             margin-bottom: 15px;
         }
-
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
-
-        input[type="text"],
-        input[type="email"] {
+        input[type="text"], input[type="email"] {
             width: 100%;
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
         }
-
         button {
             background-color: #007bff;
             color: white;
@@ -97,11 +82,9 @@
             border-radius: 4px;
             cursor: pointer;
         }
-
         button:hover {
             background-color: #0056b3;
         }
-
         .refresh-btn {
             display: block;
             margin: 20px auto;
@@ -110,11 +93,10 @@
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <h1>User Database</h1>
-
+        
         <!-- User List -->
         <div th:if="${not #lists.isEmpty(users)}">
             <h2>All Users (Total: <span th:text="${#lists.size(users)}"></span>)</h2>
@@ -126,13 +108,13 @@
                 </li>
             </ul>
         </div>
-
+        
         <!-- No Users Message -->
         <div th:if="${#lists.isEmpty(users)}" class="no-users">
             <h2>No users found in the database</h2>
             <p>Add some users using the form below!</p>
         </div>
-
+        
         <!-- Add User Form -->
         <div class="add-user-form">
             <h3>Add New User</h3>
@@ -148,18 +130,8 @@
                 <button type="submit">Add User</button>
             </form>
         </div>
-        <div >
-            <form action="/uploadFile" method="post" enctype="multipart/form-data">
-                <label for="fileyesyes">Get THis?</label>
-                <input type="file" id="fileyesyes" name = "pdffile">
-                <button type="submit">Upload</button>
-            </form>    
-        </div>
+        
         <a href="/users" class="refresh-btn button">Refresh List</a>
     </div>
-    <div>
-        <button onclick="location.href='/test'">test</button>
-    </div>
 </body>
-
 </html>

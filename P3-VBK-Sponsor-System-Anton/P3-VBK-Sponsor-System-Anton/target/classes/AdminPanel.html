@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Admin Panel</title>
+    <!-- <link rel="stylesheet" href="/style.css"> -->
+</head>
+
+<style>
+
+    header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .Button {
+        border-radius: 10px;
+        text-align: center;
+        display: inline-block;
+        margin: 10px;
+        padding: 10px 20px;
+        border: none;
+        font-size : 20px;
+        background-color: darkgrey;
+        transition-duration: 0.3s;
+        cursor: pointer;
+    }
+
+    .LogOutBtn {
+        position: fixed;
+        text-align: center;
+        bottom: 100px;
+        left: 10px;
+        margin: 10px;
+        padding: 10px;
+        width: 200px;
+    }
+
+    .LogOutBtn:hover {
+        background-color: dodgerblue;
+        color: white;
+    }
+
+    .NavBtn {
+        display: block;
+        margin: 10px;
+        padding: 10px;
+        width: 200px;
+    }
+
+    .NavBtn:hover {
+        background-color: dodgerblue;
+        color: white;
+    }
+
+    .NavBox {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        border-radius: 10px;
+        background-color: lightgrey;
+        padding: 10px;
+        margin: 10px;
+        width: 200px;
+    }
+
+    .NavBarTitle {
+        border-radius: 10px;
+        background-color: dodgerblue;
+        font-size: 20px;
+        font-weight: bold;
+        margin: 10px;
+        padding: 10px;
+        width: 200px;
+        text-align: center;
+    }
+
+    main {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 20px;
+        margin: 10px;
+    }
+
+    .UserList {
+        border-radius: 10px;
+        background-color: lightgrey;
+        padding: 20px;
+        margin: 50px;
+        margin-top: 10px;
+        width: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+        .UserList ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .CreateUser {
+        border-radius: 10px;
+        background-color: lightgrey;
+        padding: 20px;
+        margin: 50px;
+        margin-top: 10px;
+        width: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .FontTitle {
+        border-radius: 10px;
+        background-color: lightgrey;
+        font-size: 30px;
+        font-weight: bold;
+        margin: 50px;
+        margin-bottom: 10px;
+        padding: 10px;
+        width: 200px;
+        text-align: center;
+    }
+
+    .UserBtn {
+        display: block;
+        margin: 10px;
+        padding: 10px;
+        width: 200px;
+    }
+
+    .UserBtn:hover {
+        background-color: dodgerblue;
+        color: white;
+    }
+</style>
+
+<body> 
+    <header> 
+        <h1 class="NavBarTitle">VBK Sponsor System</h1>
+        <div class="NavBox">
+        <nav>
+            <button class="Button NavBtn" id="HomePageBtn" onclick="window.location.href='/HomePage.html'">Forside</button>
+            <button class="Button NavBtn" id="ChangeLogBtn" onclick="window.location.href='/ChangeLog.html'">Change log</button>
+            <button class="Button NavBtn" id="Archive" onclick="window.location.href='/Archive.html'">Arkiv</button>
+            <button class="Button NavBtn" id="AdminPanelBtn" onclick="window.location.href='/AdminPanel.html'">Admin panel</button>
+            <button class="Button LogOutBtn" id="LogOutBtn" onclick="window.location.href='/LogIn.html'">Log ud</button>
+        </nav>
+        </div>
+    </header>
+    <main> 
+        <div>
+        <h2 class="FontTitle">Brugere</h2>
+        <div class="UserList">
+            <ul>
+                <button class="Button UserBtn" id="UserBtn1" onclick="">Bruger 1</button>
+                <button class="Button UserBtn" id="UserBtn2" onclick="">Bruger 2</button>
+                <button class="Button UserBtn" id="UserBtn3" onclick="">Bruger 3</button>
+                <button class="Button UserBtn" id="UserBtn4" onclick="">Bruger 4</button>
+                <button class="Button UserBtn" id="UserBtn5" onclick="">Bruger 5</button>
+                <button class="Button UserBtn" id="UserBtn6" onclick="">Bruger 6</button>
+                <button class="Button UserBtn" id="UserBtn7" onclick="">Bruger 7</button>
+                <button class="Button UserBtn" id="UserBtn8" onclick="">Bruger 8</button>
+                <button class="Button UserBtn" id="UserBtn9" onclick="">Bruger 9</button>
+                <button class="Button UserBtn" id="UserBtn10" onclick="">Bruger 10</button>
+                <button class="Button UserBtn" id="UserBtn11" onclick="">Bruger 11</button>
+                <button class="Button UserBtn" id="UserBtn12" onclick="">Bruger 12</button>
+                <button class="Button UserBtn" id="UserBtn13" onclick="">Bruger 13</button>
+                <button class="Button UserBtn" id="UserBtn14" onclick="">Bruger 14</button>
+                <button class="Button UserBtn" id="UserBtn15" onclick="">Bruger 15</button>
+                <button class="Button UserBtn" id="UserBtn16" onclick="">Bruger 16</button>
+                <button class="Button UserBtn" id="UserBtn17" onclick="">Bruger 17</button>
+                <button class="Button UserBtn" id="UserBtn18" onclick="">Bruger 18</button>
+                <button class="Button UserBtn" id="UserBtn19" onclick="">Bruger 19</button>
+
+            </ul>
+        </div>
+        </div>
+
+        <div>
+        <h3 class="FontTitle">Opret bruger</h3>
+        <div class="CreateUser">
+            <input type="text" id="UserName" placeholder="Skriv brugernavn" style="margin: 10px">
+            <input type="text" id="UserPassword" placeholder="Skriv adgangskode" style="margin: 10px">
+            <input type="text" id="UserPasswordRepeat" placeholder="Gentag adgangskode" style="margin: 10px">
+            <button id="createProjectBtn">Opret bruger</button>
+        </div>
+        </div>
+
+    </main>
+    <footer>
+
+    </footer>
+</body>
+
+</html>
