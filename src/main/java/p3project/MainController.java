@@ -54,7 +54,7 @@ public class MainController {
 	}
 
 
-
+/*
     // boilerplate, kombiner på nogen måde?
     @PutMapping("/update/sponsor")
     public String updateSponsorFields(@RequestParam Sponsor sponsor) {
@@ -111,7 +111,7 @@ public class MainController {
         else if (requestObject instanceof Service)   serviceRepository.save(storedObject);
         else throw new ClassNotFoundException();
     }
-
+*/
 
     // Changelog page request (HTML)
     @GetMapping("/changelog")
