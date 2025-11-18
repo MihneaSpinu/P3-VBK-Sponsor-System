@@ -162,6 +162,21 @@ public class MainController {
 		return "AdminPanel";
 	}
 
+	@GetMapping("/login")
+	public String showLoginPage() {
+		return "login";
+	}
+
+	@GetMapping("/Loginpage3")
+	public String showLoginPage3() {
+		return "Loginpage3";
+	}
+
+	@GetMapping("/Complete")
+	public String showCompletePage() {
+		return "Complete";
+	}
+
 	@GetMapping("/homepage")
 	public String showHomepage(Model model) {
 		Iterable<Sponsor> sponsors = sponsorRepository.findAll();
@@ -230,4 +245,20 @@ public class MainController {
 		return "redirect:/users";
 	}
 
+	@PostMapping("/login/confirm")
+	public String confirmLogin(
+			@RequestParam String username,
+			@RequestParam String email,
+			Model model) {
+
+		User user = userRepository.findByName(username);
+
+		if (user == null || !user.getEmail().equals(email)) {
+			model.addAttribute("error", "Invalid username or email");
+			return "login";
+		}
+
+		model.addAttribute("user", user);
+		return "Complete";
+	}
 }
