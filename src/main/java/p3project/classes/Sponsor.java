@@ -1,16 +1,24 @@
 package p3project.classes;
+
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
+@Entity
 public class Sponsor {
+
+    @Id
     private String sponsorName;
     private String contactPerson;
     private String email;
-    private int phoneNumber;
-    private int cvrNumber;
+    private String phoneNumber;
+    private String cvrNumber;
     private boolean status;
     private String comments;
 
     // Constructor
     public Sponsor(String sponsorName, String contactPerson, String email,
-                   int phoneNumber, int cvrNumber, boolean status, String comments) {
+                    String phoneNumber, String cvrNumber, boolean status, String comments) {
         this.sponsorName = sponsorName;
         this.contactPerson = contactPerson;
         this.email = email;
@@ -18,6 +26,10 @@ public class Sponsor {
         this.cvrNumber = cvrNumber;
         this.status = status;
         this.comments = comments;
+    }
+
+    public Sponsor() {
+    // Required by JPA
     }
 
     // Getters and Setters
@@ -45,19 +57,19 @@ public class Sponsor {
         this.email = email;
     }
 
-    public int getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(int phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
-    public int getCvrNumber() {
+    public String getCvrNumber() {
         return cvrNumber;
     }
 
-    public void setCvrNumber(int cvrNumber) {
+    public void setCvrNumber(String cvrNumber) {
         this.cvrNumber = cvrNumber;
     }
 

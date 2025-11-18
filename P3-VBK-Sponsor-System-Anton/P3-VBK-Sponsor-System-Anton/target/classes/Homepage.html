@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -397,7 +397,6 @@
     </aside>
 
     <!-- Sponsor Modal-->
-        <!-- Sponsor Modal-->
     <div id="Smodal">
       <div class="ModalBox">
         <h1 class="ModalTitle">Indsæt sponsor navn</h1>
@@ -413,14 +412,13 @@
           </div>
           <div class="SponsorContactInfo">
             <h2 class="title">Kontakt information</h2>
-              <p><span id="SponsorCity" class="ModalTag">By og postnummer</span></p>
-              <p><span id="SponsorAdress" class="ModalTag">Adresse</span></p>
-              <p><span id="SponsorCVR" class="ModalTag">CVR nummer</span></p>
-              <p><span id="SponsorContactPerson" class="ModalTag">Kontaktperson</span></p>
-              <p><span id="SponsorEmail" class="ModalTag">Email</span></p>
-              <p><span id="SponsorPhoneNumber" class="ModalTag">Telefonnummer</span></p>
+              <input type="text" id="SponsorCity" class="ModalTag" placeholder="By og postnummer">
+              <input type="text" id="SponsorAdress" class="ModalTag" placeholder="Adresse">
+              <input type="text" id="SponsorCVR" class="ModalTag" placeholder="CVR nummer">
+              <input type="text" id="SponsorContactPerson" class="ModalTag" placeholder="Kontaktperson">
+              <input type="text" id="SponsorEmail" class="ModalTag" placeholder="Email">
+              <input type="text" id="SponsorPhoneNumber" class="ModalTag" placeholder="Telefonnummer">
               <button class="ModalTag">Opdater info</button>
-
           </div>
           <div class="SponsorStatus">
             <h2 class="title">Status</h2>
@@ -435,7 +433,7 @@
     <!-- Contract Modal-->
     <div id="Cmodal">
       <div class="ModalBox">
-        <h1 class="ModalTitle">Indsæt sponsor navn</h1>
+        <h1 class="ModalTitle">Indsæt sponsor navn: indsæt kontrakt navn</h1>
         <a class="CloseModal" href="#Smodal">X</a>
         <div class="ContractModal">
         </div>
@@ -469,88 +467,54 @@
           <div>
             <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank"><button class="ModalTag">Åben PDF</button></a>
           </div>
-            <label class="ModalTag" style="cursor:pointer;">
-              Vedhæft PDF
-              <input type="file" accept="application/pdf" style="display:none;">
-            </label>
+          <div>
+            <a href="#"><button class="ModalTag">Vedhæft PDF</button></a>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Main Content -->
     <main class="main-content">
-  <div class="table-wrapper">
-    <table class="sponsor-table">
-      <thead>
-        <tr>
-          <th>Sponsor name ▾</th>
-          <th>Services ▾</th>
-          <th>Status ▾</th>
-          <th>Date ▾</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr th:each="sponsor : ${sponsors}">
-          <td>
-            <a class="sponsor-clickable" href="#Smodal"
-              th:attr="data-name=${sponsor.sponsorName}, 
-                        data-contact=${sponsor.contactPerson}, 
-                        data-email=${sponsor.email},
-                        data-phone=${sponsor.phoneNumber},
-                        data-cvr=${sponsor.cvrNumber},
-                        data-status=${sponsor.status},
-                        data-comments=${sponsor.comments}"
-              th:text="${sponsor.sponsorName}">Sponsor Name</a>
-          </td>
-          <td>
-            <div class="col-list">
-              <div class="tag" th:text="${sponsor.contactPerson}">Contact</div>
-            </div>
-          </td>
-          <td>
-            <div class="col-list">
-              <div th:text="${sponsor.status ? 'Aktiv' : 'Inaktiv'}" 
-                  th:classappend="${sponsor.status ? 'status green' : 'status red'}">Status</div>
-            </div>
-          </td>
-          <td>
-            <div class="col-list">
-              <div class="tag" th:text="${sponsor.comments}">Comments</div>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <div class="table-wrapper">
+        <table class="sponsor-table">
+          <thead>
+            <tr>
+              <th>Sponsor name ▾</th>
+              <th>Services ▾</th>
+              <th>Status ▾</th>
+              <th>Date ▾</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a class="sponsor-clickable" href="#Smodal">Spar Nord</a></td>
+              <td>
+                <div class="col-list">
+                  <div class="tag">T-Shirt</div>
+                  <div class="tag">AD board</div>
+                  <div class="tag">Match tickets</div>
+                </div>
+              </td>
+              <td>
+                <div class="col-list">
+                  <div class="status red">Not ordered</div>
+                  <div class="status yellow">Getting set up</div>
+                  <div class="status green">Tickets printed</div>
+                </div>
+              </td>
+              <td>
+                <div class="col-list">
+                  <div class="tag">15/09/2025 - 02/02/2026</div>
+                  <div class="tag">15/09/2025 - 02/02/2026</div>
+                  <div class="tag">15/09/2025 - 02/02/2026</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
   </div>
-</main>
-  </div>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const sponsorLinks = document.querySelectorAll('.sponsor-clickable');
-      
-      sponsorLinks.forEach(link => {
-        link.addEventListener('click', function(event){
-
-          event.preventDefault();
-          
-          // Get data attributes
-          const name = this.getAttribute('data-name')
-          const contact = this.getAttribute('data-contact');
-          const email = this.getAttribute('data-email');
-          const phone = this.getAttribute('data-phone');
-          const cvr = this.getAttribute('data-cvr');
-          const status = this.getAttribute('data-status');
-          const comments = this.getAttribute('data-comments');
-
-          document.getElementById("SponsorCity").textContent = "woops";
-          document.getElementById("SponsorAdress").textContent = "woops again";
-          document.getElementById("SponsorCVR").textContent = cvr;
-          document.getElementById("SponsorContactPerson").textContent = contact;
-          document.getElementById("SponsorEmail").textContent = email;
-          document.getElementById("SponsorPhoneNumber").textContent = phone;
-        })
-      })
-    })
-  </script>
 </body>
 </html>

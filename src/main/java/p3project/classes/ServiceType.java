@@ -1,7 +1,7 @@
 package p3project.classes;
     
-    public enum ServiceType 
-    {
+public enum ServiceType 
+{
    Tickets,
    Banner,
    Coupons
