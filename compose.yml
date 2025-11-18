@@ -8,6 +8,8 @@ services:
       - 'MYSQL_USER=myuser'
     ports:
       - '3306'
+    volumes:
+      - mysql_data:/var/lib/mysql   #Make storage space for the .pdf files
   
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -20,3 +22,6 @@ services:
       - "8081:80"
     depends_on:
       - mysql
+
+volumes:
+  mysql_data: #Make space

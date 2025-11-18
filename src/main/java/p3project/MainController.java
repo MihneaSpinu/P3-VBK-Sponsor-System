@@ -89,7 +89,8 @@ public class MainController {
 			return "error"; // Or handle appropriately
 		}
 		
-
+		contractRepository.save(contact);
+		
 		return "redirect:/users";
 
 	}

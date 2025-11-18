@@ -22,7 +22,7 @@ public class Contract {
     private String type;
 
     @Lob
-    @Column(name = "pdf_data")
+    @Column(name = "pdf_data", columnDefinition = "LONGBLOB") /*Longblob to have enough storage for .pdf's */
     private byte[] pdfData;
     
    
