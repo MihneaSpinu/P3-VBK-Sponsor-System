@@ -48,6 +48,10 @@ public class MainController {
 		// @ResponseBody means the returned String is the response, not a view name
 		// @RequestParam means it is a parameter from the GET or POST request
 
+		if (!isValidUsername(name)) {
+			return "Error: invalid username - only letters, numbers and underscore allowed";
+		}
+
 		User n = new User();
 		n.setName(name);
 		n.setEmail(email);
@@ -209,7 +213,7 @@ public class MainController {
 
 	// Missing validation, error handling (try-catch), and security measures
 	@PostMapping("/users/add")
-	public String addUserFromWeb(@RequestParam String name, @RequestParam String email) {
+	public String addUserFromWeb(@RequestParam String name, @RequestParam String email, Model model) {
 
 		Contract contact = new Contract(
 				LocalDate.of(2025, 1, 1),
@@ -238,6 +242,12 @@ public class MainController {
 			System.out.println("Could not set PDF data: " + e.getMessage());
 		}
 		contractRepository.save(contact);
+		if (!isValidUsername(name)) {
+			model.addAttribute("error", "Invalid username: only letters, numbers and underscore allowed");
+			model.addAttribute("users", userRepository.findAll());
+			return "users";
+		}
+
 		User user = new User();
 		user.setName(name);
 		user.setEmail(email);
@@ -251,6 +261,11 @@ public class MainController {
 			@RequestParam String email,
 			Model model) {
 
+		if (!isValidUsername(username)) {
+			model.addAttribute("error", "Invalid username: only letters, numbers and underscore allowed");
+			return "login";
+		}
+
 		User user = userRepository.findByName(username);
 
 		if (user == null || !user.getEmail().equals(email)) {
@@ -260,5 +275,12 @@ public class MainController {
 
 		model.addAttribute("user", user);
 		return "Complete";
+	}
+
+	// Username validation: allow only letters, digits and underscore
+	private boolean isValidUsername(String username) {
+		if (username == null) return false;
+		String trimmed = username.trim();
+		return trimmed.matches("^[A-Za-z0-9_]+$");
 	}
 }
