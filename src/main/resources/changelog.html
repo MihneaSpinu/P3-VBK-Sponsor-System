@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Hændelses oversigt</title>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="changelog.js" defer></script>
+</head>
+<body>
+<h1>Eventlog</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Type</th>
+            <th>Name</th>
+            <th>Timestamp</th>
+            <th>Action</th>
+            <th>Before</th>
+            <th>After</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr th:each="changelog : ${changelogs}">
+            <td th:text="${changelog.username}"></td>
+            <td th:text="${changelog.objectType}"></td>
+            <td th:text="${changelog.objectName}"></td>
+            <td th:text="${changelog.timestamp}"></td>
+            <td th:text="${changelog.action}"></td>
+            <td th:text="${changelog.before == null ? N/A : changelog.before}"></td> <!-- (N/A) (-) ( ) -->
+            <td th:text="${changelog.after == null ? N/A : changelog.before}"></td>
+        </tr>
+    </tbody>
+</table>
+
+</html>
