@@ -39,6 +39,10 @@ public class Contract {
     // required by JPA
     }
 
+    public Long getId() {
+        return this.id;
+    }
+
     public LocalDate getStartDate() {
         return startDate;
     }
