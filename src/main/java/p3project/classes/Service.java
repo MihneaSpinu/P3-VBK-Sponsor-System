@@ -3,7 +3,11 @@ package p3project.classes;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
+@Entity
+@Table(name = "services")
 public class Service {
 
     @Id
@@ -12,6 +16,9 @@ public class Service {
     private ServiceType type;
     private boolean status;
     private int amountOrDuration;
+
+    // changed code: no-arg constructor required by JPA
+    protected Service() {}
 
     // Constructor
     public Service(ServiceType type, boolean status, int amountOrDuration) {

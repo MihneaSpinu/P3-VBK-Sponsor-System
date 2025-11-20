@@ -1,4 +1,5 @@
 package p3project.classes;
+
 import java.time.LocalDate;
 
 import jakarta.persistence.Column;
@@ -7,7 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
-
 
 @Entity
 public class Contract {
@@ -21,14 +21,13 @@ public class Contract {
     private boolean status;
     private String type;
 
-    // Link contract to sponsor by sponsorName 
+    // Link contract to sponsor by sponsorName
     private String sponsorName;
 
     @Lob
-    @Column(name = "pdf_data", columnDefinition = "LONGBLOB") /*Longblob to have enough storage for .pdf's */
+    @Column(name = "pdf_data", columnDefinition = "LONGBLOB") /* Longblob to have enough storage for .pdf's */
     private byte[] pdfData;
-    
-   
+
     // Constructor
     public Contract(LocalDate startDate, LocalDate endDate, int payment, boolean status, String typeName) {
         this.startDate = startDate;
@@ -39,9 +38,10 @@ public class Contract {
     }
 
     public Contract() {
-    // required by JPA
+        // required by JPA
     }
 
+    // Returns the ID of the entity
     public Long getId() {
         return this.id;
     }
@@ -58,11 +58,11 @@ public class Contract {
         return endDate;
     }
 
-    public byte[] getPdfData(){
+    public byte[] getPdfData() {
         return this.pdfData;
     }
 
-    public void setPdfData(byte[] pdfData){
+    public void setPdfData(byte[] pdfData) {
         this.pdfData = pdfData;
     }
 
@@ -85,11 +85,12 @@ public class Contract {
     public void setStatus(boolean status) {
         this.status = status;
     }
+
     public String getType() {
         return type;
     }
-    public void setType(String type)
-    {
+
+    public void setType(String type) {
         this.type = type;
     }
 
@@ -101,10 +102,5 @@ public class Contract {
     // Sets the name of the sponsor
     public void setSponsorName(String sponsorName) {
         this.sponsorName = sponsorName;
-    }
-    
-    // Returns the ID of the entity
-    public Long getId() {
-        return id;
     }
 }
