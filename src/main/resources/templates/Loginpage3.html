@@ -6,7 +6,7 @@
     <title>Login</title>
 
 
-    <link rel="stylesheet" href="Loginpage3.css">
+    <link rel="stylesheet" th:href="@{/Loginpage3.css}" />
 </head>
 <body>
      
@@ -17,11 +17,12 @@
         <p id = "Info">A user can only be made by an existing admin of the program.<br><br>
 The username and password is given by that admin</p>
     </div>
-<div class ="box2">
+<div class ="box2"> 
 <h2> Login</h2>
- <form action="Complete" method="post">
+ <form action="/login/confirm" method="post">
 <input type="text" id ="username" name="username" placeholder="Enter Username">
 <input type="email" id="email" name ="email" placeholder= "Enter Email">
+<p th:if="${error}" th:text="${error}" style="color:red;"></p>
 <button type="submit">Confirm</button>
  </form>
 </div>
