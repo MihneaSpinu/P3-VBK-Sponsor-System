@@ -87,7 +87,7 @@ public class MainController {
     // boilerplate update handlers
     @PutMapping("/update/sponsor")
     public @ResponseBody ResponseEntity<String> updateSponsorFields(@RequestBody Sponsor sponsor) {
-        var maybe = sponsorRepository.findById(sponsor.getSponsorName());
+        var maybe = sponsorRepository.findById(sponsor.getId());
         if (!maybe.isPresent()) {
             return new ResponseEntity<>("Sponsor not found", HttpStatus.NOT_FOUND);
         }
@@ -191,7 +191,7 @@ public class MainController {
     // Handles creating a new contract for a sponsor
     @PostMapping("/sponsors/addContract")
     public String addContractForSponsor(
-            @RequestParam String sponsorName,
+            @RequestParam Long sponsorId,
             @RequestParam String startDate,
             @RequestParam String endDate,
             @RequestParam int payment,
@@ -200,15 +200,17 @@ public class MainController {
         LocalDate start = LocalDate.parse(startDate);
         LocalDate end = LocalDate.parse(endDate);
         Contract contract = new Contract(start, end, payment, status, type);
-        contract.setSponsorName(sponsorName);
+        contract.setSponsorId(sponsorId);
+        var s = sponsorRepository.findById(sponsorId);
+        if (s.isPresent()) contract.setSponsorName(s.get().getSponsorName());
         contractRepository.save(contract);
         return "redirect:/sponsors";
     }
 
-        // Handles editing an existing sponsor
-        @PostMapping("/sponsors/edit")
-        public String editSponsor(
-            @RequestParam String originalSponsorName,
+    // Handles editing an existing sponsor
+    @PostMapping("/sponsors/edit")
+    public String editSponsor(
+            @RequestParam Long sponsorId,
             @RequestParam String sponsorName,
             @RequestParam(required = false) String contactPerson,
             @RequestParam(required = false) String email,
@@ -223,36 +225,26 @@ public class MainController {
             model.addAttribute("contracts", contractRepository.findAll());
             return "sponsors";
         }
-        var maybe = sponsorRepository.findById(originalSponsorName);
+        var maybe = sponsorRepository.findById(sponsorId);
         if (maybe.isPresent()) {
             Sponsor s = maybe.get();
-            if (!originalSponsorName.equals(sponsorName)) {
-                Sponsor newS = new Sponsor(sponsorName,
-                        contactPerson == null ? s.getContactPerson() : contactPerson,
-                        email == null ? s.getEmail() : email,
-                        phoneNumber == null ? s.getPhoneNumber() : phoneNumber,
-                        cvrNumber == null ? s.getCvrNumber() : cvrNumber,
-                        status,
-                        comments == null ? s.getComments() : comments);
+            // update fields (keep generated id)
+            s.setSponsorName(sponsorName == null ? s.getSponsorName() : sponsorName);
+            s.setContactPerson(contactPerson == null ? s.getContactPerson() : contactPerson);
+            s.setEmail(email == null ? s.getEmail() : email);
+            s.setPhoneNumber(phoneNumber == null ? s.getPhoneNumber() : phoneNumber);
+            s.setCvrNumber(cvrNumber == null ? s.getCvrNumber() : cvrNumber);
+            s.setStatus(status);
+            s.setComments(comments == null ? s.getComments() : comments);
+            sponsorRepository.save(s);
 
-                sponsorRepository.deleteById(originalSponsorName);
-                sponsorRepository.save(newS);
-
-                Iterable<Contract> contracts = contractRepository.findAll();
-                for (Contract c : contracts) {
-                    if (originalSponsorName.equals(c.getSponsorName())) {
-                        c.setSponsorName(sponsorName);
-                        contractRepository.save(c);
-                    }
+            // update stored sponsorName copy on contracts
+            Iterable<Contract> contracts = contractRepository.findAll();
+            for (Contract c : contracts) {
+                if (sponsorId.equals(c.getSponsorId())) {
+                    c.setSponsorName(s.getSponsorName());
+                    contractRepository.save(c);
                 }
-            } else {
-                s.setContactPerson(contactPerson == null ? s.getContactPerson() : contactPerson);
-                s.setEmail(email == null ? s.getEmail() : email);
-                s.setPhoneNumber(phoneNumber == null ? s.getPhoneNumber() : phoneNumber);
-                s.setCvrNumber(cvrNumber == null ? s.getCvrNumber() : cvrNumber);
-                s.setStatus(status);
-                s.setComments(comments == null ? s.getComments() : comments);
-                sponsorRepository.save(s);
             }
         }
         return "redirect:/sponsors";
@@ -260,11 +252,11 @@ public class MainController {
 
     // Deletes a sponsor and all contracts linked to that sponsor
     @PostMapping("/sponsors/delete")
-    public String deleteSponsor(@RequestParam String sponsorName) {
-        sponsorRepository.deleteById(sponsorName);
+    public String deleteSponsor(@RequestParam Long sponsorId) {
+        sponsorRepository.deleteById(sponsorId);
         Iterable<Contract> contracts = contractRepository.findAll();
         for (Contract c : contracts) {
-            if (sponsorName.equals(c.getSponsorName())) {
+            if (sponsorId.equals(c.getSponsorId())) {
                 contractRepository.deleteById(c.getId());
             }
         }
@@ -275,7 +267,7 @@ public class MainController {
     @PostMapping("/sponsors/editContract")
     public String editContract(
             @RequestParam Long contractId,
-            @RequestParam String sponsorName,
+            @RequestParam Long sponsorId,
             @RequestParam String startDate,
             @RequestParam String endDate,
             @RequestParam int payment,
@@ -284,7 +276,9 @@ public class MainController {
         var maybe = contractRepository.findById(contractId);
         if (maybe.isPresent()) {
             Contract c = maybe.get();
-            c.setSponsorName(sponsorName);
+            c.setSponsorId(sponsorId);
+            var s = sponsorRepository.findById(sponsorId);
+            if (s.isPresent()) c.setSponsorName(s.get().getSponsorName());
             c.setStartDate(LocalDate.parse(startDate));
             c.setEndDate(LocalDate.parse(endDate));
             c.setPayment(payment);

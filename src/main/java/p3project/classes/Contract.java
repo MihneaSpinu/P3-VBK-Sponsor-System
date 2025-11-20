@@ -22,6 +22,10 @@ public class Contract {
     private String type;
 
     // Link contract to sponsor by sponsorName
+    // sponsor id (generated) to link to Sponsor
+    private Long sponsorId;
+
+    // copy of sponsor name for easy display in views
     private String sponsorName;
 
     @Lob
@@ -44,6 +48,14 @@ public class Contract {
     // Returns the ID of the entity
     public Long getId() {
         return this.id;
+    }
+
+    public Long getSponsorId() {
+        return sponsorId;
+    }
+
+    public void setSponsorId(Long sponsorId) {
+        this.sponsorId = sponsorId;
     }
 
     public LocalDate getStartDate() {

@@ -83,8 +83,8 @@
               >
                 <input
                   type="hidden"
-                  name="sponsorName"
-                  th:value="${sponsor.sponsorName}"
+                  name="sponsorId"
+                  th:value="${sponsor.id}"
                 />
                 <button type="submit">Delete</button>
               </form>
@@ -97,11 +97,7 @@
               style="display: none; margin-top: 8px"
               class="form"
             >
-              <input
-                type="hidden"
-                name="originalSponsorName"
-                th:value="${sponsor.sponsorName}"
-              />
+              <input type="hidden" name="sponsorId" th:value="${sponsor.id}" />
               <label>Sponsor Name</label>
               <input
                 name="sponsorName"
@@ -182,10 +178,10 @@
         <h2>Create Contract For Sponsor</h2>
         <form action="/sponsors/addContract" method="post">
           <label for="sponsorSelect">Sponsor</label>
-          <select id="sponsorSelect" name="sponsorName" required>
+          <select id="sponsorSelect" name="sponsorId" required>
             <option
               th:each="s : ${sponsors}"
-              th:value="${s.sponsorName}"
+              th:value="${s.id}"
               th:text="${s.sponsorName}"
             ></option>
           </select>
@@ -255,12 +251,12 @@
                 th:value="${contract.id}"
               />
               <label>Sponsor</label>
-              <select name="sponsorName">
+              <select name="sponsorId">
                 <option
                   th:each="s : ${sponsors}"
-                  th:value="${s.sponsorName}"
+                  th:value="${s.id}"
                   th:text="${s.sponsorName}"
-                  th:selected="${s.sponsorName == contract.sponsorName}"
+                  th:selected="${s.id == contract.sponsorId}"
                 ></option>
               </select>
               <label>Start Date</label>
