@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import p3project.classes.Sponsor;
 
-public interface SponsorRepository extends JpaRepository<Sponsor, Long> {
+public interface SponsorRepository extends JpaRepository<Sponsor, String> {
 
 }

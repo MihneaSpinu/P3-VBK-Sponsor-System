@@ -87,7 +87,11 @@ public class MainController {
     // boilerplate update handlers
     @PutMapping("/update/sponsor")
     public @ResponseBody ResponseEntity<String> updateSponsorFields(@RequestBody Sponsor sponsor) {
-        Sponsor storedSponsor = sponsorRepository.getReferenceById(sponsor.getId());
+        var maybe = sponsorRepository.findById(sponsor.getSponsorName());
+        if (!maybe.isPresent()) {
+            return new ResponseEntity<>("Sponsor not found", HttpStatus.NOT_FOUND);
+        }
+        Sponsor storedSponsor = maybe.get();
         Integer fieldsChanged;
         try {
             fieldsChanged = compareFields(sponsor, storedSponsor);
@@ -201,10 +205,9 @@ public class MainController {
         return "redirect:/sponsors";
     }
 
-    // Handles editing an existing sponsor
-    @PostMapping("/sponsors/edit")
-    public String editSponsor(
-            @RequestParam Long id,
+        // Handles editing an existing sponsor
+        @PostMapping("/sponsors/edit")
+        public String editSponsor(
             @RequestParam String originalSponsorName,
             @RequestParam String sponsorName,
             @RequestParam(required = false) String contactPerson,
@@ -220,10 +223,10 @@ public class MainController {
             model.addAttribute("contracts", contractRepository.findAll());
             return "sponsors";
         }
-        Sponsor maybe = sponsorRepository.getReferenceById(id);
-        if (maybe != null) {
-            Sponsor s = maybe;
-            if (!id.equals(sponsorName)) {
+        var maybe = sponsorRepository.findById(originalSponsorName);
+        if (maybe.isPresent()) {
+            Sponsor s = maybe.get();
+            if (!originalSponsorName.equals(sponsorName)) {
                 Sponsor newS = new Sponsor(sponsorName,
                         contactPerson == null ? s.getContactPerson() : contactPerson,
                         email == null ? s.getEmail() : email,
@@ -232,12 +235,12 @@ public class MainController {
                         status,
                         comments == null ? s.getComments() : comments);
 
-                sponsorRepository.deleteById(id);
+                sponsorRepository.deleteById(originalSponsorName);
                 sponsorRepository.save(newS);
 
                 Iterable<Contract> contracts = contractRepository.findAll();
                 for (Contract c : contracts) {
-                    if (id.equals(c.getSponsorName())) {
+                    if (originalSponsorName.equals(c.getSponsorName())) {
                         c.setSponsorName(sponsorName);
                         contractRepository.save(c);
                     }
@@ -257,11 +260,11 @@ public class MainController {
 
     // Deletes a sponsor and all contracts linked to that sponsor
     @PostMapping("/sponsors/delete")
-    public String deleteSponsor(@RequestParam Long id) {
-        sponsorRepository.deleteById(id);
+    public String deleteSponsor(@RequestParam String sponsorName) {
+        sponsorRepository.deleteById(sponsorName);
         Iterable<Contract> contracts = contractRepository.findAll();
         for (Contract c : contracts) {
-            if (id.equals(c.getId())) {
+            if (sponsorName.equals(c.getSponsorName())) {
                 contractRepository.deleteById(c.getId());
             }
         }
