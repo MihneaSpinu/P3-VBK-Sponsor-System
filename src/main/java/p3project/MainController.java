@@ -87,11 +87,7 @@ public class MainController {
     // boilerplate update handlers
     @PutMapping("/update/sponsor")
     public @ResponseBody ResponseEntity<String> updateSponsorFields(@RequestBody Sponsor sponsor) {
-        var maybe = sponsorRepository.findById(sponsor.getId());
-        if (!maybe.isPresent()) {
-            return new ResponseEntity<>("Sponsor not found", HttpStatus.NOT_FOUND);
-        }
-        Sponsor storedSponsor = maybe.get();
+        Sponsor storedSponsor = sponsorRepository.getReferenceById(sponsor.getId());
         Integer fieldsChanged;
         try {
             fieldsChanged = compareFields(sponsor, storedSponsor);
