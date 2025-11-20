@@ -152,8 +152,16 @@
             <form action="/uploadFile" method="post" enctype="multipart/form-data">
                 <label for="fileyesyes">Get THis?</label>
                 <input type="file" id="fileyesyes" name = "pdffile">
+                <input type="hidden" name="contractId" value="1">
                 <button type="submit">Upload</button>
             </form>    
+        </div>
+        <div>
+            <form action="/getFile" method="get">
+                <label for="contractId">Download PDF</label>
+                <input type="hidden" name="contractId" value="1"> <!-- Replace value with the correct id -->
+                <button type="submit">Download PDF</button>
+            </form>
         </div>
         <a href="/users" class="refresh-btn button">Refresh List</a>
     </div>

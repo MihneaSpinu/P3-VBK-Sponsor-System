@@ -6,6 +6,9 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,16 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 import p3project.classes.Contract;
 import p3project.classes.Sponsor;
 import p3project.classes.User;
-import p3project.classes.Eventlog;
-import p3project.classes.Changelog;
 import p3project.repositories.ContractRepository;
+import p3project.repositories.LogRepository;
 import p3project.repositories.SponsorRepository;
 import p3project.repositories.UserRepository;
-import p3project.repositories.LogRepository;
-
-import java.lang.reflect.Field;
-
-import static p3project.classes.Action.*;
 
 @Controller // This means that this class is a Controller
 public class MainController {
@@ -185,27 +182,37 @@ public class MainController {
 		return "homepage";
 	}
 
+	@GetMapping("/getFile")
+	public ResponseEntity<byte[]> getFile(@RequestParam long contractId){
+		Contract contract = contractRepository.findById(contractId)
+			.orElseThrow(() -> new RuntimeException("/uploadFile, Contract not found"));
+		byte[] pdfData = contract.getPdfData();
+
+    return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"contract.pdf\"")
+            .contentType(MediaType.APPLICATION_PDF)
+            .body(pdfData);
+
+	}
+
 	@PostMapping("/uploadFile")
-	public String uploadFileTo(@RequestParam MultipartFile pdffile) {
-		Contract contact = new Contract(
-				LocalDate.of(2025, 1, 1),
-				LocalDate.of(2025, 12, 31),
-				2000,
-				true,
-				"Standard");
+	public String uploadFileTo(@RequestParam MultipartFile pdffile, @RequestParam Long contractId) {
+		Contract contract = contractRepository.findById(contractId)
+				.orElseThrow(() -> new RuntimeException("/uploadFile, Contract not found"));
+
 		try {
-			contact.setPdfData(pdffile.getBytes());
-			System.out.println("\n \n PDF file loaded successfully! \n \n");
+			contract.setPdfData(pdffile.getBytes());
+			System.out.println("\n\nPDF file loaded successfully!\n\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "error"; // Or handle appropriately
 		}
 
-		contractRepository.save(contact);
+		contractRepository.save(contract);
 
 		return "redirect:/users";
-
 	}
+
 
 	// Missing validation, error handling (try-catch), and security measures
 	@PostMapping("/users/add")
