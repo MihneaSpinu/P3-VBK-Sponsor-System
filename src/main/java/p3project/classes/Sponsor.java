@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 public class Sponsor {
 
     @Id
+    private Long id;
     private String sponsorName;
     private String contactPerson;
     private String email;
@@ -33,6 +34,10 @@ public class Sponsor {
     }
 
     // Getters and Setters
+    public Long getId() {
+        return this.id;
+    }
+
     public String getSponsorName() {
         return sponsorName;
     }

@@ -1,6 +1,9 @@
+package p3project.classes;
+
+/*
 public class Javascript1 {
   public static void main(String[] args) {
-           User normalUser = new User("alex", "mypassword123", false);
+       User normalUser = new User("alex", "mypassword123", false);
         User adminUser = new User("admin", "securePass!", true);
         User[] users = new User[2];
 
@@ -10,3 +13,4 @@ public class Javascript1 {
   }
   
 }
+*/
