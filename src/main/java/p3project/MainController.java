@@ -48,6 +48,10 @@ public class MainController {
 		// @ResponseBody means the returned String is the response, not a view name
 		// @RequestParam means it is a parameter from the GET or POST request
 
+		if (!isValidUsername(name)) {
+			return "Error: invalid username - only letters, numbers and underscore allowed";
+		}
+
 		User n = new User();
 		n.setName(name);
 		n.setEmail(email);
@@ -185,6 +189,167 @@ public class MainController {
 		return "homepage";
 	}
 
+	// Displays the sponsors page with lists of sponsors and contracts
+	@GetMapping("/sponsors")
+	public String showSponsors(Model model) {
+		model.addAttribute("sponsors", sponsorRepository.findAll());
+		model.addAttribute("contracts", contractRepository.findAll());
+		return "sponsors";
+	}
+
+	// Handles adding a new sponsor from the web form
+	@PostMapping("/sponsors/add")
+	public String addSponsorFromWeb(
+			@RequestParam String sponsorName,
+			@RequestParam String contactPerson,
+			@RequestParam String email,
+			@RequestParam String phoneNumber,
+			@RequestParam String cvrNumber,
+			@RequestParam(required = false, defaultValue = "false") boolean status,
+			@RequestParam(required = false) String comments,
+			Model model
+	) {
+		// Serverside phone validation: kun digits allowed
+		if (phoneNumber != null && phoneNumber.length() > 0 && !phoneNumber.matches("^[0-9]+$")) {
+			model.addAttribute("error", "Phone number must contain digits only.");
+			model.addAttribute("sponsors", sponsorRepository.findAll());
+			model.addAttribute("contracts", contractRepository.findAll());
+			return "sponsors";
+		}
+
+		// Create and save the new sponsor
+		Sponsor sponsor = new Sponsor(sponsorName, contactPerson, email, phoneNumber, cvrNumber, status, comments == null ? "" : comments);
+		sponsorRepository.save(sponsor);
+		return "redirect:/sponsors";
+	}
+
+	// Handles creating a new contract for a sponsor
+	@PostMapping("/sponsors/addContract")
+	public String addContractForSponsor(
+			@RequestParam String sponsorName,
+			@RequestParam String startDate,
+			@RequestParam String endDate,
+			@RequestParam int payment,
+			@RequestParam(required = false, defaultValue = "false") boolean status,
+			@RequestParam String type
+	) {
+		// Parse date strings to LocalDate and save the contract
+		LocalDate start = LocalDate.parse(startDate);
+		LocalDate end = LocalDate.parse(endDate);
+		Contract contract = new Contract(start, end, payment, status, type);
+		contract.setSponsorName(sponsorName);
+		contractRepository.save(contract);
+		return "redirect:/sponsors";
+	}
+
+	// Handles editing an existing sponsor
+	@PostMapping("/sponsors/edit")
+	public String editSponsor(
+			@RequestParam String originalSponsorName,
+			@RequestParam String sponsorName,
+			@RequestParam(required = false) String contactPerson,
+			@RequestParam(required = false) String email,
+			@RequestParam(required = false) String phoneNumber,
+			@RequestParam(required = false) String cvrNumber,
+			@RequestParam(required = false, defaultValue = "false") boolean status,
+			@RequestParam(required = false) String comments,
+			Model model
+	) {
+		// Validate phone number
+		if (phoneNumber != null && phoneNumber.length() > 0 && !phoneNumber.matches("^[0-9]+$")) {
+			model.addAttribute("error", "Phone number must contain digits only.");
+			model.addAttribute("sponsors", sponsorRepository.findAll());
+			model.addAttribute("contracts", contractRepository.findAll());
+			return "sponsors";
+		}
+		// Find sponsor by name
+		var maybe = sponsorRepository.findById(originalSponsorName);
+		if (maybe.isPresent()) {
+			Sponsor s = maybe.get();
+			// If the sponsors name (primary key) changes, delete old and create new
+			if (!originalSponsorName.equals(sponsorName)) {
+				Sponsor newS = new Sponsor(sponsorName,
+						contactPerson == null ? s.getContactPerson() : contactPerson,
+						email == null ? s.getEmail() : email,
+						phoneNumber == null ? s.getPhoneNumber() : phoneNumber,
+						cvrNumber == null ? s.getCvrNumber() : cvrNumber,
+						status,
+						comments == null ? s.getComments() : comments);
+				
+				// Replace old record
+				sponsorRepository.deleteById(originalSponsorName);
+				sponsorRepository.save(newS);
+
+				// update contracts to new sponsorName
+				Iterable<Contract> contracts = contractRepository.findAll();
+				for (Contract c : contracts) {
+					if (originalSponsorName.equals(c.getSponsorName())) {
+						c.setSponsorName(sponsorName);
+						contractRepository.save(c);
+					}
+				}
+			} else {
+				// update fields on the same entity
+				s.setContactPerson(contactPerson == null ? s.getContactPerson() : contactPerson);
+				s.setEmail(email == null ? s.getEmail() : email);
+				s.setPhoneNumber(phoneNumber == null ? s.getPhoneNumber() : phoneNumber);
+				s.setCvrNumber(cvrNumber == null ? s.getCvrNumber() : cvrNumber);
+				s.setStatus(status);
+				s.setComments(comments == null ? s.getComments() : comments);
+				sponsorRepository.save(s);
+			}
+		}
+		return "redirect:/sponsors";
+	}
+
+	// Deletes a sponsor and all contracts linked to that sponsor
+	@PostMapping("/sponsors/delete")
+	public String deleteSponsor(@RequestParam String sponsorName) {
+		// delete sponsor 
+		sponsorRepository.deleteById(sponsorName);
+		// and related contracts
+		Iterable<Contract> contracts = contractRepository.findAll();
+		for (Contract c : contracts) {
+			if (sponsorName.equals(c.getSponsorName())) {
+				contractRepository.deleteById(c.getId());
+			}
+		}
+		return "redirect:/sponsors";
+	}
+
+	// Handles editing an existing contract
+	@PostMapping("/sponsors/editContract")
+	public String editContract(
+			@RequestParam Long contractId,
+			@RequestParam String sponsorName,
+			@RequestParam String startDate,
+			@RequestParam String endDate,
+			@RequestParam int payment,
+			@RequestParam(required = false, defaultValue = "false") boolean status,
+			@RequestParam String type
+	) {
+		var maybe = contractRepository.findById(contractId);
+		if (maybe.isPresent()) {
+			Contract c = maybe.get();
+			// Update contract fields
+			c.setSponsorName(sponsorName);
+			c.setStartDate(LocalDate.parse(startDate));
+			c.setEndDate(LocalDate.parse(endDate));
+			c.setPayment(payment);
+			c.setStatus(status);
+			c.setType(type);
+			contractRepository.save(c);
+		}
+		return "redirect:/sponsors";
+	}
+
+	// Deletes a contract by ID
+	@PostMapping("/sponsors/deleteContract")
+	public String deleteContract(@RequestParam Long contractId) {
+		contractRepository.deleteById(contractId);
+		return "redirect:/sponsors";
+	}
+
 	@PostMapping("/uploadFile")
 	public String uploadFileTo(@RequestParam MultipartFile pdffile) {
 		Contract contact = new Contract(
@@ -209,7 +374,7 @@ public class MainController {
 
 	// Missing validation, error handling (try-catch), and security measures
 	@PostMapping("/users/add")
-	public String addUserFromWeb(@RequestParam String name, @RequestParam String email) {
+	public String addUserFromWeb(@RequestParam String name, @RequestParam String email, Model model) {
 
 		Contract contact = new Contract(
 				LocalDate.of(2025, 1, 1),
@@ -238,6 +403,12 @@ public class MainController {
 			System.out.println("Could not set PDF data: " + e.getMessage());
 		}
 		contractRepository.save(contact);
+		if (!isValidUsername(name)) {
+			model.addAttribute("error", "Invalid username: only letters, numbers and underscore allowed");
+			model.addAttribute("users", userRepository.findAll());
+			return "users";
+		}
+
 		User user = new User();
 		user.setName(name);
 		user.setEmail(email);
@@ -251,6 +422,11 @@ public class MainController {
 			@RequestParam String email,
 			Model model) {
 
+		if (!isValidUsername(username)) {
+			model.addAttribute("error", "Invalid username: only letters, numbers and underscore allowed");
+			return "login";
+		}
+
 		User user = userRepository.findByName(username);
 
 		if (user == null || !user.getEmail().equals(email)) {
@@ -260,5 +436,12 @@ public class MainController {
 
 		model.addAttribute("user", user);
 		return "Complete";
+	}
+
+	// Username validation: allow only letters, digits and underscore
+	private boolean isValidUsername(String username) {
+		if (username == null) return false;
+		String trimmed = username.trim();
+		return trimmed.matches("^[A-Za-z0-9_]+$");
 	}
 }

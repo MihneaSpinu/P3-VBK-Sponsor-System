@@ -21,6 +21,9 @@ public class Contract {
     private boolean status;
     private String type;
 
+    // Link contract to sponsor by sponsorName 
+    private String sponsorName;
+
     @Lob
     @Column(name = "pdf_data", columnDefinition = "LONGBLOB") /*Longblob to have enough storage for .pdf's */
     private byte[] pdfData;
@@ -84,5 +87,20 @@ public class Contract {
     public void setType(String type)
     {
         this.type = type;
+    }
+
+    // Returns the name of the sponsor
+    public String getSponsorName() {
+        return sponsorName;
+    }
+
+    // Sets the name of the sponsor
+    public void setSponsorName(String sponsorName) {
+        this.sponsorName = sponsorName;
+    }
+    
+    // Returns the ID of the entity
+    public Long getId() {
+        return id;
     }
 }
