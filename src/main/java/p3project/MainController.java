@@ -1,28 +1,34 @@
 package p3project;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import p3project.classes.*;
-import p3project.repositories.*;
-
-import java.lang.reflect.Field;
-import java.util.Optional;
-
-import static p3project.classes.Action.*;
+import p3project.classes.Changelog;
+import p3project.classes.Contract;
+import p3project.classes.Service;
+import p3project.classes.Sponsor;
+import p3project.classes.User;
+import p3project.repositories.ContractRepository;
+import p3project.repositories.LogRepository;
+import p3project.repositories.ServiceRepository;
+import p3project.repositories.SponsorRepository;
+import p3project.repositories.UserRepository;
 
 @Controller // This means that this class is a Controller
 public class MainController {
@@ -73,75 +79,82 @@ public class MainController {
     }
 
 
-      // boilerplate, kombiner på nogen måde?
 
+    // boilerplate, kombiner på nogen måde?
     @PutMapping("/update/sponsor")
-    public String updateSponsorFields(@RequestBody Sponsor sponsor) {
-      Sponsor storedSponsor = sponsorRepository.getReferenceById(sponsor.getId());
-      try {
-        compareFields(sponsor, storedSponsor);
-      } catch (ClassNotFoundException e) {
-        return "Error"; // wip
-      }
-        return "Success"; // wip
+    public @ResponseBody ResponseEntity<String> updateSponsorFields(@RequestBody Sponsor sponsor) {
+        Sponsor storedSponsor = sponsorRepository.getReferenceById(sponsor.getId());
+        // alt herunder i handleren skal, om muligt, laves til en funktion: return handleRequest(object, storedObject)... typ skit
+        Integer fieldsChanged;
+        try {
+            fieldsChanged = compareFields(sponsor, storedSponsor);
+        } catch (ClassNotFoundException e) {
+            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(fieldsChanged.toString(), HttpStatus.OK);
     }
 
-      @PutMapping("/update/contract")
-      public String updateContractFields(@RequestBody Contract contract) {
-      Contract storedContract = contractRepository.getReferenceById(contract.getId());
-      try {
-      compareFields(contract, storedContract);
-     } catch (ClassNotFoundException e) {
-      return "Internal server error"; // wip
-      }
-      return "Success"; // wip
-      }
-
-      @PutMapping("/update/service")
-      public String updateServiceFields(@RequestBody Service service) {
-      Service storedService = serviceRepository.getReferenceById(service.getId());
-      try {
-        compareFields(service, storedService);
-      } catch (ClassNotFoundException e) {
-      return "Error"; // wip
-      }
-      return "Success"; // wip
-      }
-      // returnér int med antal af opdaterede felter(?)
-      private <T> void compareFields(T requestObject, T storedObject) throws ClassNotFoundException{ // fjern generic?
-      Field[] fields = requestObject.getClass().getDeclaredFields(); // burde være lige meget hvilken en + ingen inheritence, igen lige meget (for nu)
-      for(Field field : fields) {
-        field.setAccessible(true); // adgang til private
+    @PutMapping("/update/contract")
+    public @ResponseBody ResponseEntity<String> updateContractFields(@RequestBody Contract contract) {
+        Contract storedContract = contractRepository.getReferenceById(contract.getId());
+        Integer fieldsChanged;
         try {
-            if(field.getName().equals("id")) continue;
-            Object before = field.get(storedObject); // old, stored...?
-            Object after = field.get(requestObject); // new, current...?
-            if(!before.equals(after)) {
-                User user = new User(); // <-- skal slettes
-                Changelog log = Changelog.create(user, requestObject.toString(), requestObject.toString(), before.toString(), after.toString()); // getName fix?
-                logRepository.save(log);
-                field.set(storedObject, after);
-            }
-        } catch (IllegalAccessException e) { // skal være der for field.get kan bruges, burde ikke aktivere: setAccessible(true)
-            throw new RuntimeException(e);
+            fieldsChanged = compareFields(contract, storedContract);
+        } catch (ClassNotFoundException e) {
+            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-      }
+        return new ResponseEntity<>(fieldsChanged.toString(), HttpStatus.OK);
+    }
 
-      if (requestObject instanceof Sponsor) sponsorRepository.save((Sponsor)storedObject);
-      // opdater i stedet for gem??
-      else if (requestObject instanceof Contract)
-      contractRepository.save((Contract)storedObject);
-      else if (requestObject instanceof Service)
-      serviceRepository.save((Service)storedObject);
-      else throw new ClassNotFoundException();
-     }
+    @PutMapping("/update/service")
+    public @ResponseBody ResponseEntity<String> updateServiceFields(@RequestBody Service service) {
+        Service storedService = serviceRepository.getReferenceById(service.getId());
+        Integer fieldsChanged;
+        try {
+            fieldsChanged = compareFields(service, storedService);
+        } catch (ClassNotFoundException e) {
+            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(fieldsChanged.toString(), HttpStatus.OK);
+    }
+
+    // returnér int med antal af opdaterede felter(?)
+    private <T> Integer compareFields(T requestObject, T storedObject) throws ClassNotFoundException{ // fjern generic
+        Integer fieldsChanged = 0;
+        Field[] fields = requestObject.getClass().getDeclaredFields(); // burde være lige meget hvilken en + ingen inheritence, igen lige meget (for nu)
+        for(Field field : fields) {
+            field.setAccessible(true); // adgang til private
+            try {
+                if(field.getName().equals("id")) continue;
+                Object before = field.get(storedObject); // old, stored...?
+                Object after = field.get(requestObject); // new, current...?
+                if(!before.equals(after)) {
+                    User user = new User(); // <-- skal slettes
+                    Changelog log = Changelog.create(user, requestObject.toString(), requestObject.toString(), before.toString(), after.toString()); // wip
+                    logRepository.save(log);
+                    field.set(storedObject, after);
+                    fieldsChanged++;
+                    System.out.println("Updated " + field.toString() + ": " + before.toString() + " -> " + after.toString());
+                }
+            } catch (IllegalAccessException error) { // skal være der for field.get kan bruges, burde ikke aktivere: setAccessible(true)
+                throw new RuntimeException(error);
+            }
+        }
+
+        if (requestObject instanceof Sponsor)       sponsorRepository.save((Sponsor)storedObject); // opdater i stedet for gem??
+        else if (requestObject instanceof Contract) contractRepository.save((Contract)storedObject);
+        else if (requestObject instanceof Service)  serviceRepository.save((Service)storedObject);
+        else throw new ClassNotFoundException();
+        
+        return fieldsChanged;
+    }
 
 
     // Changelog page request (HTML)
     @GetMapping("/changelog")
     public String changelogPage(Model page) {
         page.addAttribute("changelog", logRepository.findAll()); // måske lave noget med sider / dynamisk?
-        return "changelog"; // side
+        return "changelog"; // side (eksisterer ikke endnu)
     }
 
     @GetMapping("/test")
