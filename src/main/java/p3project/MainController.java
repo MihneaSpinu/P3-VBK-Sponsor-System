@@ -193,12 +193,12 @@ public class MainController {
             @RequestParam Long sponsorId,
             @RequestParam String startDate,
             @RequestParam String endDate,
-            @RequestParam int payment,
+            @RequestParam String payment,
             @RequestParam(required = false, defaultValue = "false") boolean status,
             @RequestParam String type) {
         LocalDate start = LocalDate.parse(startDate);
         LocalDate end = LocalDate.parse(endDate);
-        Contract contract = new Contract(start, end, payment, status, type);
+        Contract contract = new Contract(start, end, Integer.parseInt(payment), status, type);
         contract.setSponsorId(sponsorId);
         var s = sponsorRepository.findById(sponsorId);
         if (s.isPresent())
