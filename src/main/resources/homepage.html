@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Homepage</title>
+    <link rel="stylesheet" href="Sidebar.css">
 
     <style>
         body {
@@ -21,63 +22,6 @@
         .container {
             display: flex;
             flex: 1;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 16rem;
-            /* 64 in Tailwind */
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .logo {
-            background-color: #bbf7d0;
-            /* green-200 */
-            text-align: center;
-            padding: 0.75rem;
-            border-radius: 0.375rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-        }
-
-        .menu {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .menu-btn {
-            background-color: #e5e7eb;
-            /* gray-200 */
-            padding: 0.5rem;
-            border: none;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .menu-btn:hover {
-            background-color: #d1d5db;
-            /* gray-300 */
-        }
-
-        .logout-btn {
-            background-color: #e5e7eb;
-            padding: 0.5rem;
-            border: none;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            margin-top: 1.5rem;
-            transition: background-color 0.2s;
-        }
-
-        .logout-btn:hover {
-            background-color: #d1d5db;
         }
 
         /* Main content */
@@ -398,17 +342,16 @@
                 <div class="logo">VBK Sponsor System</div>
 
                 <div class="menu">
-                    <button class="menu-btn">Homepage</button>
-                    <button class="menu-btn">Change log</button>
-                    <button class="menu-btn">Archive</button>
-                    <button class="menu-btn">Admin panel</button>
+                    <button class="menu-btn" onclick="location.href='/homepage'">Forside</button>
+                    <button class="menu-btn" onclick="location.href='/changelog'">Change log</button>
+                    <button class="menu-btn" onclick="location.href='/archive'">Arkiv</button>
+                    <button class="menu-btn" onclick="location.href='/AdminPanel'">Admin panel</button>
                 </div>
             </div>
 
-            <button class="logout-btn">Log out</button>
+            <button class="logout-btn" onclick="location.href='/login'">Log ud</button>
         </aside>
 
-        <!-- Sponsor Modal-->
         <!-- Sponsor Modal-->
         <div id="Smodal">
             <div class="ModalBox">
