@@ -84,78 +84,73 @@ public class MainController {
         return "sponsors";
     }
 
+
+    // Changelog page
+    @GetMapping("/changelog")
+    public String changelogPage(Model model) {
+        model.addAttribute("changelogs", logRepository.findAll());
+        return "changelog";
+    }
+
+    
     // boilerplate update handlers
-    @PutMapping("/update/sponsor")
-    public @ResponseBody ResponseEntity<String> updateSponsorFields(@RequestBody Sponsor sponsor) {
+    @PostMapping("/update/sponsor")
+    public ResponseEntity<String> updateSponsorFields(@RequestBody Sponsor sponsor) {
         Sponsor storedSponsor = sponsorRepository.getReferenceById(sponsor.getId());
-        Integer fieldsChanged;
-        try {
-            fieldsChanged = compareFields(sponsor, storedSponsor);
-        } catch (ClassNotFoundException e) {
-            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<>(fieldsChanged.toString(), HttpStatus.OK);
+        return handleUpdateRequest(sponsor, storedSponsor);
     }
 
-    @PutMapping("/update/contract")
-    public @ResponseBody ResponseEntity<String> updateContractFields(@RequestBody Contract contract) {
+    @PostMapping("/update/contract")
+    public ResponseEntity<String> updateContractFields(@RequestBody Contract contract) {
         Contract storedContract = contractRepository.getReferenceById(contract.getId());
-        Integer fieldsChanged;
-        try {
-            fieldsChanged = compareFields(contract, storedContract);
-        } catch (ClassNotFoundException e) {
-            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<>(fieldsChanged.toString(), HttpStatus.OK);
+        return handleUpdateRequest(contract, storedContract);
     }
 
-    @PutMapping("/update/service")
-    public @ResponseBody ResponseEntity<String> updateServiceFields(@RequestBody Service service) {
+    @PostMapping("/update/service")
+    public ResponseEntity<String> updateServiceFields(@RequestBody Service service) {
         Service storedService = serviceRepository.getReferenceById(service.getId());
+        return handleUpdateRequest(service, storedService);
+    }
+
+    private <T> ResponseEntity<String> handleUpdateRequest(T requestObject, T storedObject) {
         Integer fieldsChanged;
         try {
-            fieldsChanged = compareFields(service, storedService);
-        } catch (ClassNotFoundException e) {
-            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+            fieldsChanged = compareFields(requestObject, storedObject);
+        } catch(ClassNotFoundException error) {
+            return new ResponseEntity<>("Internal server error: " + error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(fieldsChanged.toString(), HttpStatus.OK);
     }
 
-    // return number of updated fields
+    // fejl håndtering tba, if(==null) etc...
     private <T> Integer compareFields(T requestObject, T storedObject) throws ClassNotFoundException {
+        // if(!(requestObject.getClass().equals(storedObject.getClass())))
+
         Integer fieldsChanged = 0;
         Field[] fields = requestObject.getClass().getDeclaredFields();
         for (Field field : fields) {
             field.setAccessible(true);
             try {
-                if (field.getName().equals("id"))
-                    continue;
+                if (field.getName().equals("id")) continue; // slet?
                 Object before = field.get(storedObject);
                 Object after = field.get(requestObject);
-                if (!Objects.equals(before, after)) {
-                    // create changelog entry
-                    Changelog log = Changelog.create(new User(), requestObject.toString(), requestObject.toString(),
-                            before == null ? "null" : before.toString(), after == null ? "null" : after.toString());
+                if (!before.equals(after)) {
+                    Changelog log = Changelog.create(new User(), requestObject.toString(), requestObject.toString(), before.toString(), after.toString()); // wip
                     logRepository.save(log);
                     field.set(storedObject, after);
                     fieldsChanged++;
-                    System.out.println(
-                            "Updated " + field.toString() + ": " + (before == null ? "null" : before.toString())
-                                    + " -> " + (after == null ? "null" : after.toString()));
+                    System.out.println("Updated " + field.toString() + ": " + before.toString() + " -> " + after.toString());
                 }
             } catch (IllegalAccessException error) {
                 throw new RuntimeException(error);
             }
         }
 
-        if (requestObject instanceof Sponsor)
-            sponsorRepository.save((Sponsor) storedObject);
-        else if (requestObject instanceof Contract)
-            contractRepository.save((Contract) storedObject);
-        else if (requestObject instanceof Service)
-            serviceRepository.save((Service) storedObject);
-        else
-            throw new ClassNotFoundException();
+        // lav compareFields returnere "T", og lav nedenstående til sin egen funktion "saveUpdatedObject" eller w/e
+        if (requestObject instanceof Sponsor)       sponsorRepository.save((Sponsor) storedObject);
+        else if (requestObject instanceof Contract) contractRepository.save((Contract) storedObject);
+        else if (requestObject instanceof Service)  serviceRepository.save((Service) storedObject);
+        else throw new ClassNotFoundException();
 
         return fieldsChanged;
     }
@@ -309,13 +304,6 @@ public class MainController {
         }
         contractRepository.save(contract);
         return "redirect:/users";
-    }
-
-    // Changelog page
-    @GetMapping("/changelog")
-    public String changelogPage(Model model) {
-        model.addAttribute("changelog", logRepository.findAll());
-        return "changelog";
     }
 
     @GetMapping("/test")
