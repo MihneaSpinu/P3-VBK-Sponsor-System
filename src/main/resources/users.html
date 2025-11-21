@@ -173,6 +173,22 @@
         >
           <strong th:text="${error}">Error message</strong>
         </div>
+        <div >
+            <form action="/uploadFile" method="post" enctype="multipart/form-data">
+                <label for="fileyesyes">Get THis?</label>
+                <input type="file" id="fileyesyes" name = "pdffile">
+                <input type="hidden" name="contractId" value="1">
+                <button type="submit">Upload</button>
+            </form>    
+        </div>
+        <div>
+            <form action="/getFile" method="get">
+                <label for="contractId">Download PDF</label>
+                <input type="hidden" name="contractId" value="1"> <!-- Replace value with the correct id -->
+                <button type="submit">Download PDF</button>
+            </form>
+        </div>
+        <a href="/users" class="refresh-btn button">Refresh List</a>
         <form action="/users/add" method="post">
           <div class="form-group">
             <label for="name">Name:</label>
@@ -190,13 +206,6 @@
             <input type="email" id="email" name="email" required />
           </div>
           <button type="submit" id="addUserBtn" disabled>Add User</button>
-        </form>
-      </div>
-      <div>
-        <form action="/uploadFile" method="post" enctype="multipart/form-data">
-          <label for="fileyesyes">Get THis?</label>
-          <input type="file" id="fileyesyes" name="pdffile" />
-          <button type="submit">Upload</button>
         </form>
       </div>
       <a href="/users" class="refresh-btn button">Refresh List</a>

@@ -8,7 +8,9 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -84,7 +86,6 @@ public class MainController {
         return "sponsors";
     }
 
-
     // Changelog page
     @GetMapping("/changelog")
     public String changelogPage(Model model) {
@@ -92,7 +93,6 @@ public class MainController {
         return "changelog";
     }
 
-    
     // boilerplate update handlers
     @PostMapping("/update/sponsor")
     public ResponseEntity<String> updateSponsorFields(@RequestBody Sponsor sponsor) {
@@ -116,7 +116,7 @@ public class MainController {
         Integer fieldsChanged;
         try {
             fieldsChanged = compareFields(requestObject, storedObject);
-        } catch(ClassNotFoundException error) {
+        } catch (ClassNotFoundException error) {
             return new ResponseEntity<>("Internal server error: " + error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(fieldsChanged.toString(), HttpStatus.OK);
@@ -131,26 +131,34 @@ public class MainController {
         for (Field field : fields) {
             field.setAccessible(true);
             try {
-                if (field.getName().equals("id")) continue; // slet?
+                if (field.getName().equals("id"))
+                    continue; // slet?
                 Object before = field.get(storedObject);
                 Object after = field.get(requestObject);
                 if (!before.equals(after)) {
-                    Changelog log = Changelog.create(new User(), requestObject.toString(), requestObject.toString(), before.toString(), after.toString()); // wip
+                    Changelog log = Changelog.create(new User(), requestObject.toString(), requestObject.toString(),
+                            before.toString(), after.toString()); // wip
                     logRepository.save(log);
                     field.set(storedObject, after);
                     fieldsChanged++;
-                    System.out.println("Updated " + field.toString() + ": " + before.toString() + " -> " + after.toString());
+                    System.out.println(
+                            "Updated " + field.toString() + ": " + before.toString() + " -> " + after.toString());
                 }
             } catch (IllegalAccessException error) {
                 throw new RuntimeException(error);
             }
         }
 
-        // lav compareFields returnere "T", og lav nedenstående til sin egen funktion "saveUpdatedObject" eller w/e
-        if (requestObject instanceof Sponsor)       sponsorRepository.save((Sponsor) storedObject);
-        else if (requestObject instanceof Contract) contractRepository.save((Contract) storedObject);
-        else if (requestObject instanceof Service)  serviceRepository.save((Service) storedObject);
-        else throw new ClassNotFoundException();
+        // lav compareFields returnere "T", og lav nedenstående til sin egen funktion
+        // "saveUpdatedObject" eller w/e
+        if (requestObject instanceof Sponsor)
+            sponsorRepository.save((Sponsor) storedObject);
+        else if (requestObject instanceof Contract)
+            contractRepository.save((Contract) storedObject);
+        else if (requestObject instanceof Service)
+            serviceRepository.save((Service) storedObject);
+        else
+            throw new ClassNotFoundException();
 
         return fieldsChanged;
     }
@@ -193,7 +201,8 @@ public class MainController {
         Contract contract = new Contract(start, end, payment, status, type);
         contract.setSponsorId(sponsorId);
         var s = sponsorRepository.findById(sponsorId);
-        if (s.isPresent()) contract.setSponsorName(s.get().getSponsorName());
+        if (s.isPresent())
+            contract.setSponsorName(s.get().getSponsorName());
         contractRepository.save(contract);
         return "redirect:/sponsors";
     }
@@ -269,7 +278,8 @@ public class MainController {
             Contract c = maybe.get();
             c.setSponsorId(sponsorId);
             var s = sponsorRepository.findById(sponsorId);
-            if (s.isPresent()) c.setSponsorName(s.get().getSponsorName());
+            if (s.isPresent())
+                c.setSponsorName(s.get().getSponsorName());
             c.setStartDate(LocalDate.parse(startDate));
             c.setEndDate(LocalDate.parse(endDate));
             c.setPayment(payment);
@@ -287,22 +297,35 @@ public class MainController {
         return "redirect:/sponsors";
     }
 
+    @GetMapping("/getFile")
+    public ResponseEntity<byte[]> getFile(@RequestParam long contractId) {
+        Contract contract = contractRepository.findById(contractId)
+                .orElseThrow(() -> new RuntimeException("/uploadFile, Contract not found"));
+        byte[] pdfData = contract.getPdfData();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"contract.pdf\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdfData);
+
+    }
+
     // File upload
     @PostMapping("/uploadFile")
-    public String uploadFile(@RequestParam MultipartFile pdffile) {
-        Contract contract = new Contract(
-                LocalDate.of(2025, 1, 1),
-                LocalDate.of(2025, 12, 31),
-                2000,
-                true,
-                "Standard");
+    public String uploadFileTo(@RequestParam MultipartFile pdffile, @RequestParam Long contractId) {
+        Contract contract = contractRepository.findById(contractId)
+                .orElseThrow(() -> new RuntimeException("/uploadFile, Contract not found"));
+
         try {
             contract.setPdfData(pdffile.getBytes());
+            System.out.println("\n\nPDF file loaded successfully!\n\n");
         } catch (IOException e) {
             e.printStackTrace();
-            return "error";
+            return "error"; // Or handle appropriately
         }
+
         contractRepository.save(contract);
+
         return "redirect:/users";
     }
 
