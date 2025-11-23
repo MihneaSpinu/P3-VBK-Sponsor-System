@@ -76,8 +76,8 @@
                 Edit
               </button>
               <form
-                th:action="@{/sponsors/delete/{id}(id=${sponsor.id})}"
-                method="DELETE"
+                th:action="@{/sponsors/delete}"
+                method="POST"
                 style="display: inline"
                 th:onsubmit="return confirm('Delete sponsor and its contracts? This cannot be undone.')"
               >
@@ -224,8 +224,8 @@
                 Edit
               </button>
               <form
-                th:action="@{/sponsors/deleteContract/{id}(id=${contract.id})}"
-                method="DELETE"
+                th:action="@{/sponsors/deleteContract}"
+                method="POST"
                 style="display: inline"
                 th:onsubmit="return confirm('Delete this contract? This cannot be undone.')"
               >

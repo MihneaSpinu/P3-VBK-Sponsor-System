@@ -245,8 +245,8 @@ public class MainController {
 
 
     // Deletes a sponsor and all contracts linked to that sponsor
-    @DeleteMapping("/sponsors/delete/{id}")
-    public String deleteSponsor(@PathVariable Long sponsorId) {
+    @PostMapping("/sponsors/delete")
+    public String deleteSponsor(@RequestParam Long sponsorId) {
         sponsorRepository.deleteById(sponsorId);
         Iterable<Contract> contracts = contractRepository.findAll();
         for (Contract contract : contracts) {
@@ -285,8 +285,8 @@ public class MainController {
     }
 
     // Deletes a contract by ID
-    @DeleteMapping("/sponsors/deleteContract/{id}")
-    public String deleteContract(@PathVariable Long contractId) {
+    @PostMapping("/sponsors/deleteContract")
+    public String deleteContract(@RequestParam Long contractId) {
         contractRepository.deleteById(contractId);
         return "redirect:/sponsors";
     }
