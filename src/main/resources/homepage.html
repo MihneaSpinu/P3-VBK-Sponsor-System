@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Homepage</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="Sidebar.css">
+    <link rel="stylesheet" th:href="@{/css/Sidebar.css}" href="static/css/Sidebar.css">
 
     <style>
         body {
@@ -465,7 +465,7 @@
                             <td>
                                 <div class="col-list">
                                     <div th:text="${sponsor.status ? 'Aktiv' : 'Inaktiv'}"
-                                        th:classappend="${sponsor.status ? 'status green' : 'status red'}">Status</div>
+                                        class="status" th:classappend="${sponsor.status ? 'green' : 'red'}">Status</div>
                                 </div>
                             </td>
                             <td>
