@@ -182,6 +182,9 @@
             </form>    
         </div>
         <div>
+            <!-- lav dynamisk med thymeleaf: <form th:action="@{/getFile/{id}(id=${contract.id})}" method="GET"> -->
+            <!-- contract = contractRepo.findbyid(id) model.addattribute("contractpage", contract)  -->
+
             <form action="/getFile" method="get">
                 <label for="contractId">Download PDF</label>
                 <input type="hidden" name="contractId" value="1"> <!-- Replace value with the correct id -->

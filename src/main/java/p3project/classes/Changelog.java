@@ -1,30 +1,33 @@
 package p3project.classes;
 
+import java.lang.reflect.Field;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
-import static p3project.classes.Action.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @DiscriminatorValue("Changelog") // "Changelog" bliver værdien til "logType" kolonnen
 public class Changelog extends Eventlog {
     // changed code: avoid reserved words by mapping to safe column names
+    private String field;
+
     @Column(name = "before_value")
     private String before;
 
     @Column(name = "after_value")
     private String after;
 
-    // ikke @Override
-    public static Changelog create(User user, String objectType, String objectName, String before, String after) {
-        Changelog log = (Changelog)Eventlog.create(user, objectType, objectName, UPDATE);
-        log.before = before;
-        log.after = after;
+    // sæt ind i constructor?
+    public static <T> Changelog create(User user, T changedObject, Field field, Object before, Object after) {
+        Changelog log = (Changelog)Eventlog.create(user, changedObject, "UPDATE");
+        log.field = field.getName();
+        log.before = before.toString();
+        log.after = after.toString();
         return log;
     }
 

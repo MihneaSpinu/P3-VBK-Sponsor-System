@@ -12,10 +12,11 @@
     <thead>
         <tr>
             <th>Username</th>
+            <th>Action</th>
             <th>Type</th>
             <th>Name</th>
             <th>Timestamp</th>
-            <th>Action</th>
+            <th>Field</th>
             <th>Before</th>
             <th>After</th>
         </tr>
@@ -24,12 +25,13 @@
     <tbody>
         <tr th:each="changelog : ${changelogs}">
             <td th:text="${changelog.username}"></td>
+            <td th:text="${changelog.action}"></td>
             <td th:text="${changelog.objectType}"></td>
             <td th:text="${changelog.objectName}"></td>
             <td th:text="${changelog.timestamp}"></td>
-            <td th:text="${changelog.action}"></td>
-            <td th:text="${changelog.before == null ? N/A : changelog.before}"></td> <!-- (N/A) (-) ( ) -->
-            <td th:text="${changelog.after == null ? N/A : changelog.before}"></td>
+            <td th:text="${changelog.field == null ? '-' : changelog.field}"></td> <!-- elvis? -->
+            <td th:text="${changelog.before == null ? '-' : changelog.before}"></td> <!-- (N/A) (-) ( )...? -->
+            <td th:text="${changelog.after == null ? '-' : changelog.before}"></td>
         </tr>
     </tbody>
 </table>
