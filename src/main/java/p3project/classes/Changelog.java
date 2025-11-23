@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @DiscriminatorValue("Changelog") // "Changelog" bliver værdien til "logType" kolonnen
 public class Changelog extends Eventlog {
-    // changed code: avoid reserved words by mapping to safe column names
+
     private String field;
 
     @Column(name = "before_value")
@@ -21,6 +21,18 @@ public class Changelog extends Eventlog {
 
     @Column(name = "after_value")
     private String after;
+
+    public String getField() {
+        return this.field;
+    }
+
+    public String getBefore() {
+        return this.before;
+    }
+
+    public String getAfter() {
+        return this.after;
+    }
 
     // sæt ind i constructor?
     public static <T> Changelog create(User user, T changedObject, Field field, Object before, Object after) {

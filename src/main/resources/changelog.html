@@ -29,11 +29,10 @@
             <td th:text="${changelog.objectType}"></td>
             <td th:text="${changelog.objectName}"></td>
             <td th:text="${changelog.timestamp}"></td>
-            <td th:text="${changelog.field == null ? '-' : changelog.field}"></td> <!-- elvis? -->
-            <td th:text="${changelog.before == null ? '-' : changelog.before}"></td> <!-- (N/A) (-) ( )...? -->
-            <td th:text="${changelog.after == null ? '-' : changelog.before}"></td>
+            <td th:text="${changelog instanceof T(p3project.classes.Changelog) ? changelog.field : '-'}"></td>
+            <td th:text="${changelog instanceof T(p3project.classes.Changelog) ? changelog.before : '-'}"></td>
+            <td th:text="${changelog instanceof T(p3project.classes.Changelog) ? changelog.after  : '-'}"></td>
         </tr>
     </tbody>
 </table>
-
 </html>

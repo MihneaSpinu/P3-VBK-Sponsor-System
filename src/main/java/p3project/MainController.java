@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
 import p3project.classes.Changelog;
+import p3project.classes.Eventlog;
 import p3project.classes.Contract;
 import p3project.classes.Service;
 import p3project.classes.Sponsor;
@@ -194,8 +195,7 @@ public class MainController {
         Contract contract = new Contract(start, end, Integer.parseInt(payment), status, type);
         contract.setSponsorId(sponsorId);
         var s = sponsorRepository.findById(sponsorId);
-        if (s.isPresent())
-            contract.setSponsorName(s.get().getSponsorName());
+        if (s.isPresent()) contract.setSponsorName(s.get().getSponsorName());
         contractRepository.save(contract);
         return "redirect:/sponsors";
     }

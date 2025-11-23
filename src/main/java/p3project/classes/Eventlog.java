@@ -38,11 +38,32 @@ public class Eventlog {
         return this.id;
     }
 
+    public String getUsername() {
+        return this.username;
+    }
+
+    public String getObjectType() {
+        return this.objectType;
+    }
+
+    public String getObjectName() {
+        return this.objectName;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return this.timestamp;
+    }
+
+    public String getAction() {
+        return this.action;
+    }
+
     // sæt ind i constructor?
     public static <T> Eventlog create(User user, T changedObject, String action) {
         Eventlog log = new Eventlog();
-        log.username = user.getName();
-        log.objectType = changedObject.getClass().getSimpleName(); // oversæt til dansk på frontend xd
+        log.username = "testUsername";
+        
+        //log.objectType = changedObject.getClass().getSimpleName(); // oversæt til dansk på frontend xd
         try {
             Method getName = changedObject.getClass().getMethod("getName"); // jank
             log.objectName = getName.invoke(changedObject).toString();
@@ -50,6 +71,7 @@ public class Eventlog {
             log.objectName = "-";
             throw new RuntimeException("Error getting name of target object: ", error);
         }
+        
         log.timestamp = LocalDateTime.now(); // skal formateres ordentligt
         log.action = action;
         return log;
