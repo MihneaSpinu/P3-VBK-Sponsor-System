@@ -12,17 +12,21 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
 import p3project.classes.Changelog;
+import p3project.classes.Eventlog;
 import p3project.classes.Contract;
 import p3project.classes.Service;
 import p3project.classes.Sponsor;
@@ -94,19 +98,19 @@ public class MainController {
     }
 
     // boilerplate update handlers
-    @PostMapping("/update/sponsor")
+    @PutMapping("/update/sponsor")
     public ResponseEntity<String> updateSponsorFields(@RequestBody Sponsor sponsor) {
         Sponsor storedSponsor = sponsorRepository.getReferenceById(sponsor.getId());
         return handleUpdateRequest(sponsor, storedSponsor);
     }
 
-    @PostMapping("/update/contract")
+    @PutMapping("/update/contract")
     public ResponseEntity<String> updateContractFields(@RequestBody Contract contract) {
         Contract storedContract = contractRepository.getReferenceById(contract.getId());
         return handleUpdateRequest(contract, storedContract);
     }
 
-    @PostMapping("/update/service")
+    @PutMapping("/update/service")
     public ResponseEntity<String> updateServiceFields(@RequestBody Service service) {
         Service storedService = serviceRepository.getReferenceById(service.getId());
         return handleUpdateRequest(service, storedService);
@@ -124,41 +128,30 @@ public class MainController {
 
     // fejl håndtering tba, if(==null) etc...
     private <T> Integer compareFields(T requestObject, T storedObject) throws ClassNotFoundException {
-        // if(!(requestObject.getClass().equals(storedObject.getClass())))
 
         Integer fieldsChanged = 0;
         Field[] fields = requestObject.getClass().getDeclaredFields();
         for (Field field : fields) {
             field.setAccessible(true);
             try {
-                if (field.getName().equals("id"))
-                    continue; // slet?
                 Object before = field.get(storedObject);
                 Object after = field.get(requestObject);
                 if (!before.equals(after)) {
-                    Changelog log = Changelog.create(new User(), requestObject.toString(), requestObject.toString(),
-                            before.toString(), after.toString()); // wip
+                    Changelog log = Changelog.create(new User(), requestObject, field, before, after); // user wip
                     logRepository.save(log);
                     field.set(storedObject, after);
                     fieldsChanged++;
-                    System.out.println(
-                            "Updated " + field.toString() + ": " + before.toString() + " -> " + after.toString());
+                    System.out.println("Updated " + field.getName() + ": " + before.toString() + " -> " + after.toString());
                 }
             } catch (IllegalAccessException error) {
                 throw new RuntimeException(error);
             }
         }
 
-        // lav compareFields returnere "T", og lav nedenstående til sin egen funktion
-        // "saveUpdatedObject" eller w/e
-        if (requestObject instanceof Sponsor)
-            sponsorRepository.save((Sponsor) storedObject);
-        else if (requestObject instanceof Contract)
-            contractRepository.save((Contract) storedObject);
-        else if (requestObject instanceof Service)
-            serviceRepository.save((Service) storedObject);
-        else
-            throw new ClassNotFoundException();
+        if (requestObject instanceof Sponsor)       sponsorRepository.save((Sponsor) storedObject);
+        else if (requestObject instanceof Contract) contractRepository.save((Contract) storedObject);
+        else if (requestObject instanceof Service)  serviceRepository.save((Service) storedObject);
+        else throw new ClassNotFoundException();
 
         return fieldsChanged;
     }
@@ -184,6 +177,7 @@ public class MainController {
         Sponsor sponsor = new Sponsor(sponsorName, contactPerson, email, phoneNumber, cvrNumber, status,
                 comments == null ? "" : comments);
         sponsorRepository.save(sponsor);
+        
         return "redirect:/sponsors";
     }
 
@@ -201,8 +195,7 @@ public class MainController {
         Contract contract = new Contract(start, end, Integer.parseInt(payment), status, type);
         contract.setSponsorId(sponsorId);
         var s = sponsorRepository.findById(sponsorId);
-        if (s.isPresent())
-            contract.setSponsorName(s.get().getSponsorName());
+        if (s.isPresent()) contract.setSponsorName(s.get().getSponsorName());
         contractRepository.save(contract);
         return "redirect:/sponsors";
     }
@@ -240,24 +233,25 @@ public class MainController {
 
             // update stored sponsorName copy on contracts
             Iterable<Contract> contracts = contractRepository.findAll();
-            for (Contract c : contracts) {
-                if (sponsorId.equals(c.getSponsorId())) {
-                    c.setSponsorName(s.getSponsorName());
-                    contractRepository.save(c);
+            for (Contract contract : contracts) {
+                if (sponsorId.equals(contract.getSponsorId())) {
+                    contract.setSponsorName(s.getSponsorName());
+                    contractRepository.save(contract);
                 }
             }
         }
         return "redirect:/sponsors";
     }
 
+
     // Deletes a sponsor and all contracts linked to that sponsor
     @PostMapping("/sponsors/delete")
     public String deleteSponsor(@RequestParam Long sponsorId) {
         sponsorRepository.deleteById(sponsorId);
         Iterable<Contract> contracts = contractRepository.findAll();
-        for (Contract c : contracts) {
-            if (sponsorId.equals(c.getSponsorId())) {
-                contractRepository.deleteById(c.getId());
+        for (Contract contract : contracts) {
+            if (sponsorId.equals(contract.getSponsorId())) {
+                contractRepository.deleteById(contract.getId());
             }
         }
         return "redirect:/sponsors";
@@ -297,6 +291,7 @@ public class MainController {
         return "redirect:/sponsors";
     }
 
+    // fjern requestparam?
     @GetMapping("/getFile")
     public ResponseEntity<byte[]> getFile(@RequestParam long contractId) {
         Contract contract = contractRepository.findById(contractId)

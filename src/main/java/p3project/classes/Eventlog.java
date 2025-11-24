@@ -1,7 +1,8 @@
 package p3project.classes;
 
-import java.util.Date; // date, localdate, time?
-import static p3project.classes.Action.*; // static for ikke at skrive Action.CREATE etc...
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 
@@ -19,14 +20,12 @@ public class Eventlog {
     private String username;
     private String objectType; // .getClass().getSimpleName();
     private String objectName;
-    private Date timestamp;
-    private int action; // String måske?
+    private LocalDateTime timestamp;
+    private String action; // String måske?
 
-    protected Eventlog() {
-    }
+    protected Eventlog() {}
     /*
-     * public Eventlog(User user, String objectType, String objectName, Action
-     * action) {
+     * public Eventlog(User user, String objectType, String objectName, Action action) {
      * this.username = user.getName();
      * this.objectType = objectType.getClass().getSimpleName();
      * this.objectName = objectName;
@@ -39,12 +38,41 @@ public class Eventlog {
         return this.id;
     }
 
-    public static Eventlog create(User user, Object objectType, String objectName, int action) {
+    public String getUsername() {
+        return this.username;
+    }
+
+    public String getObjectType() {
+        return this.objectType;
+    }
+
+    public String getObjectName() {
+        return this.objectName;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return this.timestamp;
+    }
+
+    public String getAction() {
+        return this.action;
+    }
+
+    // sæt ind i constructor?
+    public static <T> Eventlog create(User user, T changedObject, String action) {
         Eventlog log = new Eventlog();
-        log.username = user.getName();
-        log.objectType = objectType.getClass().getSimpleName(); // oversæt til dansk på frontend xd
-        log.objectName = objectName;
-        log.timestamp = new Date();
+        log.username = "testUsername";
+        
+        //log.objectType = changedObject.getClass().getSimpleName(); // oversæt til dansk på frontend xd
+        try {
+            Method getName = changedObject.getClass().getMethod("getName"); // jank
+            log.objectName = getName.invoke(changedObject).toString();
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException error) {
+            log.objectName = "-";
+            throw new RuntimeException("Error getting name of target object: ", error);
+        }
+        
+        log.timestamp = LocalDateTime.now(); // skal formateres ordentligt
         log.action = action;
         return log;
     }

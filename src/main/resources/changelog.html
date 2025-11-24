@@ -33,10 +33,11 @@
     <thead>
         <tr>
             <th>Username</th>
+            <th>Action</th>
             <th>Type</th>
             <th>Name</th>
             <th>Timestamp</th>
-            <th>Action</th>
+            <th>Field</th>
             <th>Before</th>
             <th>After</th>
         </tr>
@@ -45,12 +46,13 @@
     <tbody>
         <tr th:each="changelog : ${changelogs}">
             <td th:text="${changelog.username}"></td>
+            <td th:text="${changelog.action}"></td>
             <td th:text="${changelog.objectType}"></td>
             <td th:text="${changelog.objectName}"></td>
             <td th:text="${changelog.timestamp}"></td>
-            <td th:text="${changelog.action}"></td>
-            <td th:text="${changelog.before == null ? N/A : changelog.before}"></td> <!-- (N/A) (-) ( ) -->
-            <td th:text="${changelog.after == null ? N/A : changelog.before}"></td>
+            <td th:text="${changelog instanceof T(p3project.classes.Changelog) ? changelog.field : '-'}"></td>
+            <td th:text="${changelog instanceof T(p3project.classes.Changelog) ? changelog.before : '-'}"></td>
+            <td th:text="${changelog instanceof T(p3project.classes.Changelog) ? changelog.after  : '-'}"></td>
         </tr>
     </tbody>
 </table>
