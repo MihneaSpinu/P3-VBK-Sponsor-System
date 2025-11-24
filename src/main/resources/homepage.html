@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Homepage</title>
-    <link rel="stylesheet" href="Sidebar.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/Sidebar.css}" href="static/css/Sidebar.css">
+    <title>homepage</title>
 
     <style>
         body {
@@ -19,7 +20,7 @@
             min-height: 100vh;
         }
 
-        .container {
+        .app-container {
             display: flex;
             flex: 1;
         }
@@ -334,7 +335,7 @@
 
 <body class="bg-gray-100 text-gray-900">
 
-    <div class="container">
+    <div class="app-container flex min-h-screen w-full">
 
         <!-- Sidebar -->
         <aside class="sidebar">
@@ -464,7 +465,7 @@
                             <td>
                                 <div class="col-list">
                                     <div th:text="${sponsor.status ? 'Aktiv' : 'Inaktiv'}"
-                                        th:classappend="${sponsor.status ? 'status green' : 'status red'}">Status</div>
+                                        class="status" th:classappend="${sponsor.status ? 'green' : 'red'}">Status</div>
                                 </div>
                             </td>
                             <td>
@@ -501,6 +502,7 @@
                 document.getElementById("SponsorContactPerson").textContent = contact;
                 document.getElementById("SponsorEmail").textContent = email;
                 document.getElementById("SponsorPhoneNumber").textContent = phone;
+                window.location.hash = 'Smodal';
             })
         })
 
