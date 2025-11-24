@@ -7,155 +7,13 @@
     <title>Admin Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- <link rel="stylesheet" href="/style.css"> -->
-    <link rel="stylesheet" href="Sidebar.css">
+    <link rel="stylesheet" th:href="@{/css/Sidebar.css}" href="static/css/Sidebar.css">
 </head>
 
-<style>
-
-    header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 250px;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .Button {
-        border-radius: 10px;
-        text-align: center;
-        display: inline-block;
-        margin: 10px;
-        padding: 10px 20px;
-        border: none;
-        font-size: 20px;
-        background-color: darkgrey;
-        transition-duration: 0.3s;
-        cursor: pointer;
-    }
-
-    .LogOutBtn {
-        position: fixed;
-        text-align: center;
-        bottom: 100px;
-        left: 10px;
-        margin: 10px;
-        padding: 10px;
-        width: 200px;
-    }
-
-    .LogOutBtn:hover {
-        background-color: dodgerblue;
-        color: white;
-    }
-
-    .NavBtn {
-        display: block;
-        margin: 10px;
-        padding: 10px;
-        width: 200px;
-    }
-
-    .NavBtn:hover {
-        background-color: dodgerblue;
-        color: white;
-    }
-
-    .NavBox {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-        border-radius: 10px;
-        background-color: lightgrey;
-        padding: 10px;
-        margin: 10px;
-        width: 200px;
-    }
-
-    .NavBarTitle {
-        border-radius: 10px;
-        background-color: dodgerblue;
-        font-size: 20px;
-        font-weight: bold;
-        margin: 10px;
-        padding: 10px;
-        width: 200px;
-        text-align: center;
-    }
-
-    main {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        gap: 20px;
-        margin: 10px;
-    }
-
-    .UserList {
-        border-radius: 10px;
-        background-color: lightgrey;
-        padding: 20px;
-        margin: 50px;
-        margin-top: 10px;
-        width: 200px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .UserList ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .CreateUser {
-        border-radius: 10px;
-        background-color: lightgrey;
-        padding: 20px;
-        margin: 50px;
-        margin-top: 10px;
-        width: 200px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .FontTitle {
-        border-radius: 10px;
-        background-color: lightgrey;
-        font-size: 30px;
-        font-weight: bold;
-        margin: 50px;
-        margin-bottom: 10px;
-        padding: 10px;
-        width: 200px;
-        text-align: center;
-    }
-
-    .UserBtn {
-        display: block;
-        margin: 10px;
-        padding: 10px;
-        width: 200px;
-    }
-
-    .UserBtn:hover {
-        background-color: dodgerblue;
-        color: white;
-    }
-</style>
-
 <body class="bg-gray-100 text-gray-900">
+    
     <div class="flex min-h-screen">
+        
         <!-- Sidebar -->
         <aside class="sidebar">
             <div>
@@ -173,19 +31,80 @@
         </aside>
 
     <!-- Main Content -->
-    <main>
-        <div>
-        <div class="bg-gray-200 rounded-t-lg shadow-md text-sm font-semibold grid grid-cols-2">
-          <div class="px-6 py-3 border-r">Brugere</div>
-          <div class="px-6 py-3 border-r">Opret ny bruger</div>
-        </div>
+    <main class="flex-1 p-6">
+       <div>
+            <div class="bg-gray-200 rounded-t-lg text-sm font-semibold">
+                <div class="grid grid-cols-2">
+                    <div class="px-6 py-3 border-r">
+                        <span>Brugere</span>
+                    </div>
+                    <div class="px-6 py-3">
+                        <span>Tilføj bruger</span>
+                    </div>
+                </div>
+            </div>
 
-            <div>
+            <div class="grid grid-cols-2 gap-3 items-start">
 
+                <!-- User list -->
+                <section class="bg-white rounded shadow p-4">
+                    <table class="min-w-full text-sm">
+                        <tbody>
+                            <tr>
+                                <td class="px-6 py-4">
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #1</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #2</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #3</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #4</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #5</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #6</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #7</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #8</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #9</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #10</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #11</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #12</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #13</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #14</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #15</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #16</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #17</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #18</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #19</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #...</button>
+                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded">Bruger #999.999.999.999</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Add user -->
+                <section class="bg-white rounded shadow p-4">
+                    <form th:action="@{/users/add}" action="/users/add" method="post" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Brugernavn</label>
+                            <input name="username" type="text" required class="mt-1 block w-full border-gray-300 rounded px-3 py-2" placeholder="Brugernavn">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Email</label>
+                            <input name="email" type="email" required class="mt-1 block w-full border-gray-300 rounded px-3 py-2" placeholder="email@example.com">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Adgangskode</label>
+                            <input name="password" type="password" required class="mt-1 block w-full border-gray-300 rounded px-3 py-2" placeholder="Adgangskode">
+                        </div>
+
+                        <div>
+                            <button type="submit" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded">Tilføj bruger</button>
+                        </div>
+                    </form>
+                </section>
             </div>
 
         </div>
-
     </main>
     <footer>
 
