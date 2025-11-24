@@ -93,7 +93,7 @@ public class MainController {
 
     @GetMapping("/login")
     public String loginPage(Model model) {
-        return "Loginpage3"; // Thymeleaf login template
+        return "login"; // Thymeleaf login template
     }
 
     @PostMapping("/login/confirm")
@@ -107,16 +107,16 @@ public class MainController {
         // null-safe comparison
         if (user == null || !Objects.equals(email, user.getEmail())) {
             model.addAttribute("error", "Invalid username or email");
-            return "Loginpage3";
+            return "login";
         }
 
         model.addAttribute("user", user);
-        return "Complete"; // login success page
+        return "homepage"; // login success page
     }
 
-    @GetMapping("/Complete")
+    @GetMapping("/Homepage")
     public String showCompletePage() {
-        return "Complete";
+        return "homepage";
     }
 
     @GetMapping("/homepage")
