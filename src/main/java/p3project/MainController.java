@@ -366,13 +366,13 @@ public class MainController {
         return "homepage"; // login success page
     }
 
-    @GetMapping("/Homepage")
+    @GetMapping("/homepage")
     public String showCompletePage() {
         return "homepage";
     }
 
     @GetMapping("/homepage")
-    public String showHomepage(Model model) {
+    public String showhomepage(Model model) {
         Iterable<Sponsor> sponsors = sponsorRepository.findAll();
         model.addAttribute("sponsors", sponsors);
         return "homepage";
