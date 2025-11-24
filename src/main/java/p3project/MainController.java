@@ -141,17 +141,22 @@ public class MainController {
                     logRepository.save(log);
                     field.set(storedObject, after);
                     fieldsChanged++;
-                    System.out.println("Updated " + field.getName() + ": " + before.toString() + " -> " + after.toString());
+                    System.out.println(
+                            "Updated " + field.getName() + ": " + before.toString() + " -> " + after.toString());
                 }
             } catch (IllegalAccessException error) {
                 throw new RuntimeException(error);
             }
         }
 
-        if (requestObject instanceof Sponsor)       sponsorRepository.save((Sponsor) storedObject);
-        else if (requestObject instanceof Contract) contractRepository.save((Contract) storedObject);
-        else if (requestObject instanceof Service)  serviceRepository.save((Service) storedObject);
-        else throw new ClassNotFoundException();
+        if (requestObject instanceof Sponsor)
+            sponsorRepository.save((Sponsor) storedObject);
+        else if (requestObject instanceof Contract)
+            contractRepository.save((Contract) storedObject);
+        else if (requestObject instanceof Service)
+            serviceRepository.save((Service) storedObject);
+        else
+            throw new ClassNotFoundException();
 
         return fieldsChanged;
     }
@@ -177,7 +182,7 @@ public class MainController {
         Sponsor sponsor = new Sponsor(sponsorName, contactPerson, email, phoneNumber, cvrNumber, status,
                 comments == null ? "" : comments);
         sponsorRepository.save(sponsor);
-        
+
         return "redirect:/sponsors";
     }
 
@@ -195,7 +200,8 @@ public class MainController {
         Contract contract = new Contract(start, end, Integer.parseInt(payment), status, type);
         contract.setSponsorId(sponsorId);
         var s = sponsorRepository.findById(sponsorId);
-        if (s.isPresent()) contract.setSponsorName(s.get().getSponsorName());
+        if (s.isPresent())
+            contract.setSponsorName(s.get().getSponsorName());
         contractRepository.save(contract);
         return "redirect:/sponsors";
     }
@@ -242,7 +248,6 @@ public class MainController {
         }
         return "redirect:/sponsors";
     }
-
 
     // Deletes a sponsor and all contracts linked to that sponsor
     @PostMapping("/sponsors/delete")
@@ -359,11 +364,6 @@ public class MainController {
 
         model.addAttribute("user", user);
         return "homepage"; // login success page
-    }
-
-    @GetMapping("/homepage")
-    public String showCompletePage() {
-        return "homepage";
     }
 
     @GetMapping("/homepage")
