@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Homepage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/Sidebar.css}" href="static/css/Sidebar.css">
+    <title>homepage</title>
 
     <style>
         body {
@@ -18,66 +20,9 @@
             min-height: 100vh;
         }
 
-        .container {
+        .app-container {
             display: flex;
             flex: 1;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 16rem;
-            /* 64 in Tailwind */
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .logo {
-            background-color: #bbf7d0;
-            /* green-200 */
-            text-align: center;
-            padding: 0.75rem;
-            border-radius: 0.375rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-        }
-
-        .menu {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .menu-btn {
-            background-color: #e5e7eb;
-            /* gray-200 */
-            padding: 0.5rem;
-            border: none;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .menu-btn:hover {
-            background-color: #d1d5db;
-            /* gray-300 */
-        }
-
-        .logout-btn {
-            background-color: #e5e7eb;
-            padding: 0.5rem;
-            border: none;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            margin-top: 1.5rem;
-            transition: background-color 0.2s;
-        }
-
-        .logout-btn:hover {
-            background-color: #d1d5db;
         }
 
         /* Main content */
@@ -390,7 +335,7 @@
 
 <body class="bg-gray-100 text-gray-900">
 
-    <div class="container">
+    <div class="app-container flex min-h-screen w-full">
 
         <!-- Sidebar -->
         <aside class="sidebar">
@@ -414,7 +359,6 @@
 </form>
         </aside>
 
-        <!-- Sponsor Modal-->
         <!-- Sponsor Modal-->
         <div id="Smodal">
             <div class="ModalBox">
@@ -527,7 +471,7 @@
                             <td>
                                 <div class="col-list">
                                     <div th:text="${sponsor.status ? 'Aktiv' : 'Inaktiv'}"
-                                        th:classappend="${sponsor.status ? 'status green' : 'status red'}">Status</div>
+                                        class="status" th:classappend="${sponsor.status ? 'green' : 'red'}">Status</div>
                                 </div>
                             </td>
                             <td>
@@ -564,6 +508,7 @@
                 document.getElementById("SponsorContactPerson").textContent = contact;
                 document.getElementById("SponsorEmail").textContent = email;
                 document.getElementById("SponsorPhoneNumber").textContent = phone;
+                window.location.hash = 'Smodal';
             })
         })
 

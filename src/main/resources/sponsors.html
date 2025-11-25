@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sponsors</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 24px;
+        background: #f5f5f5;
+      }
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+      }
+      .list {
+        margin-bottom: 20px;
+      }
+      .item {
+        padding: 12px;
+        border: 1px solid #e1e1e1;
+        border-radius: 6px;
+        margin-bottom: 8px;
+      }
+      .form {
+        padding: 12px;
+        background: #f7f7f7;
+        border-radius: 6px;
+      }
+      label {
+        display: block;
+        margin-top: 8px;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+      }
+      button {
+        margin-top: 10px;
+        padding: 8px 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Sponsors</h1>
+
+      <section class="list">
+        <h2>All Sponsors</h2>
+        <div th:if="${not #lists.isEmpty(sponsors)}">
+          <div th:each="sponsor, stat : ${sponsors}" class="item">
+            <strong th:text="${sponsor.sponsorName}">Sponsor Name</strong>
+            <div>
+              Contact: <span th:text="${sponsor.contactPerson}">Contact</span>
+            </div>
+            <div>Email: <span th:text="${sponsor.email}">email</span></div>
+            <div>
+              Phone: <span th:text="${sponsor.phoneNumber}">phone</span>
+            </div>
+            <div>CVR: <span th:text="${sponsor.cvrNumber}">cvr</span></div>
+            <div>Status: <span th:text="${sponsor.status}">status</span></div>
+            <div>
+              Comments: <span th:text="${sponsor.comments}">comments</span>
+            </div>
+            <div style="margin-top: 8px">
+              <button
+                type="button"
+                th:onclick="|toggleSponsorEdit(${stat.index})|"
+              >
+                Edit
+              </button>
+              <form
+                th:action="@{/sponsors/delete}"
+                method="POST"
+                style="display: inline"
+                th:onsubmit="return confirm('Delete sponsor and its contracts? This cannot be undone.')"
+              >
+                <input
+                  type="hidden"
+                  name="sponsorId"
+                  th:value="${sponsor.id}"
+                />
+                <button type="submit">Delete</button>
+              </form>
+            </div>
+
+            <form
+              th:id="|sponsorEditForm-${stat.index}|"
+              th:action="@{/sponsors/edit}"
+              method="post"
+              style="display: none; margin-top: 8px"
+              class="form"
+            >
+              <input type="hidden" name="sponsorId" th:value="${sponsor.id}" />
+              <label>Sponsor Name</label>
+              <input
+                name="sponsorName"
+                th:value="${sponsor.sponsorName}"
+                required
+              />
+              <label>Contact Person</label>
+              <input name="contactPerson" th:value="${sponsor.contactPerson}" />
+              <label>Email</label>
+              <input name="email" type="email" th:value="${sponsor.email}" />
+              <label>Phone</label>
+              <input
+                name="phoneNumber"
+                type="tel"
+                inputmode="numeric"
+                pattern="^[0-9]+$"
+                title="Digits only"
+                th:value="${sponsor.phoneNumber}"
+              />
+              <label>CVR</label>
+              <input name="cvrNumber" th:value="${sponsor.cvrNumber}" />
+              <label>Active</label>
+              <select name="status">
+                <option value="true" th:selected="${sponsor.status}">
+                  True
+                </option>
+                <option value="false" th:selected="${!sponsor.status}">
+                  False
+                </option>
+              </select>
+              <label>Comments</label>
+              <input name="comments" th:value="${sponsor.comments}" />
+              <button type="submit">Save</button>
+              <button
+                type="button"
+                th:onclick="|toggleSponsorEdit(${stat.index})|"
+              >
+                Cancel
+              </button>
+            </form>
+          </div>
+        </div>
+        <div th:if="${#lists.isEmpty(sponsors)}">No sponsors yet.</div>
+      </section>
+
+      <section class="form">
+        <h2>Add Sponsor</h2>
+        <form action="/sponsors/add" method="post">
+          <label for="sponsorName">Sponsor Name</label>
+          <input id="sponsorName" name="sponsorName" required />
+          <label for="contactPerson">Contact Person</label>
+          <input id="contactPerson" name="contactPerson" />
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" />
+          <label for="phoneNumber">Phone</label>
+          <input
+            id="phoneNumber"
+            name="phoneNumber"
+            type="tel"
+            inputmode="numeric"
+            pattern="^[0-9]+$"
+            title="Digits only"
+          />
+          <label for="cvrNumber">CVR</label>
+          <input id="cvrNumber" name="cvrNumber" />
+          <label for="status">Active</label>
+          <select id="status" name="status">
+            <option value="true">True</option>
+            <option value="false" selected>False</option>
+          </select>
+          <label for="comments">Comments</label>
+          <input id="comments" name="comments" />
+          <button type="submit">Add Sponsor</button>
+        </form>
+      </section>
+
+      <section class="form">
+        <h2>Create Contract For Sponsor</h2>
+        <form action="/sponsors/addContract" method="post">
+          <label for="sponsorSelect">Sponsor</label>
+          <select id="sponsorSelect" name="sponsorId" required>
+            <option
+              th:each="s : ${sponsors}"
+              th:value="${s.id}"
+              th:text="${s.sponsorName}"
+            ></option>
+          </select>
+
+          <label for="startDate">Start Date</label>
+          <input id="startDate" name="startDate" type="date" required />
+          <label for="endDate">End Date</label>
+          <input id="endDate" name="endDate" type="date" required />
+          <label for="payment">Payment (integer)</label>
+          <input id="payment" name="payment" type="number" value="0" required />
+          <label for="type">Type</label>
+          <input id="type" name="type" value="Standard" />
+          <label for="statusC">Active</label>
+          <select id="statusC" name="status">
+            <option value="true">True</option>
+            <option value="false" selected>False</option>
+          </select>
+          <button type="submit">Create Contract</button>
+        </form>
+      </section>
+
+      <section class="list">
+        <h2>Contracts</h2>
+        <div th:if="${not #lists.isEmpty(contracts)}">
+          <div th:each="contract, statC : ${contracts}" class="item">
+            <div>Contract ID: <span th:text="${contract.id}">1</span></div>
+            <div>
+              Sponsor: <span th:text="${contract.sponsorName}">sponsor</span>
+            </div>
+            <div>Type: <span th:text="${contract.type}">type</span></div>
+            <div>Start: <span th:text="${contract.startDate}">start</span></div>
+            <div>End: <span th:text="${contract.endDate}">end</span></div>
+            <div>Payment: <span th:text="${contract.payment}">0</span></div>
+            <div>Status: <span th:text="${contract.status}">false</span></div>
+            <div style="margin-top: 8px">
+              <button
+                type="button"
+                th:onclick="|toggleContractEdit(${statC.index})|"
+              >
+                Edit
+              </button>
+              <form
+                th:action="@{/sponsors/deleteContract}"
+                method="POST"
+                style="display: inline"
+                th:onsubmit="return confirm('Delete this contract? This cannot be undone.')"
+              >
+                <input
+                  type="hidden"
+                  name="contractId"
+                  th:value="${contract.id}"
+                />
+                <button type="submit">Delete</button>
+              </form>
+            </div>
+
+            <form
+              th:id="|contractEditForm-${statC.index}|"
+              th:action="@{/sponsors/editContract}"
+              method="post"
+              style="display: none; margin-top: 8px"
+              class="form"
+            >
+              <input
+                type="hidden"
+                name="contractId"
+                th:value="${contract.id}"
+              />
+              <label>Sponsor</label>
+              <select name="sponsorId">
+                <option
+                  th:each="s : ${sponsors}"
+                  th:value="${s.id}"
+                  th:text="${s.sponsorName}"
+                  th:selected="${s.id == contract.sponsorId}"
+                ></option>
+              </select>
+              <label>Start Date</label>
+              <input
+                name="startDate"
+                type="date"
+                th:value="${contract.startDate}"
+              />
+              <label>End Date</label>
+              <input
+                name="endDate"
+                type="date"
+                th:value="${contract.endDate}"
+              />
+              <label>Payment</label>
+              <input
+                name="payment"
+                type="number"
+                th:value="${contract.payment}"
+              />
+              <label>Type</label>
+              <input name="type" th:value="${contract.type}" />
+              <label>Active</label>
+              <select name="status">
+                <option value="true" th:selected="${contract.status}">
+                  True
+                </option>
+                <option value="false" th:selected="${!contract.status}">
+                  False
+                </option>
+              </select>
+              <button type="submit">Save</button>
+              <button
+                type="button"
+                th:onclick="|toggleContractEdit(${statC.index})|"
+              >
+                Cancel
+              </button>
+            </form>
+          </div>
+        </div>
+        <div th:if="${#lists.isEmpty(contracts)}">No contracts yet.</div>
+      </section>
+    </div>
+    <script>
+      function toggleSponsorEdit(i) {
+        const id = "sponsorEditForm-" + i;
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.display =
+          el.style.display === "none" || el.style.display === ""
+            ? "block"
+            : "none";
+      }
+      function toggleContractEdit(i) {
+        const id = "contractEditForm-" + i;
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.display =
+          el.style.display === "none" || el.style.display === ""
+            ? "block"
+            : "none";
+      }
+      // Block non-digit characters in phone inputs and clean pasted values
+      (function () {
+        function attachPhoneHandlers(el) {
+          if (!el) return;
+          el.addEventListener("keydown", function (e) {
+            const k = e.key;
+            if (k.length !== 1) return; // allow control keys
+            if (!/^[0-9]$/.test(k)) {
+              e.preventDefault();
+            }
+          });
+          el.addEventListener("paste", function (e) {
+            e.preventDefault();
+            const text =
+              (e.clipboardData || window.clipboardData).getData("text") || "";
+            const filtered = text.replace(/[^0-9]/g, "");
+            const start = el.selectionStart;
+            const end = el.selectionEnd;
+            const before = el.value.slice(0, start);
+            const after = el.value.slice(end);
+            el.value = before + filtered + after;
+            const caret = start + filtered.length;
+            el.setSelectionRange(caret, caret);
+          });
+          el.addEventListener("input", function () {
+            const cleaned = el.value.replace(/[^0-9]/g, "");
+            if (cleaned !== el.value) {
+              const pos = Math.max(
+                0,
+                el.selectionStart - (el.value.length - cleaned.length)
+              );
+              el.value = cleaned;
+              el.setSelectionRange(pos, pos);
+            }
+          });
+        }
+        // attach to the add form phone and any edit phone inputs
+        attachPhoneHandlers(document.getElementById("phoneNumber"));
+        document
+          .querySelectorAll('input[name="phoneNumber"]')
+          .forEach(attachPhoneHandlers);
+      })();
+    </script>
+  </body>
+</html>

@@ -1,165 +1,296 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>User List</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background-color: #f5f5f5;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+        background-color: #f5f5f5;
+      }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
 
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-        }
+      h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+      }
 
-        .user-list {
-            list-style: none;
-            padding: 0;
-        }
+      .user-list {
+        list-style: none;
+        padding: 0;
+      }
 
-        .user-item {
-            background-color: #f9f9f9;
-            margin: 10px 0;
-            padding: 15px;
-            border-radius: 5px;
-            border-left: 4px solid #007bff;
-        }
+      .user-item {
+        background-color: #f9f9f9;
+        margin: 10px 0;
+        padding: 15px;
+        border-radius: 5px;
+        border-left: 4px solid #007bff;
+      }
 
-        .user-name {
-            font-weight: bold;
-            font-size: 18px;
-            color: #333;
-        }
+      .user-name {
+        font-weight: bold;
+        font-size: 18px;
+        color: #333;
+      }
 
-        .user-email {
-            color: #666;
-            margin-top: 5px;
-        }
+      .user-email {
+        color: #666;
+        margin-top: 5px;
+      }
 
-        .user-id {
-            color: #999;
-            font-size: 12px;
-        }
+      .user-id {
+        color: #999;
+        font-size: 12px;
+      }
 
-        .no-users {
-            text-align: center;
-            color: #666;
-            font-style: italic;
-            margin-top: 50px;
-        }
+      .no-users {
+        text-align: center;
+        color: #666;
+        font-style: italic;
+        margin-top: 50px;
+      }
 
-        .add-user-form {
-            margin-top: 40px;
-            padding: 20px;
-            background-color: #e9ecef;
-            border-radius: 5px;
-        }
+      .add-user-form {
+        margin-top: 40px;
+        padding: 20px;
+        background-color: #e9ecef;
+        border-radius: 5px;
+      }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+      .form-group {
+        margin-bottom: 15px;
+      }
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
 
-        input[type="text"],
-        input[type="email"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
+      input[type="text"],
+      input[type="email"] {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
 
-        button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
+      button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
 
-        button:hover {
-            background-color: #0056b3;
-        }
+      button:hover {
+        background-color: #0056b3;
+      }
 
-        .refresh-btn {
-            display: block;
-            margin: 20px auto;
-            text-decoration: none;
-            text-align: center;
-        }
+      .refresh-btn {
+        display: block;
+        margin: 20px auto;
+        text-decoration: none;
+        text-align: center;
+      }
+      /* popup for invalid username characters */
+      #invalidPopup {
+        position: fixed;
+        left: 50%;
+        bottom: 24px;
+        transform: translateX(-50%) translateY(20px);
+        background: #c0392b;
+        color: #fff;
+        padding: 12px 18px;
+        border-radius: 6px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 220ms ease, transform 220ms ease;
+        z-index: 9999;
+        font-weight: 600;
+      }
+      #invalidPopup.popup-show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+        pointer-events: auto;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="container">
-        <h1>User Database</h1>
+      <h1>User Database</h1>
 
-        <!-- User List -->
-        <div th:if="${not #lists.isEmpty(users)}">
-            <h2>All Users (Total: <span th:text="${#lists.size(users)}"></span>)</h2>
-            <ul class="user-list">
-                <li th:each="user : ${users}" class="user-item">
-                    <div class="user-name" th:text="${user.name}">User Name</div>
-                    <div class="user-email" th:text="${user.email}">user@example.com</div>
-                    <div class="user-id">ID: <span th:text="${user.id}">1</span></div>
-                </li>
-            </ul>
-        </div>
+      <!-- User List -->
+      <div th:if="${not #lists.isEmpty(users)}">
+        <h2>
+          All Users (Total: <span th:text="${#lists.size(users)}"></span>)
+        </h2>
+        <ul class="user-list">
+          <li th:each="user : ${users}" class="user-item">
+            <div class="user-name" th:text="${user.name}">User Name</div>
+            <div class="user-email" th:text="${user.email}">
+              user@example.com
+            </div>
+            <div class="user-id">ID: <span th:text="${user.id}">1</span></div>
+          </li>
+        </ul>
+      </div>
 
-        <!-- No Users Message -->
-        <div th:if="${#lists.isEmpty(users)}" class="no-users">
-            <h2>No users found in the database</h2>
-            <p>Add some users using the form below!</p>
-        </div>
+      <!-- No Users Message -->
+      <div th:if="${#lists.isEmpty(users)}" class="no-users">
+        <h2>No users found in the database</h2>
+        <p>Add some users using the form below!</p>
+      </div>
 
-        <!-- Add User Form -->
-        <div class="add-user-form">
-            <h3>Add New User</h3>
-            <form action="/users/add" method="post">
-                <div class="form-group">
-                    <label for="name">Name:</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <button type="submit">Add User</button>
-            </form>
+      <!-- Add User Form -->
+      <div class="add-user-form">
+        <h3>Add New User</h3>
+        <div
+          th:if="${error}"
+          style="
+            color: #a94442;
+            background: #f2dede;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+          "
+        >
+          <strong th:text="${error}">Error message</strong>
         </div>
         <div >
             <form action="/uploadFile" method="post" enctype="multipart/form-data">
                 <label for="fileyesyes">Get THis?</label>
                 <input type="file" id="fileyesyes" name = "pdffile">
+                <input type="hidden" name="contractId" value="1">
                 <button type="submit">Upload</button>
             </form>    
         </div>
+        <div>
+
+            <form action="/getFile" method="get">
+                <label for="contractId">Download PDF</label>
+                <input type="hidden" name="contractId" value="1"> <!-- Replace value with the correct id -->
+                <button type="submit">Download PDF</button>
+            </form>
+        </div>
         <a href="/users" class="refresh-btn button">Refresh List</a>
+        <form action="/users/add" method="post">
+          <div class="form-group">
+            <label for="name">Name:</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              required
+              pattern="^[A-Za-z0-9_]+$"
+              title="Only letters, numbers and underscore allowed"
+            />
+          </div>
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+          <button type="submit" id="addUserBtn" disabled>Add User</button>
+        </form>
+      </div>
+      <a href="/users" class="refresh-btn button">Refresh List</a>
     </div>
     <div>
-        <button onclick="location.href='/test'">test</button>
+      <button onclick="location.href='/test'">test</button>
     </div>
-</body>
+    <div id="invalidPopup" aria-live="assertive" role="status"></div>
+    <script>
+      (function () {
+        const nameInput = document.getElementById("name");
+        const addBtn = document.getElementById("addUserBtn");
+        const popup = document.getElementById("invalidPopup");
+        const singleCharAllowed = /^[A-Za-z0-9_]$/;
+        const allAllowed = /^[A-Za-z0-9_]+$/;
+        let hideTimeout = null;
 
+        function showPopup(msg) {
+          popup.textContent = msg;
+          popup.classList.add("popup-show");
+          if (hideTimeout) clearTimeout(hideTimeout);
+          hideTimeout = setTimeout(
+            () => popup.classList.remove("popup-show"),
+            2500
+          );
+        }
+
+        function setButtonState() {
+          const val = nameInput.value.trim();
+          addBtn.disabled = !(val.length > 0 && allAllowed.test(val));
+        }
+
+        // Block typing of invalid characters
+        nameInput.addEventListener("keydown", function (e) {
+          const key = e.key;
+          // allow control keys
+          if (key.length !== 1) return;
+          if (!singleCharAllowed.test(key)) {
+            e.preventDefault();
+            showPopup(
+              "You cannot use special characters. Only letters, numbers and underscore are allowed."
+            );
+          }
+        });
+
+        // Handle paste: insert only allowed characters
+        nameInput.addEventListener("paste", function (e) {
+          e.preventDefault();
+          const text =
+            (e.clipboardData || window.clipboardData).getData("text") || "";
+          const filtered = text.replace(/[^A-Za-z0-9_]/g, "");
+          const start = nameInput.selectionStart;
+          const end = nameInput.selectionEnd;
+          const before = nameInput.value.slice(0, start);
+          const after = nameInput.value.slice(end);
+          nameInput.value = before + filtered + after;
+          const caret = start + filtered.length;
+          nameInput.setSelectionRange(caret, caret);
+          if (filtered !== text)
+            showPopup(
+              "Pasted text contained invalid characters which were removed."
+            );
+          setButtonState();
+        });
+
+        // Input event: clean any invalid chars (IME/autofill) and keep button state
+        nameInput.addEventListener("input", function () {
+          const original = nameInput.value;
+          const cleaned = original.replace(/[^A-Za-z0-9_]/g, "");
+          if (cleaned !== original) {
+            const pos = Math.max(
+              0,
+              nameInput.selectionStart - (original.length - cleaned.length)
+            );
+            nameInput.value = cleaned;
+            nameInput.setSelectionRange(pos, pos);
+            showPopup("Special characters are not allowed and were removed.");
+          }
+          setButtonState();
+        });
+
+        document.addEventListener("DOMContentLoaded", setButtonState);
+        setButtonState();
+      })();
+    </script>
+  </body>
 </html>

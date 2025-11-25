@@ -1,13 +1,17 @@
 package p3project.classes;
 
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 
 @Entity
 public class Sponsor {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String sponsorName;
     private String contactPerson;
     private String email;
@@ -32,7 +36,10 @@ public class Sponsor {
     // Required by JPA
     }
 
-    // Getters and Setters
+    public Long getId() {
+        return this.id;
+    }
+
     public String getSponsorName() {
         return sponsorName;
     }
