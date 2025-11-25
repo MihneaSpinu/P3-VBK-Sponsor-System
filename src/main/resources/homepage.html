@@ -400,12 +400,18 @@
                 <div class="menu">
                     <button class="menu-btn">Homepage</button>
                     <button class="menu-btn">Change log</button>
-                    <button class="menu-btn">Archive</button>
-                    <button class="menu-btn">Admin panel</button>
+                    <form action="/archive" method="post">
+    <button type="submit" class="menu-btn">Archive</button>
+</form>
+
+                    <form action="/Adminpanel" method="post">
+    <button type="submit" class="menu-btn">Adminpanel</button>
+</form>
                 </div>
             </div>
-
-            <button class="logout-btn">Log out</button>
+            <form action="/Logout" method="post">
+    <button type="submit" class="logout-btn">Log out</button>
+</form>
         </aside>
 
         <!-- Sponsor Modal-->

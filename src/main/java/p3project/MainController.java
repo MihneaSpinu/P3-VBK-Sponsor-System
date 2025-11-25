@@ -74,7 +74,7 @@ public class MainController {
     public String changelogPage(Model model) {
         model.addAttribute("changelog", logRepository.findAll());
         return "changelog";
-    }
+    } 
 
     @GetMapping("/test")
     public String showTestPage() {
@@ -148,7 +148,26 @@ public class MainController {
         contractRepository.save(contract);
         return "redirect:/users";
     }
-
+   @PostMapping("/archive")
+    public String archive() {
+        
+        return "redirect:/archive"; 
+    }
+     @PostMapping("/Adminpanel")
+    public String Adminpanel() {
+        
+        return "redirect:/AdminPanel"; 
+    }
+     @PostMapping("/Logout")
+    public String Logout() {
+        
+        return "redirect:/login"; 
+    }
+    @PostMapping("/homepage")
+    public String homepage() {
+        
+        return "redirect:/homepage"; 
+    }
     // ==========================
     // Add user with demo sponsor & contract
     // ==========================
