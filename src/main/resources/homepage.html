@@ -343,14 +343,20 @@
                 <div class="logo">VBK Sponsor System</div>
 
                 <div class="menu">
-                    <button class="menu-btn" onclick="location.href='/homepage'">Forside</button>
-                    <button class="menu-btn" onclick="location.href='/changelog'">Change log</button>
-                    <button class="menu-btn" onclick="location.href='/archive'">Arkiv</button>
-                    <button class="menu-btn" onclick="location.href='/AdminPanel'">Admin panel</button>
+                    <button class="menu-btn">Homepage</button>
+                    <button class="menu-btn">Change log</button>
+                    <form action="/archive" method="post">
+    <button type="submit" class="menu-btn">Archive</button>
+</form>
+
+                    <form action="/Adminpanel" method="post">
+    <button type="submit" class="menu-btn">Adminpanel</button>
+</form>
                 </div>
             </div>
-
-            <button class="logout-btn" onclick="location.href='/login'">Log ud</button>
+            <form action="/Logout" method="post">
+    <button type="submit" class="logout-btn">Log out</button>
+</form>
         </aside>
 
         <!-- Sponsor Modal-->

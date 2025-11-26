@@ -7,8 +7,36 @@
   <title>Archive</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="filter.js"></script>
-  <link rel="stylesheet" th:href="@{/css/Sidebar.css}" href="static/css/Sidebar.css">
+  <style>
+   .menu-btn {
+            background-color: #e5e7eb;
+            /* gray-200 */
+            padding: 0.5rem;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
 
+        .menu-btn:hover {
+            background-color: #d1d5db;
+            /* gray-300 */
+        }
+
+        .logout-btn {
+            background-color: #e5e7eb;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .logout-btn:hover {
+            background-color: #d1d5db;
+        }
+  </style>
 </head>
 
 <body class="bg-gray-100 text-gray-900">
@@ -28,7 +56,21 @@
             </div>
         </div>
 
-        <button class="logout-btn" onclick="location.href='/login'">Log ud</button>
+        <div class="flex flex-col gap-4">
+          <form action="/homepage" method="post">
+    <button type="submit" class="menu-btn">homepage</button>
+</form> <!-- onlick ="href.location homepage.htm" -->
+          <button class="bg-gray-200 py-2 rounded hover:bg-gray-300">Change log</button>
+          <button class="bg-green-200 py-2 rounded hover:bg-green-300">Archive</button>
+          <form action="/Adminpanel" method="post">
+    <button type="submit" class="menu-btn">Adminpanel</button>
+</form>
+        </div>
+      </div>
+
+      <form action="/Logout" method="post">
+    <button type="submit" class="logout-btn">Log out</button>
+</form>
     </aside>
 
     <!-- Main Content -->
