@@ -25,28 +25,35 @@ import jakarta.persistence.InheritanceType;
 public class Eventlog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     private String username;
-    private String objectType; // .getClass().getSimpleName();
+    private String objectType;
     private String objectName;
     private LocalDateTime timestamp;
     private String action; // String måske?
 
-    protected Eventlog() {}
-    /*
-     * public Eventlog(User user, String objectType, String objectName, Action action) {
-     * this.username = user.getName();
-     * this.objectType = objectType.getClass().getSimpleName();
-     * this.objectName = objectName;
-     * this.timestamp = new Date();
-     * this.action = action;
-     * }
-     */
+    protected Eventlog() {};
 
-    public Integer getId() {
-        return this.id;
+    public <T> Eventlog(User user, T changedObject, String action) {
+        this.username = "Test";
+
+        this.objectType = changedObject.getClass().getSimpleName(); // oversæt til dansk på frontend xd
+        /*
+        try {
+            Method getName = changedObject.getClass().getMethod("getName"); // jank
+            this.objectName = getName.invoke(changedObject).toString();
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException error) {
+            this.objectName = "-";
+            throw new RuntimeException("Error getting name of target object: ", error);
+        }
+        */
+        this.objectName = "testObjectName";
+
+        this.timestamp = LocalDateTime.now(); // skal formateres ordentligt
+        this.action = action;
     }
 
+    // Getters used exclusively for dynamic Thymeleaf view generation
     public String getUsername() {
         return this.username;
     }
@@ -67,7 +74,10 @@ public class Eventlog {
         return this.action;
     }
 
-    // sæt ind i constructor?
+
+
+    /*
+    // legacy kode
     public static <T> Eventlog create(User user, T changedObject, String action) {
         Eventlog log = new Eventlog();
         log.username = "testUsername";
@@ -85,4 +95,5 @@ public class Eventlog {
         log.action = action;
         return log;
     }
+    */
 }
