@@ -32,6 +32,46 @@
         opacity: 0;
     }
 
+    /* Sponsor modal (Smodal) */
+    #Smodal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background-color: rgba(0, 0, 0, .5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.15s ease-in-out, visibility 0.15s ease-in-out;
+        z-index: 1000;
+    }
+
+    #Smodal:not(:target) {
+        visibility: hidden;
+        opacity: 0;
+    }
+
+    /* Contract modal (Cmodal) */
+    #Cmodal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background-color: rgba(0, 0, 0, .5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.15s ease-in-out, visibility 0.15s ease-in-out;
+        z-index: 1000;
+    }
+
+    #Cmodal:not(:target) {
+        visibility: hidden;
+        opacity: 0;
+    }
+
     .ModalBox {
         background-color: #d1d5db;
         padding: 10px;
