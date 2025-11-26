@@ -1,359 +1,191 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" th:href="@{/css/Sidebar.css}" href="static/css/Sidebar.css">
-    <title>homepage</title>
-
-    <style>
-        body {
-            margin: 0;
-            background-color: #f3f4f6;
-            /* gray-100 */
-            color: #111827;
-            /* gray-900 */
-            font-family: system-ui, sans-serif;
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .app-container {
-            display: flex;
-            flex: 1;
-        }
-
-        /* Main content */
-        .main-content {
-            flex: 1;
-            padding: 1.5rem;
-        }
-
-        .table-wrapper {
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 0.5rem;
-            overflow-x: auto;
-        }
-
-        /* Table styles */
-        .sponsor-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.875rem;
-            text-align: left;
-        }
-
-        .sponsor-table th {
-            background-color: #e5e7eb;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-        }
-
-        .sponsor-table td {
-            padding: 1rem 1.5rem;
-            border-top: 1px solid #e5e7eb;
-            vertical-align: top;
-        }
-
-        .col-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        /* Tags & status colors */
-        .tag {
-            background-color: #e5e7eb;
-            padding: 0.25rem 0.75rem;
-            border-radius: 0.375rem;
-        }
-
-        .status {
-            text-align: center;
-            color: #fff;
-            padding: 0.25rem 0.75rem;
-            border-radius: 0.375rem;
-        }
-
-        .status.red {
-            background-color: #f87171;
-            /* red-400 */
-        }
-
-        .status.yellow {
-            background-color: #fde68a;
-            /* yellow-300 */
-            color: #111827;
-        }
-
-        .status.green {
-            background-color: #4ade80;
-            /* green-400 */
-        }
-
-        .sponsor-clickable {
-            color: inherit;
-            text-decoration: none;
-            display: inline-block;
-            width: 100%;
-            cursor: pointer;
-            padding: 0;
-        }
-
-        .contract-clickable {
-            color: inherit;
-            text-decoration: none;
-            display: inline-block;
-            width: 100%;
-            cursor: pointer;
-            padding: 0;
-        }
-
-        .sponsor-link:hover {
-            text-decoration: underline;
-        }
-
-        .contract-link:hover {
-            text-decoration: underline;
-        }
-
-        #Smodal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
-            background-color: rgba(0, 0, 0, .5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #Smodal:not(:target) {
-            visibility: hidden;
-            opacity: 0;
-        }
-
-        #Cmodal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
-            background-color: rgba(0, 0, 0, .5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #Cmodal:not(:target) {
-            visibility: hidden;
-            opacity: 0;
-        }
-
-        .ModalBox {
-            background-color: #d1d5db;
-            padding: 10px;
-            border-radius: 10px;
-            max-width: 90vw;
-            width: min(600px, 90vw);
-            max-height: 90vh;
-            height: auto;
-            overflow: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-        }
-
-        .ModalRow {
-            display: flex;
-            flex-direction: row;
-            gap: 30px;
-            margin-top: 10px;
-            width: 100%;
-            justify-content: center;
-            flex-wrap: wrap;
-            align-items: flex-start;
-        }
-
-        .SponsorContract {
-            background-color: #e5e7eb;
-            padding: 20px;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            text-align: center;
-            max-width: fit-content;
-            width: 200px;
-            min-height: 0;
-            flex: 0 0 200px;
-            align-items: center;
-        }
-
-        .ContractInfo {
-            background-color: #e5e7eb;
-            padding: 10px;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            text-align: center;
-            max-width: fit-content;
-            width: 200px;
-            min-height: 0;
-            flex: 0 0 200px;
-            align-items: center;
-        }
-
-        .ContractStatus {
-            background-color: #e5e7eb;
-            padding: 10px;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            max-width: fit-content;
-            width: 200px;
-            min-height: 0;
-            flex: 0 0 200px;
-        }
-
-        .SponsorStatus {
-            background-color: #e5e7eb;
-            padding: 10px;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            max-width: fit-content;
-            width: 200px;
-            min-height: 0;
-            flex: 0 0 200px;
-        }
-
-        .SponsorContactInfo {
-            background-color: #e5e7eb;
-            padding: 10px;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            max-width: fit-content;
-            width: 200px;
-            min-height: 0;
-            flex: 0 0 200px;
-        }
-
-        .ModalTitle {
-            font-size: 24px;
-            padding: 10px;
-            border-radius: 10px;
-            max-width: fit-content;
-            max-height: fit-content;
-            font-weight: bold;
-            margin-bottom: 10px;
-            background-color: #e5e7eb;
-        }
-
-        .title {
-            font-size: 18px;
-            background-color: #fff;
-            padding: 10px;
-            border-radius: 10px;
-        }
-
-        .CloseModal {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            text-decoration: none;
-            font-size: 18px;
-            font-weight: bold;
-            color: #111827;
-            background-color: #e5e7eb;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-
-        .ModalTag {
-            display: flex;
-            background-color: #fff;
-            padding: 10px;
-            margin: 10px;
-            border-radius: 10px;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .ModalTagRed {
-            display: flex;
-            background-color: #f87171;
-            padding: 10px;
-            margin: 10px;
-            border-radius: 10px;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .ModalTagYellow {
-            display: flex;
-            background-color: #fde68a;
-            padding: 10px;
-            margin: 10px;
-            border-radius: 10px;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .ModalTagGreen {
-            display: flex;
-            background-color: #4ade80;
-            padding: 10px;
-            margin: 10px;
-            border-radius: 10px;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-    </style>
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Archive</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="filter.js"></script>
+  <link rel="stylesheet" th:href="@{/css/Sidebar.css}" href="static/css/Sidebar.css">
+  <link rel="stylesheet" th:href="@{/css/Modal.css}" href="static/css/Modal.css">
+  <link rel="stylesheet" th:href="@{/css/Table.css}" href="static/css/Table.css">
+  <link rel="stylesheet" th:href="@{/css/homepage.css}" href="static/css/homepage.css">
 
 </head>
 
 <body class="bg-gray-100 text-gray-900">
 
-    <div class="app-container flex min-h-screen w-full">
+  <div class="flex min-h-screen">
 
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div>
-                <div class="logo">VBK Sponsor System</div>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div>
+            <div class="logo">VBK Sponsor System</div>
 
-                <div class="menu">
-                    <button class="menu-btn" onclick="location.href='/homepage'">Forside</button>
-                    <button class="menu-btn" onclick="location.href='/changelog'">Change log</button>
-                    <button class="menu-btn" onclick="location.href='/archive'">Arkiv</button>
-                    <button class="menu-btn" onclick="location.href='/AdminPanel'">Admin panel</button>
-                </div>
+            <div class="menu">
+                <button class="menu-btn" onclick="location.href='/homepage'">Forside</button>
+                <button class="menu-btn" onclick="location.href='/changelog'">Change log</button>
+                <button class="menu-btn" onclick="location.href='/archive'">Arkiv</button>
+                <button class="menu-btn" onclick="location.href='/AdminPanel'">Admin panel</button>
             </div>
+        </div>
 
-            <button class="logout-btn" onclick="location.href='/login'">Log ud</button>
-        </aside>
+        <button class="logout-btn" onclick="location.href='/login'">Log ud</button>
+    </aside>
 
-        <!-- Sponsor Modal-->
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+
+      <div class="relative">
+
+        <!-- Column headers -->
+        <div class="bg-gray-200 rounded-t-lg shadow-md text-sm font-semibold grid grid-cols-4">
+          <div class="px-6 py-3 border-r flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span>Sponsor name</span>
+              <label for="sortSelect" class="sr-only">Sort</label>
+              <select id="sortSelect" class="bg-white border text-xs rounded px-2 py-1">
+                <option value="">Sort</option>
+                <option value="name-asc">Name A→Z</option>
+                <option value="name-desc">Name Z→A</option>
+                <option value="date-asc">Earliest start ↑</option>
+              </select>
+            </div>
+            <div class="flex items-center">
+              <button id="openFilterBtn" class="ml-4 bg-white border px-2 py-1 text-xs rounded hover:bg-gray-100">Filter</button>
+            </div>
+          </div>
+          <div class="px-6 py-3 border-r">Services</div>
+          <div class="px-6 py-3 border-r">Status</div>
+          <div class="px-6 py-3">Active periods</div>
+        </div>
+
+        <!-- Sponsor cards -->
+        <div class="space-y-4 mt-0">
+
+          <!-- Card 1 -->
+          <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="grid grid-cols-4 text-sm">
+
+              <div class="border-r p-4 flex items-stretch">
+                <div onclick="location.hash='Smodal'" class="bg-gray-200 rounded px-4 py-3 w-full text-center hover:bg-gray-300">
+                  Spar Nord
+                </div>
+              </div>
+
+              <div class="border-r p-4 flex items-stretch">
+                <div class="flex flex-col gap-2 w-full">
+                  <div class="bg-gray-200 rounded px-4 py-3 text-center">Logo op trøjer</div>
+                  <div class="bg-gray-200 rounded px-4 py-3 text-center">5 Billetter per kamp</div>
+                  <div class="bg-gray-200 rounded px-4 py-3 text-center">Logo på bande</div>
+                </div>
+              </div>
+
+              <div class="border-r p-4 flex items-stretch">
+                <div class="flex flex-col gap-2 w-full">
+                  <div class="bg-green-400 rounded px-4 py-3 text-center">Aktiv</div>
+                  <div class="bg-yellow-200 rounded px-4 py-3 text-center">I gang</div>
+                  <div class="bg-red-400 rounded px-4 py-3 text-center">Inaktiv</div>
+                </div>
+              </div>
+
+              <div class="p-4 flex items-stretch">
+                <div class="flex flex-col gap-2 w-full">
+                  <div class="bg-gray-200 rounded px-4 py-3 text-center">
+                    15/09/2025 - 02/02/2026
+                  </div>
+                  <div class="bg-gray-200 rounded px-4 py-3 text-center">
+                    15/09/2025 - 02/02/2026
+                  </div>
+                  <div class="bg-gray-200 rounded px-4 py-3 text-center">
+                    15/09/2025 - 02/02/2026
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="grid grid-cols-4 text-sm">
+
+              <div class="border-r p-4 flex items-stretch">
+                <div onclick="location.hash='Smodal'" class="bg-gray-200 rounded px-4 py-3 w-full text-center hover:bg-gray-300">
+                  Spar Syd
+                </div>
+              </div>
+
+              <div class="border-r p-4 flex items-stretch">
+                <div class="flex flex-col gap-2 w-full">
+                  <div class="bg-gray-200 rounded px-4 py-3 w-full text-center">Logo op trøjer</div>
+                </div>
+              </div>
+
+              <div class="border-r p-4 flex items-stretch">
+                <div class="bg-green-400 rounded px-4 py-3 w-full text-center">Aktiv</div>
+              </div>
+
+              <div class="p-4 flex items-stretch">
+                <div class="bg-gray-200 rounded px-4 py-3 w-full text-center">
+                  29/11/2025 - 11/05/2026
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+</body>
+  <!-- Filter Modal -->
+  <div id="filterModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg w-11/12 max-w-2xl p-6 shadow-lg">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">Filter sponsors</h2>
+        <button id="closeFilterBtn" class="text-gray-600 hover:text-gray-900">✕</button>
+      </div>
+
+      <form id="filterForm" class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Name contains</label>
+          <input id="filterName" type="text" class="mt-1 block w-full rounded border-gray-300 shadow-sm" placeholder="e.g. Spar">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Active start (from)</label>
+          <input id="filterDateFrom" type="date" class="mt-1 block w-full rounded border-gray-300 shadow-sm">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Active end (to)</label>
+          <input id="filterDateTo" type="date" class="mt-1 block w-full rounded border-gray-300 shadow-sm">
+        </div>
+
+        <!-- Hidden so filter.js still works -->
+        <input type="hidden" id="filterDescription" name="filterDescription" value="">
+        <input type="hidden" id="filterMinPayment" name="filterMinPayment" value="">
+        <input type="hidden" id="filterMaxPayment" name="filterMaxPayment" value="">
+
+        <div class="col-span-2 flex justify-between mt-4">
+          <div>
+            <button id="applyFilterBtn" type="button" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Apply</button>
+            <button id="clearFilterBtn" type="button" class="ml-2 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Clear</button>
+          </div>
+          <div>
+            <button id="closeFilterBtnBottom" type="button" class="bg-white border px-3 py-2 rounded hover:bg-gray-50">Close</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sponsor Modal-->
         <div id="Smodal">
             <div class="ModalBox">
                 <h1 class="ModalTitle">Indsæt sponsor navn</h1>
@@ -433,80 +265,5 @@
                 </div>
             </div>
         </div>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <div class="table-wrapper">
-                <table class="sponsor-table">
-                    <thead>
-                        <tr>
-                            <th>Sponsor name ▾</th>
-                            <th>Services ▾</th>
-                            <th>Status ▾</th>
-                            <th>Date ▾</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="sponsor : ${sponsors}">
-                            <td>
-                                <a class="sponsor-clickable" href="#Smodal" th:attr="data-name=${sponsor.sponsorName}, 
-                        data-contact=${sponsor.contactPerson}, 
-                        data-email=${sponsor.email},
-                        data-phone=${sponsor.phoneNumber},
-                        data-cvr=${sponsor.cvrNumber},
-                        data-status=${sponsor.status},
-                        data-comments=${sponsor.comments}" th:text="${sponsor.sponsorName}">Sponsor Name</a>
-                            </td>
-                            <td>
-                                <div class="col-list">
-                                    <div class="tag" th:text="${sponsor.contactPerson}">Contact</div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="col-list">
-                                    <div th:text="${sponsor.status ? 'Aktiv' : 'Inaktiv'}"
-                                        class="status" th:classappend="${sponsor.status ? 'green' : 'red'}">Status</div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="col-list">
-                                    <div class="tag" th:text="${sponsor.comments}">Comments</div>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </main>
-    </div>
-    <script>
-        const sponsorLinks = document.querySelectorAll('.sponsor-clickable');
-
-        sponsorLinks.forEach(link => {
-            link.addEventListener('click', function (event) {
-
-                event.preventDefault();
-
-                // Get data attributes
-                const name = this.getAttribute('data-name')
-                const contact = this.getAttribute('data-contact');
-                const email = this.getAttribute('data-email');
-                const phone = this.getAttribute('data-phone');
-                const cvr = this.getAttribute('data-cvr');
-                const status = this.getAttribute('data-status');
-                const comments = this.getAttribute('data-comments');
-
-                document.getElementById("SponsorCity").textContent = "woops";
-                document.getElementById("SponsorAdress").textContent = "woops again";
-                document.getElementById("SponsorCVR").textContent = cvr;
-                document.getElementById("SponsorContactPerson").textContent = contact;
-                document.getElementById("SponsorEmail").textContent = email;
-                document.getElementById("SponsorPhoneNumber").textContent = phone;
-                window.location.hash = 'Smodal';
-            })
-        })
-
-    </script>
-</body>
 
 </html>
