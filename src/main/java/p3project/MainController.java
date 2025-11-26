@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import p3project.classes.Changelog;
+import p3project.classes.Eventlog;
 import p3project.classes.Contract;
 import p3project.classes.Service;
 import p3project.classes.Sponsor;

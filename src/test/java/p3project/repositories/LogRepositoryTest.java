@@ -31,7 +31,7 @@ class LogRepositoryTest {
         entityManager.persistAndFlush(user);
 
         Object testObject = new Object();
-        Eventlog log = Eventlog.create(user, testObject, "Test Object");
+        Eventlog log = new Eventlog(user, testObject, "Test Object");
 
         // When
         Eventlog savedLog = logRepository.save(log);
