@@ -185,7 +185,7 @@ public class MainController {
 	@GetMapping("/getFile")
 	public ResponseEntity<byte[]> getFile(@RequestParam long contractId){
 		Contract contract = contractRepository.findById(contractId)
-			.orElseThrow(() -> new RuntimeException("/uploadFile, Contract not found"));
+			.orElseThrow(() -> new RuntimeException("/getFile, Contract not found"));
 		byte[] pdfData = contract.getPdfData();
 
     return ResponseEntity.ok()
@@ -199,7 +199,7 @@ public class MainController {
 	public String uploadFileTo(@RequestParam MultipartFile pdffile, @RequestParam Long contractId) {
 		Contract contract = contractRepository.findById(contractId)
 				.orElseThrow(() -> new RuntimeException("/uploadFile, Contract not found"));
-
+	
 		try {
 			contract.setPdfData(pdffile.getBytes());
 			System.out.println("\n\nPDF file loaded successfully!\n\n");

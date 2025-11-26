@@ -81,6 +81,10 @@ public class Sponsor {
         this.status = status;
     }
 
+    public boolean getStatus(){
+        return status;
+    }
+
     public String getComments() {
         return comments;
     }
