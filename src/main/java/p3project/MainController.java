@@ -79,6 +79,15 @@ public class MainController {
     @GetMapping("/users")
     public String showUsers(Model model) {
         model.addAttribute("users", userRepository.findAll());
+
+        // ---------------------------------------------------------------
+        // DETTE KODE ER TIL TEST AF EVENTLOG, SKAL FJERNES VED FÆRDIG PRODUKTION
+        Sponsor sponsor = new Sponsor();
+        sponsor.setSponsorName("testSponsorNavn");
+        Eventlog log = new Eventlog(new User(), sponsor, "CREATED");
+        logRepository.save(log);
+        // ---------------------------------------------------------------
+
         return "users";
     }
 
@@ -137,12 +146,11 @@ public class MainController {
                 Object before = field.get(storedObject);
                 Object after = field.get(requestObject);
                 if (!before.equals(after)) {
-                    Changelog log = Changelog.create(new User(), requestObject, field, before, after); // user wip
+                    Changelog log = new Changelog(new User(), requestObject, field, before, after);
                     logRepository.save(log);
                     field.set(storedObject, after);
                     fieldsChanged++;
-                    System.out.println(
-                            "Updated " + field.getName() + ": " + before.toString() + " -> " + after.toString());
+                    System.out.println("Updated " + field.getName() + ": " + before.toString() + " -> " + after.toString());
                 }
             } catch (IllegalAccessException error) {
                 throw new RuntimeException(error);

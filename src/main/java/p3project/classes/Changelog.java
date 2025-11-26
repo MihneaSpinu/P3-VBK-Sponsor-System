@@ -8,11 +8,21 @@ import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 
 @Entity
 @DiscriminatorValue("Changelog") // "Changelog" bliver værdien til "logType" kolonnen
 public class Changelog extends Eventlog {
+
+    public <T> Changelog(User user, T changedObject, Field field, Object before, Object after) {
+        super(user, changedObject, "UPDATED");
+
+        this.field = field.getName();
+        this.before = before.toString();
+        this.after = after.toString();
+    }
 
     private String field;
 
@@ -34,7 +44,7 @@ public class Changelog extends Eventlog {
         return this.after;
     }
 
-    // sæt ind i constructor?
+    /* legacy kode
     public static <T> Changelog create(User user, T changedObject, Field field, Object before, Object after) {
         Changelog log = (Changelog)Eventlog.create(user, changedObject, "UPDATE");
         log.field = field.getName();
@@ -42,5 +52,6 @@ public class Changelog extends Eventlog {
         log.after = after.toString();
         return log;
     }
+    */
 
 }
