@@ -4,11 +4,7 @@ import java.lang.reflect.Field;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.DiscriminatorColumn;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
 
-import java.time.LocalDateTime;
 
 @Entity
 @DiscriminatorValue("Changelog") // "Changelog" bliver værdien til "logType" kolonnen

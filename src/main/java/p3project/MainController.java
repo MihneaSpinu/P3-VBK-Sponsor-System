@@ -12,21 +12,17 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
 import p3project.classes.Changelog;
-import p3project.classes.Eventlog;
 import p3project.classes.Contract;
 import p3project.classes.Service;
 import p3project.classes.Sponsor;
@@ -194,16 +190,24 @@ public class MainController {
             @RequestParam String endDate,
             @RequestParam String payment,
             @RequestParam(required = false, defaultValue = "false") boolean status,
-            @RequestParam String type) {
-        LocalDate start = LocalDate.parse(startDate);
-        LocalDate end = LocalDate.parse(endDate);
-        Contract contract = new Contract(start, end, Integer.parseInt(payment), status, type);
-        contract.setSponsorId(sponsorId);
-        var s = sponsorRepository.findById(sponsorId);
-        if (s.isPresent())
-            contract.setSponsorName(s.get().getSponsorName());
-        contractRepository.save(contract);
-        return "redirect:/sponsors";
+            @RequestParam String type,
+            Model model) {
+        try {
+            LocalDate start = LocalDate.parse(startDate);
+            LocalDate end = LocalDate.parse(endDate);
+            Contract contract = new Contract(start, end, Integer.parseInt(payment), status, type);
+            contract.setSponsorId(sponsorId);
+            java.util.Optional<Sponsor> sponsorOpt = sponsorRepository.findById(sponsorId);
+            if (sponsorOpt.isPresent())
+                contract.setSponsorName(sponsorOpt.get().getSponsorName());
+            contractRepository.save(contract);
+            return "redirect:/sponsors";
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("sponsors", sponsorRepository.findAll());
+            model.addAttribute("contracts", contractRepository.findAll());
+            return "sponsors";
+        }
     }
 
     // Handles editing an existing sponsor
@@ -224,24 +228,24 @@ public class MainController {
             model.addAttribute("contracts", contractRepository.findAll());
             return "sponsors";
         }
-        var maybe = sponsorRepository.findById(sponsorId);
-        if (maybe.isPresent()) {
-            Sponsor s = maybe.get();
+        java.util.Optional<Sponsor> sponsorOpt = sponsorRepository.findById(sponsorId);
+        if (sponsorOpt.isPresent()) {
+            Sponsor sponsor = sponsorOpt.get();
             // update fields (keep generated id)
-            s.setSponsorName(sponsorName == null ? s.getSponsorName() : sponsorName);
-            s.setContactPerson(contactPerson == null ? s.getContactPerson() : contactPerson);
-            s.setEmail(email == null ? s.getEmail() : email);
-            s.setPhoneNumber(phoneNumber == null ? s.getPhoneNumber() : phoneNumber);
-            s.setCvrNumber(cvrNumber == null ? s.getCvrNumber() : cvrNumber);
-            s.setStatus(status);
-            s.setComments(comments == null ? s.getComments() : comments);
-            sponsorRepository.save(s);
+            sponsor.setSponsorName(sponsorName == null ? sponsor.getSponsorName() : sponsorName);
+            sponsor.setContactPerson(contactPerson == null ? sponsor.getContactPerson() : contactPerson);
+            sponsor.setEmail(email == null ? sponsor.getEmail() : email);
+            sponsor.setPhoneNumber(phoneNumber == null ? sponsor.getPhoneNumber() : phoneNumber);
+            sponsor.setCvrNumber(cvrNumber == null ? sponsor.getCvrNumber() : cvrNumber);
+            sponsor.setStatus(status);
+            sponsor.setComments(comments == null ? sponsor.getComments() : comments);
+            sponsorRepository.save(sponsor);
 
             // update stored sponsorName copy on contracts
             Iterable<Contract> contracts = contractRepository.findAll();
             for (Contract contract : contracts) {
                 if (sponsorId.equals(contract.getSponsorId())) {
-                    contract.setSponsorName(s.getSponsorName());
+                    contract.setSponsorName(sponsor.getSponsorName());
                     contractRepository.save(contract);
                 }
             }
@@ -271,20 +275,28 @@ public class MainController {
             @RequestParam String endDate,
             @RequestParam int payment,
             @RequestParam(required = false, defaultValue = "false") boolean status,
-            @RequestParam String type) {
-        var maybe = contractRepository.findById(contractId);
-        if (maybe.isPresent()) {
-            Contract c = maybe.get();
-            c.setSponsorId(sponsorId);
-            var s = sponsorRepository.findById(sponsorId);
-            if (s.isPresent())
-                c.setSponsorName(s.get().getSponsorName());
-            c.setStartDate(LocalDate.parse(startDate));
-            c.setEndDate(LocalDate.parse(endDate));
-            c.setPayment(payment);
-            c.setStatus(status);
-            c.setType(type);
-            contractRepository.save(c);
+            @RequestParam String type,
+            Model model) {
+        java.util.Optional<Contract> contractOpt = contractRepository.findById(contractId);
+        if (contractOpt.isPresent()) {
+            Contract contract = contractOpt.get();
+            contract.setSponsorId(sponsorId);
+            java.util.Optional<Sponsor> sponsorOpt = sponsorRepository.findById(sponsorId);
+            if (sponsorOpt.isPresent())
+                contract.setSponsorName(sponsorOpt.get().getSponsorName());
+            try {
+                contract.setStartDate(LocalDate.parse(startDate));
+                contract.setEndDate(LocalDate.parse(endDate));
+                contract.setPayment(payment);
+                contract.setStatus(status);
+                contract.setType(type);
+                contractRepository.save(contract);
+            } catch (IllegalArgumentException ex) {
+                model.addAttribute("error", ex.getMessage());
+                model.addAttribute("sponsors", sponsorRepository.findAll());
+                model.addAttribute("contracts", contractRepository.findAll());
+                return "sponsors";
+            }
         }
         return "redirect:/sponsors";
     }
