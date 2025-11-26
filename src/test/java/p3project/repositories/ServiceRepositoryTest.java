@@ -33,7 +33,7 @@ class ServiceRepositoryTest {
         // Then
         assertThat(savedService.getId()).isNotNull();
         assertThat(savedService.getType()).isEqualTo(ServiceType.Banner);
-        assertThat(savedService.isStatus()).isTrue();
+        assertThat(savedService.getStatus()).isTrue();
         assertThat(savedService.getAmountOrDuration()).isEqualTo(100);
     }
 
@@ -49,7 +49,7 @@ class ServiceRepositoryTest {
         // Then
         assertThat(foundService).isPresent();
         assertThat(foundService.get().getType()).isEqualTo(ServiceType.Tickets);
-        assertThat(foundService.get().isStatus()).isFalse();
+        assertThat(foundService.get().getStatus()).isFalse();
         assertThat(foundService.get().getAmountOrDuration()).isEqualTo(50);
     }
 
@@ -87,7 +87,7 @@ class ServiceRepositoryTest {
         // Then
         assertThat(updatedService.getId()).isEqualTo(savedService.getId());
         assertThat(updatedService.getType()).isEqualTo(ServiceType.Tickets);
-        assertThat(updatedService.isStatus()).isFalse();
+        assertThat(updatedService.getStatus()).isFalse();
         assertThat(updatedService.getAmountOrDuration()).isEqualTo(250);
     }
 

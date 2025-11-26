@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>Hændelses oversigt</title>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +14,7 @@
 <body class="bg-gray-100 text-gray-900">
     <div class="flex min-h-screen w-full">
 
-    <!-- Sidebar -->
+        <!-- Sidebar -->
         <aside class="sidebar">
             <div>
                 <div class="logo">VBK Sponsor System</div>
@@ -29,37 +30,43 @@
             <button class="logout-btn" onclick="location.href='/login'">Log ud</button>
         </aside>
 
-<main class="flex-1 p-6">
-<div  class="table-wrapper">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Username</th>
-                <th>Action</th>
-                <th>Type</th>
-                <th>Name</th>
-                <th>Timestamp</th>
-                <th>Field</th>
-                <th>Before</th>
-                <th>After</th>
-            </tr>
-        </thead>
+        <main class="flex-1 p-6">
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Action</th>
+                            <th>Type</th>
+                            <th>Name</th>
+                            <th>Timestamp</th>
+                            <th>Field</th>
+                            <th>Before</th>
+                            <th>After</th>
+                        </tr>
+                    </thead>
 
-        <tbody>
-            <tr th:each="changelog : ${changelogs}">
-                <td th:text="${changelog.username}"></td>
-                <td th:text="${changelog.action}"></td>
-                <td th:text="${changelog.objectType}"></td>
-                <td th:text="${changelog.objectName}"></td>
-                <td th:text="${changelog.timestamp}"></td>
-                <td th:text="${changelog instanceof T(p3project.classes.Changelog) ? changelog.field : '-'}"></td>
-                <td th:text="${changelog instanceof T(p3project.classes.Changelog) ? changelog.before : '-'}"></td>
-                <td th:text="${changelog instanceof T(p3project.classes.Changelog) ? changelog.after  : '-'}"></td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-</main>
+                    <tbody>
+                        <tr th:each="changelog : ${changelogs}">
+                            <td th:text="${changelog.username}"></td>
+                            <td th:text="${changelog.action}"></td>
+                            <td th:text="${changelog.objectType}"></td>
+                            <td th:text="${changelog.objectName}"></td>
+                            <td th:text="${changelog.timestamp}"></td>
+                            <td
+                                th:text="${changelog instanceof T(p3project.classes.Changelog) ? changelog.field : '-'}">
+                            </td>
+                            <td
+                                th:text="${changelog instanceof T(p3project.classes.Changelog) ? changelog.before : '-'}">
+                            </td>
+                            <td
+                                th:text="${changelog instanceof T(p3project.classes.Changelog) ? changelog.after  : '-'}">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
     </div>
 </body>
 

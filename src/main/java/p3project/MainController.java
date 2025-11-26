@@ -92,19 +92,19 @@ public class MainController {
     }
 
     // boilerplate update handlers
-    @PutMapping("/update/sponsor")
+    @PostMapping("/update/sponsor")
     public ResponseEntity<String> updateSponsorFields(@RequestBody Sponsor sponsor) {
         Sponsor storedSponsor = sponsorRepository.getReferenceById(sponsor.getId());
         return handleUpdateRequest(sponsor, storedSponsor);
     }
 
-    @PutMapping("/update/contract")
+    @PostMapping("/update/contract")
     public ResponseEntity<String> updateContractFields(@RequestBody Contract contract) {
         Contract storedContract = contractRepository.getReferenceById(contract.getId());
         return handleUpdateRequest(contract, storedContract);
     }
 
-    @PutMapping("/update/service")
+    @PostMapping("/update/service")
     public ResponseEntity<String> updateServiceFields(@RequestBody Service service) {
         Service storedService = serviceRepository.getReferenceById(service.getId());
         return handleUpdateRequest(service, storedService);

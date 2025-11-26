@@ -31,7 +31,7 @@ class LogRepositoryTest {
         entityManager.persistAndFlush(user);
 
         Object testObject = new Object();
-        Eventlog log = Eventlog.create(user, testObject, "Test Object", 1);
+        Eventlog log = Eventlog.create(user, testObject, "Test Object");
 
         // When
         Eventlog savedLog = logRepository.save(log);
@@ -49,7 +49,7 @@ class LogRepositoryTest {
         entityManager.persistAndFlush(user);
 
         Object testObject = new String("Test String");
-        Eventlog log = Eventlog.create(user, testObject, "Test String Object", 2);
+        Eventlog log = Eventlog.create(user, testObject, "Test String Object");
         Eventlog persistedLog = entityManager.persistAndFlush(log);
 
         // When
@@ -75,8 +75,8 @@ class LogRepositoryTest {
 
         Object obj1 = new Object();
         Object obj2 = new Object();
-        Eventlog log1 = Eventlog.create(user1, obj1, "Object 1", 1);
-        Eventlog log2 = Eventlog.create(user2, obj2, "Object 2", 2);
+        Eventlog log1 = Eventlog.create(user1, obj1, "Object 1");
+        Eventlog log2 = Eventlog.create(user2, obj2, "Object 2");
         entityManager.persistAndFlush(log1);
         entityManager.persistAndFlush(log2);
 
@@ -96,7 +96,7 @@ class LogRepositoryTest {
         entityManager.persistAndFlush(user);
 
         Object testObject = new Object();
-        Eventlog log = Eventlog.create(user, testObject, "To Delete", 3);
+        Eventlog log = Eventlog.create(user, testObject, "To Delete");
         Eventlog savedLog = entityManager.persistAndFlush(log);
         Integer logId = savedLog.getId();
 
@@ -119,9 +119,9 @@ class LogRepositoryTest {
         Object obj1 = new Object();
         Object obj2 = new Object();
         Object obj3 = new Object();
-        Eventlog log1 = Eventlog.create(user, obj1, "Log 1", 1);
-        Eventlog log2 = Eventlog.create(user, obj2, "Log 2", 2);
-        Eventlog log3 = Eventlog.create(user, obj3, "Log 3", 3);
+        Eventlog log1 = Eventlog.create(user, obj1, "Log 1");
+        Eventlog log2 = Eventlog.create(user, obj2, "Log 2");
+        Eventlog log3 = Eventlog.create(user, obj3, "Log 3");
         entityManager.persistAndFlush(log1);
         entityManager.persistAndFlush(log2);
         entityManager.persistAndFlush(log3);
@@ -143,9 +143,9 @@ class LogRepositoryTest {
 
         String stringObj = "Test String";
         Integer intObj = 42;
-        
-        Eventlog log1 = Eventlog.create(user, stringObj, "String Object", 1);
-        Eventlog log2 = Eventlog.create(user, intObj, "Integer Object", 2);
+
+        Eventlog log1 = Eventlog.create(user, stringObj, "String Object");
+        Eventlog log2 = Eventlog.create(user, intObj, "Integer Object");
 
         // When
         Eventlog savedLog1 = logRepository.save(log1);
@@ -167,10 +167,10 @@ class LogRepositoryTest {
         Object obj1 = new Object();
         Object obj2 = new Object();
         Object obj3 = new Object();
-        
-        Eventlog log1 = Eventlog.create(user, obj1, "Action 1", 1);
-        Eventlog log2 = Eventlog.create(user, obj2, "Action 2", 2);
-        Eventlog log3 = Eventlog.create(user, obj3, "Action 3", 3);
+
+        Eventlog log1 = Eventlog.create(user, obj1, "Action 1");
+        Eventlog log2 = Eventlog.create(user, obj2, "Action 2");
+        Eventlog log3 = Eventlog.create(user, obj3, "Action 3");
 
         // When
         logRepository.save(log1);
@@ -191,9 +191,9 @@ class LogRepositoryTest {
         entityManager.persistAndFlush(user);
 
         Object obj = new Object();
-        Eventlog createLog = Eventlog.create(user, obj, "Test Object", 1);  // CREATE action
-        Eventlog updateLog = Eventlog.create(user, obj, "Test Object", 2);  // UPDATE action
-        Eventlog deleteLog = Eventlog.create(user, obj, "Test Object", 3);  // DELETE action
+        Eventlog createLog = Eventlog.create(user, obj, "Test Object"); // CREATE action
+        Eventlog updateLog = Eventlog.create(user, obj, "Test Object"); // UPDATE action
+        Eventlog deleteLog = Eventlog.create(user, obj, "Test Object"); // DELETE action
 
         // When
         Eventlog savedCreate = logRepository.save(createLog);
