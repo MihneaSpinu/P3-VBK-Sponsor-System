@@ -3,8 +3,17 @@ package p3project.classes;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
+import java.util.Date; // date, localdate, time?
 
-import jakarta.persistence.*;
+import jakarta.persistence.DiscriminatorColumn; // static for ikke at skrive Action.CREATE etc...
+import jakarta.persistence.DiscriminatorType;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE) // Én tabel til hele klasse hierarkiet

@@ -16,7 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,7 +26,6 @@ import p3project.classes.Contract;
 import p3project.classes.Service;
 import p3project.classes.Sponsor;
 import p3project.classes.User;
-
 import p3project.repositories.ContractRepository;
 import p3project.repositories.LogRepository;
 import p3project.repositories.ServiceRepository;
@@ -94,19 +92,19 @@ public class MainController {
     }
 
     // boilerplate update handlers
-    @PutMapping("/update/sponsor")
+    @PostMapping("/update/sponsor")
     public ResponseEntity<String> updateSponsorFields(@RequestBody Sponsor sponsor) {
         Sponsor storedSponsor = sponsorRepository.getReferenceById(sponsor.getId());
         return handleUpdateRequest(sponsor, storedSponsor);
     }
 
-    @PutMapping("/update/contract")
+    @PostMapping("/update/contract")
     public ResponseEntity<String> updateContractFields(@RequestBody Contract contract) {
         Contract storedContract = contractRepository.getReferenceById(contract.getId());
         return handleUpdateRequest(contract, storedContract);
     }
 
-    @PutMapping("/update/service")
+    @PostMapping("/update/service")
     public ResponseEntity<String> updateServiceFields(@RequestBody Service service) {
         Service storedService = serviceRepository.getReferenceById(service.getId());
         return handleUpdateRequest(service, storedService);

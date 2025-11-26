@@ -1,9 +1,9 @@
 package p3project.classes;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 @Entity
@@ -39,7 +39,7 @@ public class Service {
         this.type = type;
     }
 
-    public boolean isStatus() {
+    public boolean getStatus() {
         return status;
     }
 
