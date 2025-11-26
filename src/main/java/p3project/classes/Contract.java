@@ -34,6 +34,10 @@ public class Contract {
 
     // Constructor
     public Contract(LocalDate startDate, LocalDate endDate, int payment, boolean status, String typeName) {
+        // valider datoer: startDate må ikke være efter endDate
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Contract start date cannot be after end date");
+        }
         this.startDate = startDate;
         this.endDate = endDate;
         this.payment = payment;
@@ -63,6 +67,10 @@ public class Contract {
     }
 
     public void setStartDate(LocalDate startDate) {
+        // Hvis endDate allerede er sat, sørg for at startDate ikke er efter den
+        if (startDate != null && this.endDate != null && startDate.isAfter(this.endDate)) {
+            throw new IllegalArgumentException("Contract start date cannot be after end date");
+        }
         this.startDate = startDate;
     }
 
@@ -79,6 +87,10 @@ public class Contract {
     }
 
     public void setEndDate(LocalDate endDate) {
+        // Hvis startDate allerede er sat, sørg for at endDate ikke er før den
+        if (endDate != null && this.startDate != null && endDate.isBefore(this.startDate)) {
+            throw new IllegalArgumentException("Contract end date cannot be before start date");
+        }
         this.endDate = endDate;
     }
 

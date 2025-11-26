@@ -51,6 +51,21 @@
     <div class="container">
       <h1>Sponsors</h1>
 
+      <!-- Error besked area (Vis validation eller errors) -->
+      <div
+        th:if="${error}"
+        style="
+          background: #ffe6e6;
+          border: 1px solid #ff8080;
+          padding: 10px;
+          margin: 12px 0;
+          border-radius: 6px;
+        "
+      >
+        <strong style="color: #a80000">Error:</strong>
+        <span th:text="${error}" style="margin-left: 8px; color: #600"></span>
+      </div>
+
       <section class="list">
         <h2>All Sponsors</h2>
         <div th:if="${not #lists.isEmpty(sponsors)}">
