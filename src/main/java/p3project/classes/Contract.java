@@ -15,6 +15,7 @@ public class Contract {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String name;
     private LocalDate startDate;
     private LocalDate endDate;
     private int payment;
@@ -56,6 +57,14 @@ public class Contract {
 
     public Long getSponsorId() {
         return sponsorId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     public void setSponsorId(Long sponsorId) {

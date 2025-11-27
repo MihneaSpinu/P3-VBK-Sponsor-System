@@ -3,6 +3,7 @@ package p3project.classes;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date; // date, localdate, time?
 
 import jakarta.persistence.DiscriminatorColumn; // static for ikke at skrive Action.CREATE etc...
@@ -29,16 +30,14 @@ public class Eventlog {
     private String username;
     private String objectType;
     private String objectName;
-    private LocalDateTime timestamp;
+    private String timestamp;
     private String action; // String måske?
 
     protected Eventlog() {};
 
     public <T> Eventlog(User user, T changedObject, String action) {
         this.username = "Test";
-
         this.objectType = changedObject.getClass().getSimpleName(); // oversæt til dansk på frontend xd
-        /*
         try {
             Method getName = changedObject.getClass().getMethod("getName"); // jank
             this.objectName = getName.invoke(changedObject).toString();
@@ -46,10 +45,10 @@ public class Eventlog {
             this.objectName = "-";
             throw new RuntimeException("Error getting name of target object: ", error);
         }
-        */
-        this.objectName = "testObjectName";
 
-        this.timestamp = LocalDateTime.now(); // skal formateres ordentligt
+        LocalDateTime unformattedTimestamp = LocalDateTime.now();
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM-yyyy  HH:mm");
+        this.timestamp = unformattedTimestamp.format(format);
         this.action = action;
     }
 
@@ -66,7 +65,7 @@ public class Eventlog {
         return this.objectName;
     }
 
-    public LocalDateTime getTimestamp() {
+    public String getTimestamp() {
         return this.timestamp;
     }
 
@@ -74,7 +73,7 @@ public class Eventlog {
         return this.action;
     }
 
-
+    // NO SETTERS !!!!
 
     /*
     // legacy kode

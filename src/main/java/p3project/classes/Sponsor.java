@@ -12,7 +12,7 @@ public class Sponsor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String sponsorName;
+    private String name;
     private String contactPerson;
     private String email;
     private String phoneNumber;
@@ -21,9 +21,9 @@ public class Sponsor {
     private String comments;
 
     // Constructor
-    public Sponsor(String sponsorName, String contactPerson, String email,
+    public Sponsor(String name, String contactPerson, String email,
                     String phoneNumber, String cvrNumber, boolean status, String comments) {
-        this.sponsorName = sponsorName;
+        this.name = name;
         this.contactPerson = contactPerson;
         this.email = email;
         this.phoneNumber = phoneNumber;
@@ -40,12 +40,16 @@ public class Sponsor {
         return this.id;
     }
 
-    public String getSponsorName() {
-        return sponsorName;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setSponsorName(String sponsorName) {
-        this.sponsorName = sponsorName;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getContactPerson() {

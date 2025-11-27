@@ -14,11 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import p3project.classes.Changelog;
@@ -78,7 +74,7 @@ public class MainController {
         // ---------------------------------------------------------------
         // DETTE KODE ER TIL TEST AF EVENTLOG, SKAL FJERNES VED FÆRDIG PRODUKTION
         Sponsor sponsor = new Sponsor();
-        sponsor.setSponsorName("testSponsorNavn");
+        sponsor.setName("testSponsorNavn");
         Eventlog log = new Eventlog(new User(), sponsor, "CREATED");
         logRepository.save(log);
         // ---------------------------------------------------------------
@@ -103,19 +99,19 @@ public class MainController {
 
     // boilerplate update handlers
     @PostMapping("/update/sponsor")
-    public ResponseEntity<String> updateSponsorFields(@RequestBody Sponsor sponsor) {
+    public ResponseEntity<String> updateSponsorFields(@ModelAttribute Sponsor sponsor) {
         Sponsor storedSponsor = sponsorRepository.getReferenceById(sponsor.getId());
         return handleUpdateRequest(sponsor, storedSponsor);
     }
 
     @PostMapping("/update/contract")
-    public ResponseEntity<String> updateContractFields(@RequestBody Contract contract) {
+    public ResponseEntity<String> updateContractFields(@ModelAttribute Contract contract) {
         Contract storedContract = contractRepository.getReferenceById(contract.getId());
         return handleUpdateRequest(contract, storedContract);
     }
 
     @PostMapping("/update/service")
-    public ResponseEntity<String> updateServiceFields(@RequestBody Service service) {
+    public ResponseEntity<String> updateServiceFields(@ModelAttribute Service service) {
         Service storedService = serviceRepository.getReferenceById(service.getId());
         return handleUpdateRequest(service, storedService);
     }
@@ -167,7 +163,7 @@ public class MainController {
     // Handles adding a new sponsor from the web form
     @PostMapping("/sponsors/add")
     public String addSponsorFromWeb(
-            @RequestParam String sponsorName,
+            @RequestParam String name,
             @RequestParam String contactPerson,
             @RequestParam String email,
             @RequestParam String phoneNumber,
@@ -182,7 +178,7 @@ public class MainController {
             return "sponsors";
         }
 
-        Sponsor sponsor = new Sponsor(sponsorName, contactPerson, email, phoneNumber, cvrNumber, status,
+        Sponsor sponsor = new Sponsor(name, contactPerson, email, phoneNumber, cvrNumber, status,
                 comments == null ? "" : comments);
         sponsorRepository.save(sponsor);
 
@@ -206,7 +202,7 @@ public class MainController {
             contract.setSponsorId(sponsorId);
             java.util.Optional<Sponsor> sponsorOpt = sponsorRepository.findById(sponsorId);
             if (sponsorOpt.isPresent())
-                contract.setSponsorName(sponsorOpt.get().getSponsorName());
+                contract.setSponsorName(sponsorOpt.get().getName());
             contractRepository.save(contract);
             return "redirect:/sponsors";
         } catch (IllegalArgumentException ex) {
@@ -221,7 +217,7 @@ public class MainController {
     @PostMapping("/sponsors/edit")
     public String editSponsor(
             @RequestParam Long sponsorId,
-            @RequestParam String sponsorName,
+            @RequestParam String name,
             @RequestParam(required = false) String contactPerson,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String phoneNumber,
@@ -239,7 +235,7 @@ public class MainController {
         if (sponsorOpt.isPresent()) {
             Sponsor sponsor = sponsorOpt.get();
             // update fields (keep generated id)
-            sponsor.setSponsorName(sponsorName == null ? sponsor.getSponsorName() : sponsorName);
+            sponsor.setName(name == null ? sponsor.getName() : name);
             sponsor.setContactPerson(contactPerson == null ? sponsor.getContactPerson() : contactPerson);
             sponsor.setEmail(email == null ? sponsor.getEmail() : email);
             sponsor.setPhoneNumber(phoneNumber == null ? sponsor.getPhoneNumber() : phoneNumber);
@@ -248,11 +244,11 @@ public class MainController {
             sponsor.setComments(comments == null ? sponsor.getComments() : comments);
             sponsorRepository.save(sponsor);
 
-            // update stored sponsorName copy on contracts
+            // update stored name copy on contracts
             Iterable<Contract> contracts = contractRepository.findAll();
             for (Contract contract : contracts) {
                 if (sponsorId.equals(contract.getSponsorId())) {
-                    contract.setSponsorName(sponsor.getSponsorName());
+                    contract.setSponsorName(sponsor.getName());
                     contractRepository.save(contract);
                 }
             }
@@ -290,7 +286,7 @@ public class MainController {
             contract.setSponsorId(sponsorId);
             java.util.Optional<Sponsor> sponsorOpt = sponsorRepository.findById(sponsorId);
             if (sponsorOpt.isPresent())
-                contract.setSponsorName(sponsorOpt.get().getSponsorName());
+                contract.setSponsorName(sponsorOpt.get().getName());
             try {
                 contract.setStartDate(LocalDate.parse(startDate));
                 contract.setEndDate(LocalDate.parse(endDate));
