@@ -1,8 +1,9 @@
 package p3project.classes;
 
 import java.time.LocalDate;
-import static org.junit.Assert.assertNull;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import org.junit.jupiter.api.Test;
 
 public class ContractTest {
@@ -37,13 +38,14 @@ public class ContractTest {
 
     }
 
+    @Test
     public void testContractWithNullValues(){
         Contract contract = new Contract();
 
         assertNull(contract.getType());
         assertNull(contract.getStartDate());
         assertNull(contract.getEndDate());
-        assertNull(contract.getPayment());
+        assertEquals(0, contract.getPayment()); //Int by default is 0. When no values givin its 0.
         //assertEquals(status, contract.getStatus)); no get status
 
     }
