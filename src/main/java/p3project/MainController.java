@@ -152,9 +152,9 @@ public class MainController {
             }
         }
 
-        if (requestObject instanceof Sponsor)       sponsorRepository.save((Sponsor) storedObject);
-        else if (requestObject instanceof Contract) contractRepository.save((Contract) storedObject);
-        else if (requestObject instanceof Service)  serviceRepository.save((Service) storedObject);
+        if (requestObject instanceof Sponsor)         sponsorRepository.save((Sponsor) storedObject);
+        else if (requestObject instanceof Contract)   contractRepository.save((Contract) storedObject);
+        else if (requestObject instanceof Service)    serviceRepository.save((Service) storedObject);
         else throw new ClassNotFoundException();
 
         return fieldsChanged;
