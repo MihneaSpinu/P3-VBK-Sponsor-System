@@ -10,7 +10,7 @@ public class EventlogTest {
     public void testLogCreation() {
         User user = new User();
         Sponsor sponsor = new Sponsor();
-        sponsor.setSponsorName("sponsorTestName");
+        sponsor.setName("sponsorTestName");
         user.setName("TestName");
         // Eventlog log = Eventlog.create(user, sponsor, "testAction");
         // assertEquals(log.objectType, ("sponsorTestName")); 

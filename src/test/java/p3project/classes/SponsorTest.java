@@ -18,7 +18,7 @@ public class SponsorTest{
         String comments = "null";
 
         Sponsor sponsor = new Sponsor();
-        sponsor.setSponsorName(sponsorName);
+        sponsor.setName(sponsorName);
         sponsor.setContactPerson(contactPerson);
         sponsor.setEmail(email);
         sponsor.setPhoneNumber(phoneNumber);
@@ -27,7 +27,7 @@ public class SponsorTest{
         sponsor.setComments(comments);
 
         //check the variables
-        assertEquals(sponsorName, sponsor.getSponsorName());
+        assertEquals(sponsorName, sponsor.getName());
         assertEquals(contactPerson, sponsor.getContactPerson());
         assertEquals(email, sponsor.getEmail());
         assertEquals(phoneNumber, sponsor.getPhoneNumber());
@@ -44,7 +44,7 @@ public class SponsorTest{
         //no values set
 
         //check the variables
-        assertNull(sponsor.getSponsorName());
+        assertNull(sponsor.getName());
         assertNull(sponsor.getContactPerson());
         assertNull(sponsor.getEmail());
         assertNull(sponsor.getPhoneNumber());

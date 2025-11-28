@@ -39,7 +39,7 @@ class SponsorRepositoryTest {
 
         // Then
         assertThat(savedSponsor.getId()).isNotNull();
-        assertThat(savedSponsor.getSponsorName()).isEqualTo("Tech Corp");
+        assertThat(savedSponsor.getName()).isEqualTo("Tech Corp");
         assertThat(savedSponsor.getContactPerson()).isEqualTo("John Smith");
         assertThat(savedSponsor.getEmail()).isEqualTo("john@techcorp.com");
         assertThat(savedSponsor.isStatus()).isTrue();
@@ -64,7 +64,7 @@ class SponsorRepositoryTest {
 
         // Then
         assertThat(foundSponsor).isPresent();
-        assertThat(foundSponsor.get().getSponsorName()).isEqualTo("Sports Inc");
+        assertThat(foundSponsor.get().getName()).isEqualTo("Sports Inc");
         assertThat(foundSponsor.get().getContactPerson()).isEqualTo("Jane Doe");
         assertThat(foundSponsor.get().isStatus()).isFalse();
     }
@@ -82,7 +82,7 @@ class SponsorRepositoryTest {
 
         // Then
         assertThat(sponsors).hasSize(2);
-        assertThat(sponsors).extracting(Sponsor::getSponsorName).containsExactlyInAnyOrder("Company A", "Company B");
+        assertThat(sponsors).extracting(Sponsor::getName).containsExactlyInAnyOrder("Company A", "Company B");
     }
 
     @Test
@@ -92,14 +92,14 @@ class SponsorRepositoryTest {
         Sponsor savedSponsor = entityManager.persistAndFlush(sponsor);
 
         // When
-        savedSponsor.setSponsorName("Updated Corp");
+        savedSponsor.setName("Updated Corp");
         savedSponsor.setContactPerson("Updated Contact");
         savedSponsor.setStatus(false);
         Sponsor updatedSponsor = sponsorRepository.save(savedSponsor);
 
         // Then
         assertThat(updatedSponsor.getId()).isEqualTo(savedSponsor.getId());
-        assertThat(updatedSponsor.getSponsorName()).isEqualTo("Updated Corp");
+        assertThat(updatedSponsor.getName()).isEqualTo("Updated Corp");
         assertThat(updatedSponsor.getContactPerson()).isEqualTo("Updated Contact");
         assertThat(updatedSponsor.isStatus()).isFalse();
     }
@@ -140,7 +140,7 @@ class SponsorRepositoryTest {
     void testSaveSponsorWithEmptyConstructor() {
         // Given
         Sponsor sponsor = new Sponsor();
-        sponsor.setSponsorName("Empty Constructor Corp");
+        sponsor.setName("Empty Constructor Corp");
         sponsor.setContactPerson("Empty Contact");
         sponsor.setEmail("empty@corp.com");
         sponsor.setPhoneNumber("55555555");
@@ -153,7 +153,7 @@ class SponsorRepositoryTest {
 
         // Then
         assertThat(savedSponsor.getId()).isNotNull();
-        assertThat(savedSponsor.getSponsorName()).isEqualTo("Empty Constructor Corp");
+        assertThat(savedSponsor.getName()).isEqualTo("Empty Constructor Corp");
         assertThat(savedSponsor.getContactPerson()).isEqualTo("Empty Contact");
     }
 }

@@ -13,6 +13,7 @@ public class Service {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String name;
     private ServiceType type;
     private boolean status;
     private int amountOrDuration;
@@ -27,10 +28,21 @@ public class Service {
         this.amountOrDuration = amountOrDuration;
     }
 
+
+
     public Long getId() {
         return this.id;
     }
     // Getters and Setters
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
     public ServiceType getType() {
         return type;
     }

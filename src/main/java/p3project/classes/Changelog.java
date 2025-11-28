@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @DiscriminatorValue("Changelog") // "Changelog" bliver værdien til "logType" kolonnen
 public class Changelog extends Eventlog {
 
+    protected Changelog() {};
+
     public <T> Changelog(User user, T changedObject, Field field, Object before, Object after) {
         super(user, changedObject, "UPDATED");
 

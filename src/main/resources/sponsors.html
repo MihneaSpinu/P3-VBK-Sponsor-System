@@ -33,7 +33,7 @@
         <h2>All Sponsors</h2>
         <div th:if="${not #lists.isEmpty(sponsors)}">
           <div th:each="sponsor, stat : ${sponsors}" class="item">
-            <strong th:text="${sponsor.sponsorName}">Sponsor Name</strong>
+            <strong th:text="${sponsor.name}">Sponsor Name</strong>
             <div>
               Contact: <span th:text="${sponsor.contactPerson}">Contact</span>
             </div>
@@ -70,16 +70,16 @@
 
             <form
               th:id="|sponsorEditForm-${stat.index}|"
-              th:action="@{/sponsors/edit}"
-              method="post"
+              th:action="@{/update/sponsor}"
+              method="POST"
               style="display: none; margin-top: 8px"
               class="form"
             >
-              <input type="hidden" name="sponsorId" th:value="${sponsor.id}" />
+              <input type="hidden" name="id" th:value="${sponsor.id}" />
               <label>Sponsor Name</label>
               <input
-                name="sponsorName"
-                th:value="${sponsor.sponsorName}"
+                name="name"
+                th:value="${sponsor.name}"
                 required
               />
               <label>Contact Person</label>
@@ -123,9 +123,9 @@
 
       <section class="form">
         <h2>Add Sponsor</h2>
-        <form action="/sponsors/add" method="post">
-          <label for="sponsorName">Sponsor Name</label>
-          <input id="sponsorName" name="sponsorName" required />
+        <form action="/sponsors/add" method="POST">
+          <label for="name">Sponsor Name</label>
+          <input id="name" name="name" required />
           <label for="contactPerson">Contact Person</label>
           <input id="contactPerson" name="contactPerson" />
           <label for="email">Email</label>
@@ -154,13 +154,13 @@
 
       <section class="form">
         <h2>Create Contract For Sponsor</h2>
-        <form action="/sponsors/addContract" method="post">
+        <form action="/sponsors/addContract" method="POST">
           <label for="sponsorSelect">Sponsor</label>
           <select id="sponsorSelect" name="sponsorId" required>
             <option
               th:each="s : ${sponsors}"
               th:value="${s.id}"
-              th:text="${s.sponsorName}"
+              th:text="${s.name}"
             ></option>
           </select>
 
@@ -177,6 +177,8 @@
             <option value="true">True</option>
             <option value="false" selected>False</option>
           </select>
+            <label for="name">Contract name:</label>
+            <input id="contractName" name="name" type="text" required>
           <button type="submit">Create Contract</button>
         </form>
       </section>
@@ -194,6 +196,7 @@
             <div>End: <span th:text="${contract.endDate}">end</span></div>
             <div>Payment: <span th:text="${contract.payment}">0</span></div>
             <div>Status: <span th:text="${contract.status}">false</span></div>
+              <div>Name: <span th:text="${contract.name}">name</span></div>
             <div style="margin-top: 8px">
               <button
                 type="button"
@@ -218,14 +221,14 @@
 
             <form
               th:id="|contractEditForm-${statC.index}|"
-              th:action="@{/sponsors/editContract}"
-              method="post"
+              th:action="@{/update/contract}"
+              method="POST"
               style="display: none; margin-top: 8px"
               class="form"
             >
               <input
                 type="hidden"
-                name="contractId"
+                name="id"
                 th:value="${contract.id}"
               />
               <label>Sponsor</label>
@@ -233,7 +236,7 @@
                 <option
                   th:each="s : ${sponsors}"
                   th:value="${s.id}"
-                  th:text="${s.sponsorName}"
+                  th:text="${s.name}"
                   th:selected="${s.id == contract.sponsorId}"
                 ></option>
               </select>
@@ -266,6 +269,9 @@
                   False
                 </option>
               </select>
+                <label>Name</label>
+                <input type="text" name="name" th:value="${contract.name}" />
+                <input type="hidden" name="sponsorName" th:value="${contract.sponsorName}" />
               <button type="submit">Save</button>
               <button
                 type="button"

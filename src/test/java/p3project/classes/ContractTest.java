@@ -13,7 +13,7 @@ public class ContractTest {
         Long id = (long) 222;
         LocalDate startDate = LocalDate.of(2002, 10, 20);
         LocalDate endDate = LocalDate.of(2025, 10, 20);
-        int payment = 100;
+        String payment = "100";
         boolean status = false;
         String type = "type";
 
