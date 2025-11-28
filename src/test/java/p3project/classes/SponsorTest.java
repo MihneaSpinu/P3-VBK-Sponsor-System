@@ -1,5 +1,6 @@
 package p3project.classes;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
@@ -49,7 +50,7 @@ public class SponsorTest{
         assertNull(sponsor.getEmail());
         assertNull(sponsor.getPhoneNumber());
         assertNull(sponsor.getCvrNumber());
-        assertNull(sponsor.getStatus());
+        assertFalse(sponsor.getStatus()); //Default for a boolean is false
         assertNull(sponsor.getComments());
     }
 

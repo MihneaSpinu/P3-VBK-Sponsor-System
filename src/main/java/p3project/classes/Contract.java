@@ -31,6 +31,7 @@ public class Contract {
     @Lob
     @Column(name = "pdf_data", columnDefinition = "LONGBLOB") /* Longblob to have enough storage for .pdf's */
     private byte[] pdfData;
+    private String fileName;
 
     // Constructor
     public Contract(LocalDate startDate, LocalDate endDate, int payment, boolean status, String typeName) {
@@ -126,5 +127,13 @@ public class Contract {
     // Sets the name of the sponsor
     public void setSponsorName(String sponsorName) {
         this.sponsorName = sponsorName;
+    }
+
+    public void setFileName(String fileName){
+        this.fileName = fileName;
+    }
+
+    public String getFileName(){
+        return this.fileName;
     }
 }

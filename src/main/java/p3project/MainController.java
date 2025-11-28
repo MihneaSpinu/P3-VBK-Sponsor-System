@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import p3project.classes.Changelog;
-import p3project.classes.Eventlog;
 import p3project.classes.Contract;
+import p3project.classes.Eventlog;
 import p3project.classes.Service;
 import p3project.classes.Sponsor;
 import p3project.classes.User;
@@ -323,9 +323,12 @@ public class MainController {
         byte[] pdfData = contract.getPdfData();
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"contract.pdf\"")
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(pdfData);
+            .header(
+                HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + contract.getFileName() + ".pdf\""
+            )
+            .contentType(MediaType.APPLICATION_PDF)
+            .body(pdfData);
 
     }
 
@@ -337,10 +340,12 @@ public class MainController {
 
         try {
             contract.setPdfData(pdffile.getBytes());
+			String cleanFilename = Paths.get(pdffile.getOriginalFilename()).getFileName().toString(); //Get the name of the file
+			contract.setFileName(cleanFilename); //save the name of the file in contract
             System.out.println("\n\nPDF file loaded successfully!\n\n");
         } catch (IOException e) {
             e.printStackTrace();
-            return "error"; // Or handle appropriately
+            return "error"; // 
         }
 
         contractRepository.save(contract);
