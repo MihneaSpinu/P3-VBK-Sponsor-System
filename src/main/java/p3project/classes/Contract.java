@@ -15,15 +15,15 @@ public class Contract {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Long sponsorId;
     private LocalDate startDate;
     private LocalDate endDate;
-    private int payment;
-    private boolean status;
+    private String payment;
     private String type;
-
+    private boolean status;
+    private String name;
     // Link contract to sponsor by sponsorName
     // sponsor id (generated) to link to Sponsor
-    private Long sponsorId;
 
     // copy of sponsor name for easy display in views
     private String sponsorName;
@@ -31,9 +31,14 @@ public class Contract {
     @Lob
     @Column(name = "pdf_data", columnDefinition = "LONGBLOB") /* Longblob to have enough storage for .pdf's */
     private byte[] pdfData;
+    private String fileName;
 
     // Constructor
-    public Contract(LocalDate startDate, LocalDate endDate, int payment, boolean status, String typeName) {
+    public Contract(LocalDate startDate, LocalDate endDate, String payment, boolean status, String typeName) {
+        // valider datoer: startDate må ikke være efter endDate
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Contract start date cannot be after end date");
+        }
         this.startDate = startDate;
         this.endDate = endDate;
         this.payment = payment;
@@ -50,8 +55,20 @@ public class Contract {
         return this.id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public Long getSponsorId() {
         return sponsorId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     public void setSponsorId(Long sponsorId) {
@@ -63,6 +80,10 @@ public class Contract {
     }
 
     public void setStartDate(LocalDate startDate) {
+        // Hvis endDate allerede er sat, sørg for at startDate ikke er efter den
+        if (startDate != null && this.endDate != null && startDate.isAfter(this.endDate)) {
+            throw new IllegalArgumentException("Contract start date cannot be after end date");
+        }
         this.startDate = startDate;
     }
 
@@ -79,14 +100,18 @@ public class Contract {
     }
 
     public void setEndDate(LocalDate endDate) {
+        // Hvis startDate allerede er sat, sørg for at endDate ikke er før den
+        if (endDate != null && this.startDate != null && endDate.isBefore(this.startDate)) {
+            throw new IllegalArgumentException("Contract end date cannot be before start date");
+        }
         this.endDate = endDate;
     }
 
-    public int getPayment() {
+    public String getPayment() {
         return payment;
     }
 
-    public void setPayment(int payment) {
+    public void setPayment(String payment) {
         this.payment = payment;
     }
 
@@ -114,5 +139,13 @@ public class Contract {
     // Sets the name of the sponsor
     public void setSponsorName(String sponsorName) {
         this.sponsorName = sponsorName;
+    }
+
+    public void setFileName(String fileName){
+        this.fileName = fileName;
+    }
+
+    public String getFileName(){
+        return this.fileName;
     }
 }
