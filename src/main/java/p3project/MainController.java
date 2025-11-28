@@ -194,12 +194,14 @@ public class MainController {
             @RequestParam String payment,
             @RequestParam(required = false, defaultValue = "false") boolean status,
             @RequestParam String type,
+            @RequestParam String name,
             Model model) {
         try {
             LocalDate start = LocalDate.parse(startDate);
             LocalDate end = LocalDate.parse(endDate);
             Contract contract = new Contract(start, end, payment, status, type);
             contract.setSponsorId(sponsorId);
+            contract.setName(name);
             java.util.Optional<Sponsor> sponsorOpt = sponsorRepository.findById(sponsorId);
             if (sponsorOpt.isPresent())
                 contract.setSponsorName(sponsorOpt.get().getName());
