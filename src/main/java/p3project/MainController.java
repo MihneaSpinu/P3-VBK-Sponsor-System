@@ -100,19 +100,22 @@ public class MainController {
     // boilerplate update handlers
     @PostMapping("/update/sponsor")
     public ResponseEntity<String> updateSponsorFields(@ModelAttribute Sponsor sponsor) {
-        Sponsor storedSponsor = sponsorRepository.getReferenceById(sponsor.getId());
+        Sponsor storedSponsor = sponsorRepository.findById(sponsor.getId())
+        .orElseThrow(() -> new RuntimeException("Unable to retrieve sponsor with id: " + sponsor.getId()));
         return handleUpdateRequest(sponsor, storedSponsor);
     }
 
     @PostMapping("/update/contract")
     public ResponseEntity<String> updateContractFields(@ModelAttribute Contract contract) {
-        Contract storedContract = contractRepository.getReferenceById(contract.getId());
+        Contract storedContract = contractRepository.findById(contract.getId())
+        .orElseThrow(() -> new RuntimeException("Unable to retrieve sponsor with id: " + contract.getId()));
         return handleUpdateRequest(contract, storedContract);
     }
 
     @PostMapping("/update/service")
     public ResponseEntity<String> updateServiceFields(@ModelAttribute Service service) {
-        Service storedService = serviceRepository.getReferenceById(service.getId());
+        Service storedService = serviceRepository.findById(service.getId())
+        .orElseThrow(() -> new RuntimeException("Unable to retrieve sponsor with id: " + service.getId()));
         return handleUpdateRequest(service, storedService);
     }
 
@@ -136,6 +139,7 @@ public class MainController {
             try {
                 Object before = field.get(storedObject);
                 Object after = field.get(requestObject);
+                if(before == null || after == null) continue; // WIP
                 if (!before.equals(after)) {
                     Changelog log = new Changelog(new User(), requestObject, field, before, after);
                     logRepository.save(log);
@@ -148,14 +152,10 @@ public class MainController {
             }
         }
 
-        if (requestObject instanceof Sponsor)
-            sponsorRepository.save((Sponsor) storedObject);
-        else if (requestObject instanceof Contract)
-            contractRepository.save((Contract) storedObject);
-        else if (requestObject instanceof Service)
-            serviceRepository.save((Service) storedObject);
-        else
-            throw new ClassNotFoundException();
+        if (requestObject instanceof Sponsor)       sponsorRepository.save((Sponsor) storedObject);
+        else if (requestObject instanceof Contract) contractRepository.save((Contract) storedObject);
+        else if (requestObject instanceof Service)  serviceRepository.save((Service) storedObject);
+        else throw new ClassNotFoundException();
 
         return fieldsChanged;
     }
@@ -198,7 +198,7 @@ public class MainController {
         try {
             LocalDate start = LocalDate.parse(startDate);
             LocalDate end = LocalDate.parse(endDate);
-            Contract contract = new Contract(start, end, Integer.parseInt(payment), status, type);
+            Contract contract = new Contract(start, end, payment, status, type);
             contract.setSponsorId(sponsorId);
             java.util.Optional<Sponsor> sponsorOpt = sponsorRepository.findById(sponsorId);
             if (sponsorOpt.isPresent())
@@ -276,7 +276,7 @@ public class MainController {
             @RequestParam Long sponsorId,
             @RequestParam String startDate,
             @RequestParam String endDate,
-            @RequestParam int payment,
+            @RequestParam String payment,
             @RequestParam(required = false, defaultValue = "false") boolean status,
             @RequestParam String type,
             Model model) {
@@ -404,7 +404,7 @@ public class MainController {
         Contract contract = new Contract(
                 LocalDate.of(2025, 1, 1),
                 LocalDate.of(2025, 12, 31),
-                2000,
+                "2000",
                 true,
                 "Standard");
         try {

@@ -262,7 +262,7 @@
             >
               <input
                 type="hidden"
-                name="contractId"
+                name="id"
                 th:value="${contract.id}"
               />
               <label>Sponsor</label>
@@ -303,6 +303,7 @@
                   False
                 </option>
               </select>
+                <input type="hidden" name="sponsorName" th:value="${contract.sponsorName}" />
               <button type="submit">Save</button>
               <button
                 type="button"

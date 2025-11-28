@@ -28,7 +28,7 @@ class ContractRepositoryTest {
         Contract contract = new Contract(
             LocalDate.of(2024, 1, 1),
             LocalDate.of(2024, 12, 31),
-            50000,
+            "50000",
             true,
             "Premium"
         );
@@ -55,7 +55,7 @@ class ContractRepositoryTest {
         Contract contract = new Contract(
             LocalDate.of(2023, 6, 1),
             LocalDate.of(2023, 12, 31),
-            25000,
+            "25000",
             false,
             "Standard"
         );
@@ -78,10 +78,10 @@ class ContractRepositoryTest {
     @Test
     void testFindAll() {
         // Given
-        Contract contract1 = new Contract(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), 30000, true, "Type A");
+        Contract contract1 = new Contract(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), "30000", true, "Type A");
         contract1.setSponsorName("Sponsor A");
         
-        Contract contract2 = new Contract(LocalDate.of(2024, 2, 1), LocalDate.of(2024, 11, 30), 40000, true, "Type B");
+        Contract contract2 = new Contract(LocalDate.of(2024, 2, 1), LocalDate.of(2024, 11, 30), "40000", true, "Type B");
         contract2.setSponsorName("Sponsor B");
         
         entityManager.persistAndFlush(contract1);
@@ -98,13 +98,13 @@ class ContractRepositoryTest {
     @Test
     void testUpdateContract() {
         // Given
-        Contract contract = new Contract(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), 10000, true, "Basic");
+        Contract contract = new Contract(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), "10000", true, "Basic");
         contract.setSponsorId(1L);
         contract.setSponsorName("Original Sponsor");
         Contract savedContract = entityManager.persistAndFlush(contract);
 
         // When
-        savedContract.setPayment(20000);
+        savedContract.setPayment("20000");
         savedContract.setType("Premium");
         savedContract.setStatus(false);
         savedContract.setSponsorName("Updated Sponsor");
@@ -121,7 +121,7 @@ class ContractRepositoryTest {
     @Test
     void testDeleteContract() {
         // Given
-        Contract contract = new Contract(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), 15000, true, "Delete");
+        Contract contract = new Contract(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), "15000", true, "Delete");
         Contract savedContract = entityManager.persistAndFlush(contract);
         Long contractId = savedContract.getId();
 
@@ -136,9 +136,9 @@ class ContractRepositoryTest {
     @Test
     void testCount() {
         // Given
-        Contract contract1 = new Contract(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), 10000, true, "Type 1");
-        Contract contract2 = new Contract(LocalDate.of(2024, 2, 1), LocalDate.of(2024, 11, 30), 20000, true, "Type 2");
-        Contract contract3 = new Contract(LocalDate.of(2024, 3, 1), LocalDate.of(2024, 10, 31), 30000, false, "Type 3");
+        Contract contract1 = new Contract(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), "10000", true, "Type 1");
+        Contract contract2 = new Contract(LocalDate.of(2024, 2, 1), LocalDate.of(2024, 11, 30), "20000", true, "Type 2");
+        Contract contract3 = new Contract(LocalDate.of(2024, 3, 1), LocalDate.of(2024, 10, 31), "30000", false, "Type 3");
         entityManager.persistAndFlush(contract1);
         entityManager.persistAndFlush(contract2);
         entityManager.persistAndFlush(contract3);
@@ -153,7 +153,7 @@ class ContractRepositoryTest {
     @Test
     void testSaveContractWithPdfData() {
         // Given
-        Contract contract = new Contract(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), 50000, true, "Premium");
+        Contract contract = new Contract(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), "50000", true, "Premium");
         byte[] pdfData = "Sample PDF Data".getBytes();
         contract.setPdfData(pdfData);
         contract.setSponsorName("PDF Sponsor");
@@ -172,7 +172,7 @@ class ContractRepositoryTest {
         Contract contract = new Contract();
         contract.setStartDate(LocalDate.of(2024, 5, 1));
         contract.setEndDate(LocalDate.of(2024, 12, 31));
-        contract.setPayment(35000);
+        contract.setPayment("35000");
         contract.setStatus(true);
         contract.setType("Custom");
         contract.setSponsorId(5L);
@@ -191,7 +191,7 @@ class ContractRepositoryTest {
     @Test
     void testUpdateContractDates() {
         // Given
-        Contract contract = new Contract(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 6, 30), 10000, true, "Short Term");
+        Contract contract = new Contract(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 6, 30), "10000", true, "Short Term");
         Contract savedContract = entityManager.persistAndFlush(contract);
 
         // When

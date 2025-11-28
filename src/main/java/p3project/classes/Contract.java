@@ -15,16 +15,15 @@ public class Contract {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+    private Long sponsorId;
     private LocalDate startDate;
     private LocalDate endDate;
-    private int payment;
-    private boolean status;
+    private String payment;
     private String type;
-
+    private boolean status;
+    private String name;
     // Link contract to sponsor by sponsorName
     // sponsor id (generated) to link to Sponsor
-    private Long sponsorId;
 
     // copy of sponsor name for easy display in views
     private String sponsorName;
@@ -34,7 +33,7 @@ public class Contract {
     private byte[] pdfData;
 
     // Constructor
-    public Contract(LocalDate startDate, LocalDate endDate, int payment, boolean status, String typeName) {
+    public Contract(LocalDate startDate, LocalDate endDate, String payment, boolean status, String typeName) {
         // valider datoer: startDate må ikke være efter endDate
         if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
             throw new IllegalArgumentException("Contract start date cannot be after end date");
@@ -53,6 +52,10 @@ public class Contract {
     // Returns the ID of the entity
     public Long getId() {
         return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getSponsorId() {
@@ -103,11 +106,11 @@ public class Contract {
         this.endDate = endDate;
     }
 
-    public int getPayment() {
+    public String getPayment() {
         return payment;
     }
 
-    public void setPayment(int payment) {
+    public void setPayment(String payment) {
         this.payment = payment;
     }
 
