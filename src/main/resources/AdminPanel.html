@@ -1,291 +1,353 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- <link rel="stylesheet" href="/style.css"> -->
-    <link rel="stylesheet" th:href="@{/css/Sidebar.css}" href="static/css/Sidebar.css">
-</head>
+    <link
+      rel="stylesheet"
+      th:href="@{/css/Sidebar.css}"
+      href="static/css/Sidebar.css"
+    />
+  </head>
 
-<style>
+  <style>
     #Umodal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 100%;
-        background-color: rgba(0, 0, 0, .5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     #Umodal:not(:target) {
-        visibility: hidden;
-        opacity: 0;
+      visibility: hidden;
+      opacity: 0;
     }
 
     #Dmodal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 100%;
-        background-color: rgba(0, 0, 0, .5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     #Dmodal:not(:target) {
-        visibility: hidden;
-        opacity: 0;
+      visibility: hidden;
+      opacity: 0;
     }
 
     .ModalBox {
-        background-color: #d1d5db;
-        padding: 10px;
-        border-radius: 10px;
-        max-width: 90vw;
-        width: min(600px, 90vw);
-        max-height: 90vh;
-        height: auto;
-        overflow: auto;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        position: relative;
+      background-color: #d1d5db;
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 90vw;
+      width: min(600px, 90vw);
+      max-height: 90vh;
+      height: auto;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
     }
 
     .ModalRow {
-        display: flex;
-        flex-direction: row;
-        gap: 30px;
-        margin-top: 10px;
-        width: 100%;
-        justify-content: center;
-        flex-wrap: wrap;
-        align-items: flex-start;
+      display: flex;
+      flex-direction: row;
+      gap: 30px;
+      margin-top: 10px;
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+      align-items: flex-start;
     }
 
     .CloseModal {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        text-decoration: none;
-        font-size: 18px;
-        font-weight: bold;
-        color: #111827;
-        background-color: #e5e7eb;
-        padding: 5px 10px;
-        border-radius: 5px;
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: bold;
+      color: #111827;
+      background-color: #e5e7eb;
+      padding: 5px 10px;
+      border-radius: 5px;
     }
 
     .ModalTitle {
-        font-size: 24px;
-        padding: 10px;
-        border-radius: 10px;
-        max-width: fit-content;
-        max-height: fit-content;
-        font-weight: bold;
-        margin-bottom: 10px;
-        background-color: #e5e7eb;
+      font-size: 24px;
+      padding: 10px;
+      border-radius: 10px;
+      max-width: fit-content;
+      max-height: fit-content;
+      font-weight: bold;
+      margin-bottom: 10px;
+      background-color: #e5e7eb;
     }
 
     .ModalTag {
-        display: flex;
-        background-color: #fff;
-        padding: 10px;
-        margin: 6px;
-        border-radius: 10px;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        min-width: 180px;
+      display: flex;
+      background-color: #fff;
+      padding: 10px;
+      margin: 6px;
+      border-radius: 10px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-width: 180px;
     }
 
     .tag {
-        background-color: #e5e7eb;
-        padding: 0.25rem 0.75rem;
-        border-radius: 0.375rem;
+      background-color: #e5e7eb;
+      padding: 0.25rem 0.75rem;
+      border-radius: 0.375rem;
     }
 
     .ModalActions {
-        display: flex;
-        gap: 8px;
-        flex-direction: column;
-        align-items: stretch;
-        width: 100%;
+      display: flex;
+      gap: 8px;
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
     }
 
     .ModalActions button,
     .ModalActions a {
-        background-color: #e5e7eb;
-        padding: 8px;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
+      background-color: #e5e7eb;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
     }
 
     .ModalActionsRow button,
     .ModalActionsRow a {
-        background-color: #e5e7eb;
-        padding: 8px;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
+      background-color: #e5e7eb;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
     }
 
     .UserField {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        align-items: stretch;
-        width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: stretch;
+      width: 100%;
     }
 
     input[type="text"],
     input[type="password"] {
-        padding: 8px;
-        border-radius: 6px;
-        border: 1px solid #9ca3af;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #9ca3af;
     }
 
     .ModalActionsRow {
-        display: flex;
-        gap: 12px;
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-        width: auto;
+      display: flex;
+      gap: 12px;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      width: auto;
     }
+  </style>
 
-</style>
+  <body class="bg-gray-100 text-gray-900">
+    <!-- User Modal-->
+    <div id="Umodal">
+      <div class="ModalBox">
+        <a class="CloseModal" href="#">X</a>
 
-<body class="bg-gray-100 text-gray-900">
-
-        <!-- User Modal-->
-        <div id="Umodal">
-            <div class="ModalBox">
-                <a class="CloseModal" href="#">X</a>
-
-                <div class="ModalRow">
-                    <div class="ModalTag">
-                        <h3 class="title">Brugernavn:</h3>
-                        <div class="UserField">
-                            <p id="UsernameDisplay">Bruger1</p>
-                            <input id="UsernameInput" class="rounded" type="text" placeholder="Nyt brugernavn">
-                            <button class="tag" onclick="">Ændre brugernavn</button>
-                        </div>
-                    </div>
-                    <div class="ModalTag">
-                        <h3 class="title">Adgangskode:</h3>
-                        <div class="UserField">
-                            <p id="PasswordDisplay">Kode1234</p>
-                            <input id="PasswordInput" class="rounded" type="password" placeholder="Ny adgangskode">
-                            <button class="tag" onclick="">Ændre adgangskode</button>
-                        </div>
-                    </div>
-
-                    <div class="ModalRow">
-                        <div class="ModalActionsRow">
-                            <button onclick="location.hash='Dmodal'" style="background:#f87171;color:#fff;">Slet bruger</button>
-                        </div>
-                    </div>
-                </div>
+        <div class="ModalRow">
+          <div class="ModalTag">
+            <h3 class="title">Brugernavn:</h3>
+            <div class="UserField">
+              <p id="UsernameDisplay">Bruger1</p>
+              <input
+                id="UsernameInput"
+                class="rounded"
+                type="text"
+                placeholder="Nyt brugernavn"
+              />
+              <button class="tag" onclick="">Ændre brugernavn</button>
             </div>
+          </div>
+          <div class="ModalTag">
+            <h3 class="title">Adgangskode:</h3>
+            <div class="UserField">
+              <p id="PasswordDisplay">Kode1234</p>
+              <input
+                id="PasswordInput"
+                class="rounded"
+                type="password"
+                placeholder="Ny adgangskode"
+              />
+              <button class="tag" onclick="">Ændre adgangskode</button>
+            </div>
+          </div>
+
+          <div class="ModalRow">
+            <div class="ModalActionsRow">
+              <button
+                onclick="location.hash='Dmodal'"
+                style="background: #f87171; color: #fff"
+              >
+                Slet bruger
+              </button>
+            </div>
+          </div>
         </div>
-
-        <!-- Delete User Modal -->
-        <div id="Dmodal">
-            <div class="ModalBox">
-                <p>Er du sikker på at du vil slette <strong id="DeleteUsername">Bruger1</strong>?</p>
-                <div class="ModalRow">
-                    <div class="ModalActionsRow">
-                        <button onclick="location.hash='Umodal'">Annuller</button>
-                        <button onclick=" location.hash='#';DeleteFunction()" style="background:#f87171;color:#fff;">Slet Bruger</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    
-    <div class="flex min-h-screen">
-        
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div>
-                <div class="logo">VBK Sponsor System</div>
-
-                <div class="menu">
-                    <button class="menu-btn" onclick="location.href='/homepage'">Forside</button>
-                    <button class="menu-btn" onclick="location.href='/changelog'">Change log</button>
-                    <button class="menu-btn" onclick="location.href='/archive'">Arkiv</button>
-                    <button class="menu-btn" onclick="location.href='/AdminPanel'">Admin panel</button>
-                </div>
-            </div>
-
-            <button class="logout-btn" onclick="location.href='/login'">Log ud</button>
-        </aside>
-
-    <!-- Main Content -->
-    <main class="flex-1 p-6">
-       <div>
-            <div class="bg-gray-200 rounded-t-lg text-sm font-semibold">
-                <div class="grid grid-cols-2">
-                    <div class="px-6 py-3 border-r">
-                        <span>Brugere</span>
-                    </div>
-                    <div class="px-6 py-3">
-                        <span>Tilføj bruger</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3 items-start">
-
-                <!-- User list -->
-                <section class="bg-white rounded shadow p-4">
-                    <table class="min-w-full text-sm">
-                        <tbody>
-                            <tr>
-                                <td class="px-6 py-4">
-                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded" onclick="location.hash='Umodal'">Bruger #1</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </section>
-
-                <!-- Add user -->
-                <section class="bg-white rounded shadow p-4">
-                    <form th:action="@{/users/add}" action="/users/add" method="post" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Brugernavn</label>
-                            <input name="username" type="text" required class="mt-1 block w-full border-gray-300 rounded px-3 py-2" placeholder="Brugernavn">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Adgangskode</label>
-                            <input name="password" type="password" required class="mt-1 block w-full border-gray-300 rounded px-3 py-2" placeholder="Adgangskode">
-                        </div>
-
-                        <div>
-                            <button type="submit" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded">Tilføj bruger</button>
-                        </div>
-                    </form>
-                </section>
-            </div>
-
-        </div>
-    </main>
-    <footer>
-
-    </footer>
+      </div>
     </div>
-</body>
 
+    <!-- Delete User Modal -->
+    <div id="Dmodal">
+      <div class="ModalBox">
+        <p>
+          Er du sikker på at du vil slette
+          <strong id="DeleteUsername">Bruger1</strong>?
+        </p>
+        <div class="ModalRow">
+          <div class="ModalActionsRow">
+            <button onclick="location.hash='Umodal'">Annuller</button>
+            <button
+              onclick=" location.hash='#';DeleteFunction()"
+              style="background: #f87171; color: #fff"
+            >
+              Slet Bruger
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div>
+          <div class="logo">VBK Sponsor System</div>
+
+          <div class="menu">
+            <button class="menu-btn" onclick="location.href='/homepage'">
+              Forside
+            </button>
+            <button class="menu-btn" onclick="location.href='/sponsors'">
+              Sponsors
+            </button>
+            <button class="menu-btn" onclick="location.href='/changelog'">
+              Change log
+            </button>
+            <button class="menu-btn" onclick="location.href='/archive'">
+              Arkiv
+            </button>
+            <button class="menu-btn" onclick="location.href='/AdminPanel'">
+              Admin panel
+            </button>
+          </div>
+        </div>
+
+        <button class="logout-btn" onclick="location.href='/login'">
+          Log ud
+        </button>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="flex-1 p-6">
+        <div>
+          <div class="bg-gray-200 rounded-t-lg text-sm font-semibold">
+            <div class="grid grid-cols-2">
+              <div class="px-6 py-3 border-r">
+                <span>Brugere</span>
+              </div>
+              <div class="px-6 py-3">
+                <span>Tilføj bruger</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 items-start">
+            <!-- User list -->
+            <section class="bg-white rounded shadow p-4">
+              <table class="min-w-full text-sm">
+                <tbody>
+                  <tr>
+                    <td class="px-6 py-4">
+                      <button
+                        class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded"
+                        onclick="location.hash='Umodal'"
+                      >
+                        Bruger #1
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+
+            <!-- Add user -->
+            <section class="bg-white rounded shadow p-4">
+              <form
+                th:action="@{/users/add}"
+                action="/users/add"
+                method="post"
+                class="space-y-4"
+              >
+                <div>
+                  <label class="block text-sm font-medium text-gray-700"
+                    >Brugernavn</label
+                  >
+                  <input
+                    name="username"
+                    type="text"
+                    required
+                    class="mt-1 block w-full border-gray-300 rounded px-3 py-2"
+                    placeholder="Brugernavn"
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700"
+                    >Adgangskode</label
+                  >
+                  <input
+                    name="password"
+                    type="password"
+                    required
+                    class="mt-1 block w-full border-gray-300 rounded px-3 py-2"
+                    placeholder="Adgangskode"
+                  />
+                </div>
+
+                <div>
+                  <button
+                    type="submit"
+                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
+                  >
+                    Tilføj bruger
+                  </button>
+                </div>
+              </form>
+            </section>
+          </div>
+        </div>
+      </main>
+      <footer></footer>
+    </div>
+  </body>
 </html>
