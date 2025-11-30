@@ -77,11 +77,7 @@
             >
               <input type="hidden" name="id" th:value="${sponsor.id}" />
               <label>Sponsor Name</label>
-              <input
-                name="name"
-                th:value="${sponsor.name}"
-                required
-              />
+              <input name="name" th:value="${sponsor.name}" required />
               <label>Contact Person</label>
               <input name="contactPerson" th:value="${sponsor.contactPerson}" />
               <label>Email</label>
@@ -163,7 +159,8 @@
               th:text="${s.name}"
             ></option>
           </select>
-
+          <label for="name">Contract name:</label>
+          <input id="contractName" name="name" type="text" required />
           <label for="startDate">Start Date</label>
           <input id="startDate" name="startDate" type="date" required />
           <label for="endDate">End Date</label>
@@ -177,8 +174,6 @@
             <option value="true">True</option>
             <option value="false" selected>False</option>
           </select>
-            <label for="name">Contract name:</label>
-            <input id="contractName" name="name" type="text" required>
           <button type="submit">Create Contract</button>
         </form>
       </section>
@@ -196,7 +191,7 @@
             <div>End: <span th:text="${contract.endDate}">end</span></div>
             <div>Payment: <span th:text="${contract.payment}">0</span></div>
             <div>Status: <span th:text="${contract.status}">false</span></div>
-              <div>Name: <span th:text="${contract.name}">name</span></div>
+            <div>Name: <span th:text="${contract.name}">name</span></div>
             <div style="margin-top: 8px">
               <button
                 type="button"
@@ -226,11 +221,7 @@
               style="display: none; margin-top: 8px"
               class="form"
             >
-              <input
-                type="hidden"
-                name="id"
-                th:value="${contract.id}"
-              />
+              <input type="hidden" name="id" th:value="${contract.id}" />
               <label>Sponsor</label>
               <select name="sponsorId">
                 <option
@@ -269,9 +260,13 @@
                   False
                 </option>
               </select>
-                <label>Name</label>
-                <input type="text" name="name" th:value="${contract.name}" />
-                <input type="hidden" name="sponsorName" th:value="${contract.sponsorName}" />
+              <label>Name</label>
+              <input type="text" name="name" th:value="${contract.name}" />
+              <input
+                type="hidden"
+                name="sponsorName"
+                th:value="${contract.sponsorName}"
+              />
               <button type="submit">Save</button>
               <button
                 type="button"
