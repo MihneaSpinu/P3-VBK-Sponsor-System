@@ -33,7 +33,6 @@ class ContractRepositoryTest {
             "Premium"
         );
         contract.setSponsorId(1L);
-        contract.setSponsorName("Tech Corp");
 
         // When
         Contract savedContract = contractRepository.save(contract);
@@ -46,7 +45,6 @@ class ContractRepositoryTest {
         assertThat(savedContract.isStatus()).isTrue();
         assertThat(savedContract.getType()).isEqualTo("Premium");
         assertThat(savedContract.getSponsorId()).isEqualTo(1L);
-        assertThat(savedContract.getSponsorName()).isEqualTo("Tech Corp");
     }
 
     @Test
@@ -60,7 +58,6 @@ class ContractRepositoryTest {
             "Standard"
         );
         contract.setSponsorId(2L);
-        contract.setSponsorName("Sports Inc");
         Contract persistedContract = entityManager.persistAndFlush(contract);
 
         // When
@@ -72,17 +69,14 @@ class ContractRepositoryTest {
         assertThat(foundContract.get().getPayment()).isEqualTo(25000);
         assertThat(foundContract.get().isStatus()).isFalse();
         assertThat(foundContract.get().getType()).isEqualTo("Standard");
-        assertThat(foundContract.get().getSponsorName()).isEqualTo("Sports Inc");
     }
 
     @Test
     void testFindAll() {
         // Given
         Contract contract1 = new Contract(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), "30000", true, "Type A");
-        contract1.setSponsorName("Sponsor A");
         
         Contract contract2 = new Contract(LocalDate.of(2024, 2, 1), LocalDate.of(2024, 11, 30), "40000", true, "Type B");
-        contract2.setSponsorName("Sponsor B");
         
         entityManager.persistAndFlush(contract1);
         entityManager.persistAndFlush(contract2);
@@ -92,7 +86,6 @@ class ContractRepositoryTest {
 
         // Then
         assertThat(contracts).hasSize(2);
-        assertThat(contracts).extracting(Contract::getSponsorName).containsExactlyInAnyOrder("Sponsor A", "Sponsor B");
     }
 
     @Test
@@ -100,14 +93,12 @@ class ContractRepositoryTest {
         // Given
         Contract contract = new Contract(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), "10000", true, "Basic");
         contract.setSponsorId(1L);
-        contract.setSponsorName("Original Sponsor");
         Contract savedContract = entityManager.persistAndFlush(contract);
 
         // When
         savedContract.setPayment("20000");
         savedContract.setType("Premium");
         savedContract.setStatus(false);
-        savedContract.setSponsorName("Updated Sponsor");
         Contract updatedContract = contractRepository.save(savedContract);
 
         // Then
@@ -115,7 +106,6 @@ class ContractRepositoryTest {
         assertThat(updatedContract.getPayment()).isEqualTo(20000);
         assertThat(updatedContract.getType()).isEqualTo("Premium");
         assertThat(updatedContract.isStatus()).isFalse();
-        assertThat(updatedContract.getSponsorName()).isEqualTo("Updated Sponsor");
     }
 
     @Test
@@ -156,7 +146,6 @@ class ContractRepositoryTest {
         Contract contract = new Contract(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), "50000", true, "Premium");
         byte[] pdfData = "Sample PDF Data".getBytes();
         contract.setPdfData(pdfData);
-        contract.setSponsorName("PDF Sponsor");
 
         // When
         Contract savedContract = contractRepository.save(contract);
@@ -176,7 +165,6 @@ class ContractRepositoryTest {
         contract.setStatus(true);
         contract.setType("Custom");
         contract.setSponsorId(5L);
-        contract.setSponsorName("Empty Constructor Sponsor");
 
         // When
         Contract savedContract = contractRepository.save(contract);
@@ -185,7 +173,6 @@ class ContractRepositoryTest {
         assertThat(savedContract.getId()).isNotNull();
         assertThat(savedContract.getStartDate()).isEqualTo(LocalDate.of(2024, 5, 1));
         assertThat(savedContract.getPayment()).isEqualTo(35000);
-        assertThat(savedContract.getSponsorName()).isEqualTo("Empty Constructor Sponsor");
     }
 
     @Test

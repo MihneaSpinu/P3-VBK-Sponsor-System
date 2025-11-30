@@ -2,10 +2,15 @@ package p3project;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -87,7 +92,23 @@ public class MainController {
     public String showSponsors(Model model) {
         model.addAttribute("sponsors", sponsorRepository.findAll());
         model.addAttribute("contracts", contractRepository.findAll());
+
+        Iterable<String> sponsorNames = fetchContractSponsorNames();
+        model.addAttribute("sponsorNames", sponsorNames);
         return "sponsors";
+    }
+
+    private List<String> fetchContractSponsorNames() {
+        Iterable<Contract> contracts = contractRepository.findAll();
+        List<String> sponsorNames = new ArrayList<>();
+
+        for(Contract contract : contracts) {
+            Long sponsorId = contract.getSponsorId();
+            Sponsor sponsor = sponsorRepository.findById(sponsorId).orElseThrow();
+            String name = sponsor.getName();
+            sponsorNames.add(name);
+        }
+        return sponsorNames;
     }
 
     // Changelog page
@@ -106,7 +127,7 @@ public class MainController {
     }
 
     @PostMapping("/update/contract")
-    public ResponseEntity<String> updateContractFields(@ModelAttribute Contract contract) {
+    public ResponseEntity<String> updateContractFields(@ModelAttribute Contract contract) { // pdfdata dead on arrival
         Contract storedContract = contractRepository.findById(contract.getId())
         .orElseThrow(() -> new RuntimeException("Unable to retrieve sponsor with id: " + contract.getId()));
         return handleUpdateRequest(contract, storedContract);
@@ -137,15 +158,18 @@ public class MainController {
         for (Field field : fields) {
             field.setAccessible(true);
             try {
+                if(field.getName().equals("pdfData")) continue; // hack
                 Object before = field.get(storedObject);
                 Object after = field.get(requestObject);
-                if(before == null || after == null) continue; // WIP
-                if (!before.equals(after)) {
+                if (!Objects.equals(before, after)) { // indbygget null håndtering
+
                     Changelog log = new Changelog(new User(), requestObject, field, before, after);
+                    // handleSpecialFields(field, log, storedObject, requestObject);
                     logRepository.save(log);
                     field.set(storedObject, after);
+
                     fieldsChanged++;
-                    System.out.println("Updated " + field.getName() + ": " + before.toString() + " -> " + after.toString());
+                    // System.out.println("Updated " + field.getName() + ": " + before.toString() + " -> " + after.toString());
                 }
             } catch (IllegalAccessException error) {
                 throw new RuntimeException(error);
@@ -160,26 +184,35 @@ public class MainController {
         return fieldsChanged;
     }
 
+    /*
+    private <T> void handleSpecialFields(Field field, Changelog log, T storedObject, T requestObject) {
+        String fieldName = field.getName();
+        switch(fieldName) {
+            case "pdfData":
+                try {
+                    Method getName = storedObject.getClass().getMethod("getFileName");
+                    String oldName = getName.invoke(storedObject).toString();
+                    String newName = getName.invoke(requestObject).toString();
+                    log.setBefore(oldName);
+                    log.setAfter(newName);
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException error) {
+                    throw new RuntimeException("Error getting name of target object: " + error);
+                }
+        }
+    }
+    */
+
     // Handles adding a new sponsor from the web form
     @PostMapping("/sponsors/add")
-    public String addSponsorFromWeb(
-            @RequestParam String name,
-            @RequestParam String contactPerson,
-            @RequestParam String email,
-            @RequestParam String phoneNumber,
-            @RequestParam String cvrNumber,
-            @RequestParam(required = false, defaultValue = "false") boolean status,
-            @RequestParam(required = false) String comments,
-            Model model) {
-        if (phoneNumber != null && phoneNumber.length() > 0 && !phoneNumber.matches("^[0-9]+$")) {
+    public String addSponsorFromWeb(@ModelAttribute Sponsor sponsor, Model model) {
+        if (sponsor.getPhoneNumber() != null && sponsor.getPhoneNumber().length() > 0 && !sponsor.getPhoneNumber().matches("^[0-9]+$")) {
             model.addAttribute("error", "Phone number must contain digits only.");
             model.addAttribute("sponsors", sponsorRepository.findAll());
             model.addAttribute("contracts", contractRepository.findAll());
+            Iterable<String> sponsorNames = fetchContractSponsorNames();
+            model.addAttribute("sponsorNames", sponsorNames);
             return "sponsors";
         }
-
-        Sponsor sponsor = new Sponsor(name, contactPerson, email, phoneNumber, cvrNumber, status,
-                comments == null ? "" : comments);
         sponsorRepository.save(sponsor);
 
         return "redirect:/sponsors";
@@ -187,76 +220,22 @@ public class MainController {
 
     // Handles creating a new contract for a sponsor
     @PostMapping("/sponsors/addContract")
-    public String addContractForSponsor(
-            @RequestParam Long sponsorId,
-            @RequestParam String startDate,
-            @RequestParam String endDate,
-            @RequestParam String payment,
-            @RequestParam(required = false, defaultValue = "false") boolean status,
-            @RequestParam String type,
-            @RequestParam String name,
-            Model model) {
+    public String addContractForSponsor(@ModelAttribute Contract contract, Model model) {
         try {
-            LocalDate start = LocalDate.parse(startDate);
-            LocalDate end = LocalDate.parse(endDate);
-            Contract contract = new Contract(start, end, payment, status, type);
-            contract.setSponsorId(sponsorId);
-            contract.setName(name);
-            java.util.Optional<Sponsor> sponsorOpt = sponsorRepository.findById(sponsorId);
-            if (sponsorOpt.isPresent())
-                contract.setSponsorName(sponsorOpt.get().getName());
             contractRepository.save(contract);
             return "redirect:/sponsors";
         } catch (IllegalArgumentException ex) {
+            // ???
             model.addAttribute("error", ex.getMessage());
             model.addAttribute("sponsors", sponsorRepository.findAll());
             model.addAttribute("contracts", contractRepository.findAll());
+
+            Iterable<String> sponsorNames = fetchContractSponsorNames();
+            model.addAttribute("sponsorNames", sponsorNames);
             return "sponsors";
         }
     }
 
-    // Handles editing an existing sponsor
-    @PostMapping("/sponsors/edit")
-    public String editSponsor(
-            @RequestParam Long sponsorId,
-            @RequestParam String name,
-            @RequestParam(required = false) String contactPerson,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String phoneNumber,
-            @RequestParam(required = false) String cvrNumber,
-            @RequestParam(required = false, defaultValue = "false") boolean status,
-            @RequestParam(required = false) String comments,
-            Model model) {
-        if (phoneNumber != null && phoneNumber.length() > 0 && !phoneNumber.matches("^[0-9]+$")) {
-            model.addAttribute("error", "Phone number must contain digits only.");
-            model.addAttribute("sponsors", sponsorRepository.findAll());
-            model.addAttribute("contracts", contractRepository.findAll());
-            return "sponsors";
-        }
-        java.util.Optional<Sponsor> sponsorOpt = sponsorRepository.findById(sponsorId);
-        if (sponsorOpt.isPresent()) {
-            Sponsor sponsor = sponsorOpt.get();
-            // update fields (keep generated id)
-            sponsor.setName(name == null ? sponsor.getName() : name);
-            sponsor.setContactPerson(contactPerson == null ? sponsor.getContactPerson() : contactPerson);
-            sponsor.setEmail(email == null ? sponsor.getEmail() : email);
-            sponsor.setPhoneNumber(phoneNumber == null ? sponsor.getPhoneNumber() : phoneNumber);
-            sponsor.setCvrNumber(cvrNumber == null ? sponsor.getCvrNumber() : cvrNumber);
-            sponsor.setStatus(status);
-            sponsor.setComments(comments == null ? sponsor.getComments() : comments);
-            sponsorRepository.save(sponsor);
-
-            // update stored name copy on contracts
-            Iterable<Contract> contracts = contractRepository.findAll();
-            for (Contract contract : contracts) {
-                if (sponsorId.equals(contract.getSponsorId())) {
-                    contract.setSponsorName(sponsor.getName());
-                    contractRepository.save(contract);
-                }
-            }
-        }
-        return "redirect:/sponsors";
-    }
 
     // Deletes a sponsor and all contracts linked to that sponsor
     @PostMapping("/sponsors/delete")
@@ -271,40 +250,6 @@ public class MainController {
         return "redirect:/sponsors";
     }
 
-    // Handles editing an existing contract
-    @PostMapping("/sponsors/editContract")
-    public String editContract(
-            @RequestParam Long contractId,
-            @RequestParam Long sponsorId,
-            @RequestParam String startDate,
-            @RequestParam String endDate,
-            @RequestParam String payment,
-            @RequestParam(required = false, defaultValue = "false") boolean status,
-            @RequestParam String type,
-            Model model) {
-        java.util.Optional<Contract> contractOpt = contractRepository.findById(contractId);
-        if (contractOpt.isPresent()) {
-            Contract contract = contractOpt.get();
-            contract.setSponsorId(sponsorId);
-            java.util.Optional<Sponsor> sponsorOpt = sponsorRepository.findById(sponsorId);
-            if (sponsorOpt.isPresent())
-                contract.setSponsorName(sponsorOpt.get().getName());
-            try {
-                contract.setStartDate(LocalDate.parse(startDate));
-                contract.setEndDate(LocalDate.parse(endDate));
-                contract.setPayment(payment);
-                contract.setStatus(status);
-                contract.setType(type);
-                contractRepository.save(contract);
-            } catch (IllegalArgumentException ex) {
-                model.addAttribute("error", ex.getMessage());
-                model.addAttribute("sponsors", sponsorRepository.findAll());
-                model.addAttribute("contracts", contractRepository.findAll());
-                return "sponsors";
-            }
-        }
-        return "redirect:/sponsors";
-    }
 
     // Deletes a contract by ID
     @PostMapping("/sponsors/deleteContract")
@@ -429,4 +374,101 @@ public class MainController {
 
         return "redirect:/users";
     }
+
+
+
+
+
+
+
+    // =================================================================================================================
+    // DEPRECATED LEGACY CODE
+    
+    // Handles editing an existing sponsor
+    @PostMapping("/sponsors/edit")
+    public String editSponsor(
+            @RequestParam Long sponsorId,
+            @RequestParam String name,
+            @RequestParam(required = false) String contactPerson,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String phoneNumber,
+            @RequestParam(required = false) String cvrNumber,
+            @RequestParam(required = false, defaultValue = "false") boolean status,
+            @RequestParam(required = false) String comments,
+            Model model) {
+        if (phoneNumber != null && phoneNumber.length() > 0 && !phoneNumber.matches("^[0-9]+$")) {
+            model.addAttribute("error", "Phone number must contain digits only.");
+            model.addAttribute("sponsors", sponsorRepository.findAll());
+            model.addAttribute("contracts", contractRepository.findAll());
+            Iterable<String> sponsorNames = fetchContractSponsorNames();
+            model.addAttribute("sponsorNames", sponsorNames);
+            return "sponsors";
+        }
+        java.util.Optional<Sponsor> sponsorOpt = sponsorRepository.findById(sponsorId);
+        if (sponsorOpt.isPresent()) {
+            Sponsor sponsor = sponsorOpt.get();
+            // update fields (keep generated id)
+            sponsor.setName(name == null ? sponsor.getName() : name);
+            sponsor.setContactPerson(contactPerson == null ? sponsor.getContactPerson() : contactPerson);
+            sponsor.setEmail(email == null ? sponsor.getEmail() : email);
+            sponsor.setPhoneNumber(phoneNumber == null ? sponsor.getPhoneNumber() : phoneNumber);
+            sponsor.setCvrNumber(cvrNumber == null ? sponsor.getCvrNumber() : cvrNumber);
+            sponsor.setStatus(status);
+            sponsor.setComments(comments == null ? sponsor.getComments() : comments);
+            sponsorRepository.save(sponsor);
+
+            // update stored name copy on contracts
+            Iterable<Contract> contracts = contractRepository.findAll();
+            for (Contract contract : contracts) {
+                if (sponsorId.equals(contract.getSponsorId())) {
+                    // contract.setSponsorName(sponsor.getName());
+                    contractRepository.save(contract);
+                }
+            }
+        }
+        return "redirect:/sponsors";
+    }
+    // =================================================================================================================
+
+
+    // =================================================================================================================
+    // DEPRECATED LEGACY CODE
+
+    // Handles editing an existing contract
+    @PostMapping("/sponsors/editContract")
+    public String editContract(
+            @RequestParam Long contractId,
+            @RequestParam Long sponsorId,
+            @RequestParam String startDate,
+            @RequestParam String endDate,
+            @RequestParam String payment,
+            @RequestParam(required = false, defaultValue = "false") boolean status,
+            @RequestParam String type,
+            Model model) {
+        java.util.Optional<Contract> contractOpt = contractRepository.findById(contractId);
+        if (contractOpt.isPresent()) {
+            Contract contract = contractOpt.get();
+            contract.setSponsorId(sponsorId);
+            try {
+                contract.setStartDate(LocalDate.parse(startDate));
+                contract.setEndDate(LocalDate.parse(endDate));
+                contract.setPayment(payment);
+                contract.setStatus(status);
+                contract.setType(type);
+                contractRepository.save(contract);
+            } catch (IllegalArgumentException ex) {
+                model.addAttribute("error", ex.getMessage());
+                model.addAttribute("sponsors", sponsorRepository.findAll());
+                model.addAttribute("contracts", contractRepository.findAll());
+                Iterable<String> sponsorNames = fetchContractSponsorNames();
+                model.addAttribute("sponsorNames", sponsorNames);
+                return "sponsors";
+            }
+        }
+        return "redirect:/sponsors";
+    }
+
+    // =================================================================================================================
+
+
 }

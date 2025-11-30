@@ -22,11 +22,6 @@ public class Contract {
     private String type;
     private boolean status;
     private String name;
-    // Link contract to sponsor by sponsorName
-    // sponsor id (generated) to link to Sponsor
-
-    // copy of sponsor name for easy display in views
-    private String sponsorName;
 
     @Lob
     @Column(name = "pdf_data", columnDefinition = "LONGBLOB") /* Longblob to have enough storage for .pdf's */
@@ -50,7 +45,6 @@ public class Contract {
         // required by JPA
     }
 
-    // Returns the ID of the entity
     public Long getId() {
         return this.id;
     }
@@ -129,16 +123,6 @@ public class Contract {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    // Returns the name of the sponsor
-    public String getSponsorName() {
-        return sponsorName;
-    }
-
-    // Sets the name of the sponsor
-    public void setSponsorName(String sponsorName) {
-        this.sponsorName = sponsorName;
     }
 
     public void setFileName(String fileName){

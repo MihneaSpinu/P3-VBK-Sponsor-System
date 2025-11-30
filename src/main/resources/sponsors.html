@@ -158,9 +158,9 @@
           <label for="sponsorSelect">Sponsor</label>
           <select id="sponsorSelect" name="sponsorId" required>
             <option
-              th:each="s : ${sponsors}"
-              th:value="${s.id}"
-              th:text="${s.name}"
+              th:each="sponsor : ${sponsors}"
+              th:value="${sponsor.id}"
+              th:text="${sponsor.name}"
             ></option>
           </select>
 
@@ -168,7 +168,7 @@
           <input id="startDate" name="startDate" type="date" required />
           <label for="endDate">End Date</label>
           <input id="endDate" name="endDate" type="date" required />
-          <label for="payment">Payment (integer)</label>
+          <label for="payment">Payment</label>
           <input id="payment" name="payment" type="number" value="0" required />
           <label for="type">Type</label>
           <input id="type" name="type" value="Standard" />
@@ -186,21 +186,20 @@
       <section class="list">
         <h2>Contracts</h2>
         <div th:if="${not #lists.isEmpty(contracts)}">
-          <div th:each="contract, statC : ${contracts}" class="item">
+          <div th:each="contract, i : ${contracts}" class="item">
             <div>Contract ID: <span th:text="${contract.id}">1</span></div>
-            <div>
-              Sponsor: <span th:text="${contract.sponsorName}">sponsor</span>
-            </div>
+            <div>Sponsor: <span th:text="${sponsorNames[i.index]}">sponsor</span></div>
             <div>Type: <span th:text="${contract.type}">type</span></div>
             <div>Start: <span th:text="${contract.startDate}">start</span></div>
             <div>End: <span th:text="${contract.endDate}">end</span></div>
             <div>Payment: <span th:text="${contract.payment}">0</span></div>
             <div>Status: <span th:text="${contract.status}">false</span></div>
-              <div>Name: <span th:text="${contract.name}">name</span></div>
+            <div>Name: <span th:text="${contract.name}">name</span></div>
+
             <div style="margin-top: 8px">
               <button
                 type="button"
-                th:onclick="|toggleContractEdit(${statC.index})|"
+                th:onclick="|toggleContractEdit(${i.index})|"
               >
                 Edit
               </button>
@@ -220,7 +219,7 @@
             </div>
 
             <form
-              th:id="|contractEditForm-${statC.index}|"
+              th:id="|contractEditForm-${i.index}|"
               th:action="@{/update/contract}"
               method="POST"
               style="display: none; margin-top: 8px"
@@ -234,10 +233,10 @@
               <label>Sponsor</label>
               <select name="sponsorId">
                 <option
-                  th:each="s : ${sponsors}"
-                  th:value="${s.id}"
-                  th:text="${s.name}"
-                  th:selected="${s.id == contract.sponsorId}"
+                  th:each="sponsor : ${sponsors}"
+                  th:value="${sponsor.id}"  
+                  th:text="${sponsor.name}"
+                  th:selected="${sponsor.id == contract.sponsorId}"
                 ></option>
               </select>
               <label>Start Date</label>
@@ -271,11 +270,11 @@
               </select>
                 <label>Name</label>
                 <input type="text" name="name" th:value="${contract.name}" />
-                <input type="hidden" name="sponsorName" th:value="${contract.sponsorName}" />
+                <input type="hidden" name="sponsorName" th:value="${sponsorNames[i.index]}" />
               <button type="submit">Save</button>
               <button
                 type="button"
-                th:onclick="|toggleContractEdit(${statC.index})|"
+                th:onclick="|toggleContractEdit(${i.index})|"
               >
                 Cancel
               </button>

@@ -4,9 +4,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date; // date, localdate, time?
 
-import jakarta.persistence.DiscriminatorColumn; // static for ikke at skrive Action.CREATE etc...
+import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -31,7 +30,7 @@ public class Eventlog {
     private String objectType;
     private String objectName;
     private String timestamp;
-    private String action; // String måske?
+    private String action;
 
     protected Eventlog() {};
 
@@ -43,7 +42,7 @@ public class Eventlog {
             this.objectName = getName.invoke(changedObject).toString();
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException error) {
             this.objectName = "-";
-            throw new RuntimeException("Error getting name of target object: ", error);
+            throw new RuntimeException("Error getting name of target object: " + error);
         }
 
         LocalDateTime unformattedTimestamp = LocalDateTime.now();
