@@ -5,56 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sponsors</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      rel="stylesheet"
-      th:href="@{/css/Sidebar.css}"
-      href="static/css/Sidebar.css"
-    />
-    <link
-      rel="stylesheet"
-      th:href="@{/css/Modal.css}"
-      href="static/css/Modal.css"
-    />
-    <link
-      rel="stylesheet"
-      th:href="@{/css/Table.css}"
-      href="static/css/Table.css"
-    />
-    <link
-      rel="stylesheet"
-      th:href="@{/css/sponsors.css}"
-      href="static/css/sponsors.css"
-    />
+    <link rel="stylesheet" th:href="@{/css/Sidebar.css}" href="static/css/Sidebar.css">
+    <link rel="stylesheet" th:href="@{/css/Modal.css}" href="static/css/Modal.css">
+    <link rel="stylesheet" th:href="@{/css/Table.css}" href="static/css/Table.css">
+    <link rel="stylesheet" th:href="@{/css/sponsors.css}" href="static/css/sponsors.css">
   </head>
   <body class="bg-gray-100 text-gray-900">
     <div class="flex min-h-screen">
+
       <!-- Sidebar -->
       <aside class="sidebar">
         <div>
           <div class="logo">VBK Sponsor System</div>
 
           <div class="menu">
-            <button class="menu-btn" onclick="location.href='/homepage'">
-              Forside
-            </button>
-            <button class="menu-btn" onclick="location.href='/sponsors'">
-              Sponsors
-            </button>
-            <button class="menu-btn" onclick="location.href='/changelog'">
-              Change log
-            </button>
-            <button class="menu-btn" onclick="location.href='/archive'">
-              Arkiv
-            </button>
-            <button class="menu-btn" onclick="location.href='/AdminPanel'">
-              Admin panel
-            </button>
+            <button class="menu-btn" onclick="location.href='/homepage'">Forside</button>
+            <button class="menu-btn" onclick="location.href='/sponsors'">Sponsors</button>
+            <button class="menu-btn" onclick="location.href='/changelog'">Change log</button>
+            <button class="menu-btn" onclick="location.href='/archive'">Arkiv</button>
+            <button class="menu-btn" onclick="location.href='/AdminPanel'">Admin panel</button>
           </div>
         </div>
 
-        <button class="logout-btn" onclick="location.href='/login'">
-          Log ud
-        </button>
+        <button class="logout-btn" onclick="location.href='/login'">Log ud</button>
       </aside>
 
       <!-- Main Content -->
@@ -66,7 +39,7 @@
           <div
             th:if="${error}"
             class="mb-4 rounded p-3"
-            style="background: #ffe6e6; border: 1px solid #ff8080; color: #600"
+            style="background:#ffe6e6;border:1px solid #ff8080;color:#600"
           >
             <strong class="text-red-700">Error:</strong>
             <span th:text="${error}" class="ml-2"></span>
@@ -76,137 +49,44 @@
             <section class="list">
               <h2 class="text-lg font-medium mb-2">All Sponsors</h2>
               <div th:if="${not #lists.isEmpty(sponsors)}">
-                <div
-                  th:each="sponsor, stat : ${sponsors}"
-                  class="item mb-4 p-3 rounded bg-gray-50"
-                >
-                  <strong class="block text-lg" th:text="${sponsor.name}"
-                    >Sponsor Name</strong
-                  >
-                  <div class="text-sm">
-                    Contact:
-                    <span th:text="${sponsor.contactPerson}">Contact</span>
-                  </div>
-                  <div class="text-sm">
-                    Email: <span th:text="${sponsor.email}">email</span>
-                  </div>
-                  <div class="text-sm">
-                    Phone: <span th:text="${sponsor.phoneNumber}">phone</span>
-                  </div>
-                  <div class="text-sm">
-                    CVR: <span th:text="${sponsor.cvrNumber}">cvr</span>
-                  </div>
-                  <div class="text-sm">
-                    Status: <span th:text="${sponsor.status}">status</span>
-                  </div>
-                  <div class="text-sm">
-                    Comments:
-                    <span th:text="${sponsor.comments}">comments</span>
-                  </div>
+                <div th:each="sponsor, stat : ${sponsors}" class="item mb-4 p-3 rounded bg-gray-50">
+                  <strong class="block text-lg" th:text="${sponsor.name}">Sponsor Name</strong>
+                  <div class="text-sm">Contact: <span th:text="${sponsor.contactPerson}">Contact</span></div>
+                  <div class="text-sm">Email: <span th:text="${sponsor.email}">email</span></div>
+                  <div class="text-sm">Phone: <span th:text="${sponsor.phoneNumber}">phone</span></div>
+                  <div class="text-sm">CVR: <span th:text="${sponsor.cvrNumber}">cvr</span></div>
+                  <div class="text-sm">Status: <span th:text="${sponsor.status}">status</span></div>
+                  <div class="text-sm">Comments: <span th:text="${sponsor.comments}">comments</span></div>
                   <div class="mt-2">
-                    <button
-                      type="button"
-                      class="px-3 py-1 bg-gray-200 rounded"
-                      th:onclick="|toggleSponsorEdit(${stat.index})|"
-                    >
-                      Edit
-                    </button>
-                    <form
-                      th:action="@{/sponsors/delete}"
-                      method="POST"
-                      style="display: inline"
-                      th:onsubmit="return confirm('Delete sponsor and its contracts? This cannot be undone.')"
-                    >
-                      <input
-                        type="hidden"
-                        name="sponsorId"
-                        th:value="${sponsor.id}"
-                      />
-                      <button
-                        type="submit"
-                        class="px-3 py-1 ml-2 bg-red-200 rounded"
-                      >
-                        Delete
-                      </button>
+                    <button type="button" class="px-3 py-1 bg-gray-200 rounded" th:onclick="|toggleSponsorEdit(${stat.index})|">Edit</button>
+                    <form th:action="@{/sponsors/delete}" method="POST" style="display:inline" th:onsubmit="return confirm('Delete sponsor and its contracts? This cannot be undone.')">
+                      <input type="hidden" name="sponsorId" th:value="${sponsor.id}" />
+                      <button type="submit" class="px-3 py-1 ml-2 bg-red-200 rounded">Delete</button>
                     </form>
                   </div>
 
-                  <form
-                    th:id="|sponsorEditForm-${stat.index}|"
-                    th:action="@{/update/sponsor}"
-                    method="POST"
-                    style="display: none; margin-top: 8px"
-                    class="form"
-                  >
+                  <form th:id="|sponsorEditForm-${stat.index}|" th:action="@{/update/sponsor}" method="POST" style="display:none;margin-top:8px" class="form">
                     <input type="hidden" name="id" th:value="${sponsor.id}" />
                     <label class="block text-sm mt-2">Sponsor Name</label>
-                    <input
-                      name="name"
-                      th:value="${sponsor.name}"
-                      required
-                      class="border rounded px-2 py-1 w-full"
-                    />
+                    <input name="name" th:value="${sponsor.name}" required class="border rounded px-2 py-1 w-full" />
                     <label class="block text-sm mt-2">Contact Person</label>
-                    <input
-                      name="contactPerson"
-                      th:value="${sponsor.contactPerson}"
-                      class="border rounded px-2 py-1 w-full"
-                    />
+                    <input name="contactPerson" th:value="${sponsor.contactPerson}" class="border rounded px-2 py-1 w-full" />
                     <label class="block text-sm mt-2">Email</label>
-                    <input
-                      name="email"
-                      type="email"
-                      th:value="${sponsor.email}"
-                      class="border rounded px-2 py-1 w-full"
-                    />
+                    <input name="email" type="email" th:value="${sponsor.email}" class="border rounded px-2 py-1 w-full" />
                     <label class="block text-sm mt-2">Phone</label>
-                    <input
-                      name="phoneNumber"
-                      type="tel"
-                      inputmode="numeric"
-                      pattern="^[0-9]+$"
-                      title="Digits only"
-                      th:value="${sponsor.phoneNumber}"
-                      class="border rounded px-2 py-1 w-full"
-                    />
+                    <input name="phoneNumber" type="tel" inputmode="numeric" pattern="^[0-9]+$" title="Digits only" th:value="${sponsor.phoneNumber}" class="border rounded px-2 py-1 w-full" />
                     <label class="block text-sm mt-2">CVR</label>
-                    <input
-                      name="cvrNumber"
-                      th:value="${sponsor.cvrNumber}"
-                      class="border rounded px-2 py-1 w-full"
-                    />
+                    <input name="cvrNumber" th:value="${sponsor.cvrNumber}" class="border rounded px-2 py-1 w-full" />
                     <label class="block text-sm mt-2">Active</label>
-                    <select
-                      name="status"
-                      class="border rounded px-2 py-1 w-full"
-                    >
-                      <option value="true" th:selected="${sponsor.status}">
-                        True
-                      </option>
-                      <option value="false" th:selected="${!sponsor.status}">
-                        False
-                      </option>
+                    <select name="status" class="border rounded px-2 py-1 w-full">
+                      <option value="true" th:selected="${sponsor.status}">True</option>
+                      <option value="false" th:selected="${!sponsor.status}">False</option>
                     </select>
                     <label class="block text-sm mt-2">Comments</label>
-                    <input
-                      name="comments"
-                      th:value="${sponsor.comments}"
-                      class="border rounded px-2 py-1 w-full"
-                    />
+                    <input name="comments" th:value="${sponsor.comments}" class="border rounded px-2 py-1 w-full" />
                     <div class="mt-2">
-                      <button
-                        type="submit"
-                        class="px-3 py-1 bg-green-200 rounded"
-                      >
-                        Save
-                      </button>
-                      <button
-                        type="button"
-                        class="px-3 py-1 ml-2 bg-gray-200 rounded"
-                        th:onclick="|toggleSponsorEdit(${stat.index})|"
-                      >
-                        Cancel
-                      </button>
+                      <button type="submit" class="px-3 py-1 bg-green-200 rounded">Save</button>
+                      <button type="button" class="px-3 py-1 ml-2 bg-gray-200 rounded" th:onclick="|toggleSponsorEdit(${stat.index})|">Cancel</button>
                     </div>
                   </form>
                 </div>
@@ -219,142 +99,49 @@
                 <h2 class="text-lg font-medium mb-2">Add Sponsor</h2>
                 <form action="/sponsors/add" method="POST" class="space-y-2">
                   <label class="block text-sm">Sponsor Name</label>
-                  <input
-                    id="name"
-                    name="name"
-                    required
-                    class="border rounded px-2 py-1 w-full"
-                  />
+                  <input id="name" name="name" required class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm">Contact Person</label>
-                  <input
-                    id="contactPerson"
-                    name="contactPerson"
-                    class="border rounded px-2 py-1 w-full"
-                  />
+                  <input id="contactPerson" name="contactPerson" class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm">Email</label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    class="border rounded px-2 py-1 w-full"
-                  />
+                  <input id="email" name="email" type="email" class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm">Phone</label>
-                  <input
-                    id="phoneNumber"
-                    name="phoneNumber"
-                    type="tel"
-                    inputmode="numeric"
-                    pattern="^[0-9]+$"
-                    title="Digits only"
-                    class="border rounded px-2 py-1 w-full"
-                  />
+                  <input id="phoneNumber" name="phoneNumber" type="tel" inputmode="numeric" pattern="^[0-9]+$" title="Digits only" class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm">CVR</label>
-                  <input
-                    id="cvrNumber"
-                    name="cvrNumber"
-                    class="border rounded px-2 py-1 w-full"
-                  />
+                  <input id="cvrNumber" name="cvrNumber" class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm">Active</label>
-                  <select
-                    id="status"
-                    name="status"
-                    class="border rounded px-2 py-1 w-full"
-                  >
+                  <select id="status" name="status" class="border rounded px-2 py-1 w-full">
                     <option value="true">True</option>
                     <option value="false" selected>False</option>
                   </select>
                   <label class="block text-sm">Comments</label>
-                  <input
-                    id="comments"
-                    name="comments"
-                    class="border rounded px-2 py-1 w-full"
-                  />
-                  <button
-                    type="submit"
-                    class="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
-                  >
-                    Add Sponsor
-                  </button>
+                  <input id="comments" name="comments" class="border rounded px-2 py-1 w-full" />
+                  <button type="submit" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded">Add Sponsor</button>
                 </form>
               </section>
 
               <section class="form">
-                <h2 class="text-lg font-medium mb-2">
-                  Create Contract For Sponsor
-                </h2>
-                <form
-                  action="/sponsors/addContract"
-                  method="POST"
-                  class="space-y-2"
-                >
+                <h2 class="text-lg font-medium mb-2">Create Contract For Sponsor</h2>
+                <form action="/sponsors/addContract" method="POST" class="space-y-2">
                   <label class="block text-sm">Sponsor</label>
-                  <select
-                    id="sponsorSelect"
-                    name="sponsorId"
-                    required
-                    class="border rounded px-2 py-1 w-full"
-                  >
-                    <option
-                      th:each="s : ${sponsors}"
-                      th:value="${s.id}"
-                      th:text="${s.name}"
-                    ></option>
+                  <select id="sponsorSelect" name="sponsorId" required class="border rounded px-2 py-1 w-full">
+                    <option th:each="s : ${sponsors}" th:value="${s.id}" th:text="${s.name}"></option>
                   </select>
                   <label class="block text-sm">Contract name:</label>
-                  <input
-                    id="contractName"
-                    name="name"
-                    type="text"
-                    required
-                    class="border rounded px-2 py-1 w-full"
-                  />
+                  <input id="contractName" name="name" type="text" required class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm">Start Date</label>
-                  <input
-                    id="startDate"
-                    name="startDate"
-                    type="date"
-                    required
-                    class="border rounded px-2 py-1 w-full"
-                  />
+                  <input id="startDate" name="startDate" type="date" required class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm">End Date</label>
-                  <input
-                    id="endDate"
-                    name="endDate"
-                    type="date"
-                    required
-                    class="border rounded px-2 py-1 w-full"
-                  />
+                  <input id="endDate" name="endDate" type="date" required class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm">Payment (integer)</label>
-                  <input
-                    id="payment"
-                    name="payment"
-                    type="number"
-                    value="0"
-                    required
-                    class="border rounded px-2 py-1 w-full"
-                  />
+                  <input id="payment" name="payment" type="number" value="0" required class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm">Type</label>
-                  <input
-                    id="type"
-                    name="type"
-                    value="Standard"
-                    class="border rounded px-2 py-1 w-full"
-                  />
+                  <input id="type" name="type" value="Standard" class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm">Active</label>
-                  <select
-                    id="statusC"
-                    name="status"
-                    class="border rounded px-2 py-1 w-full"
-                  >
+                  <select id="statusC" name="status" class="border rounded px-2 py-1 w-full">
                     <option value="true">True</option>
                     <option value="false" selected>False</option>
                   </select>
-                  <button
-                    type="submit"
-                    class="mt-2 px-4 py-2 bg-green-500 text-white rounded"
-                  >
-                    Create Contract
-                  </button>
+                  <button type="submit" class="mt-2 px-4 py-2 bg-green-500 text-white rounded">Create Contract</button>
                 </form>
               </section>
             </div>
@@ -363,135 +150,48 @@
           <section class="list mt-6">
             <h2 class="text-lg font-medium mb-2">Contracts</h2>
             <div th:if="${not #lists.isEmpty(contracts)}">
-              <div
-                th:each="contract, statC : ${contracts}"
-                class="item mb-4 p-3 bg-gray-50 rounded"
-              >
+              <div th:each="contract, statC : ${contracts}" class="item mb-4 p-3 bg-gray-50 rounded">
                 <div>Contract ID: <span th:text="${contract.id}">1</span></div>
-                <div>
-                  Sponsor:
-                  <span th:text="${contract.sponsorName}">sponsor</span>
-                </div>
+                <div>Sponsor: <span th:text="${contract.sponsorName}">sponsor</span></div>
                 <div>Type: <span th:text="${contract.type}">type</span></div>
-                <div>
-                  Start: <span th:text="${contract.startDate}">start</span>
-                </div>
+                <div>Start: <span th:text="${contract.startDate}">start</span></div>
                 <div>End: <span th:text="${contract.endDate}">end</span></div>
                 <div>Payment: <span th:text="${contract.payment}">0</span></div>
-                <div>
-                  Status: <span th:text="${contract.status}">false</span>
-                </div>
+                <div>Status: <span th:text="${contract.status}">false</span></div>
                 <div>Name: <span th:text="${contract.name}">name</span></div>
                 <div class="mt-2">
-                  <button
-                    type="button"
-                    class="px-3 py-1 bg-gray-200 rounded"
-                    th:onclick="|toggleContractEdit(${statC.index})|"
-                  >
-                    Edit
-                  </button>
-                  <form
-                    th:action="@{/sponsors/deleteContract}"
-                    method="POST"
-                    style="display: inline"
-                    th:onsubmit="return confirm('Delete this contract? This cannot be undone.')"
-                  >
-                    <input
-                      type="hidden"
-                      name="contractId"
-                      th:value="${contract.id}"
-                    />
-                    <button
-                      type="submit"
-                      class="px-3 py-1 ml-2 bg-red-200 rounded"
-                    >
-                      Delete
-                    </button>
+                  <button type="button" class="px-3 py-1 bg-gray-200 rounded" th:onclick="|toggleContractEdit(${statC.index})|">Edit</button>
+                  <form th:action="@{/sponsors/deleteContract}" method="POST" style="display:inline" th:onsubmit="return confirm('Delete this contract? This cannot be undone.')">
+                    <input type="hidden" name="contractId" th:value="${contract.id}" />
+                    <button type="submit" class="px-3 py-1 ml-2 bg-red-200 rounded">Delete</button>
                   </form>
                 </div>
 
-                <form
-                  th:id="|contractEditForm-${statC.index}|"
-                  th:action="@{/update/contract}"
-                  method="POST"
-                  style="display: none; margin-top: 8px"
-                  class="form"
-                >
+                <form th:id="|contractEditForm-${statC.index}|" th:action="@{/update/contract}" method="POST" style="display:none;margin-top:8px" class="form">
                   <input type="hidden" name="id" th:value="${contract.id}" />
                   <label class="block text-sm mt-2">Sponsor</label>
-                  <select
-                    name="sponsorId"
-                    class="border rounded px-2 py-1 w-full"
-                  >
-                    <option
-                      th:each="s : ${sponsors}"
-                      th:value="${s.id}"
-                      th:text="${s.name}"
-                      th:selected="${s.id == contract.sponsorId}"
-                    ></option>
+                  <select name="sponsorId" class="border rounded px-2 py-1 w-full">
+                    <option th:each="s : ${sponsors}" th:value="${s.id}" th:text="${s.name}" th:selected="${s.id == contract.sponsorId}"></option>
                   </select>
                   <label class="block text-sm mt-2">Start Date</label>
-                  <input
-                    name="startDate"
-                    type="date"
-                    th:value="${contract.startDate}"
-                    class="border rounded px-2 py-1 w-full"
-                  />
+                  <input name="startDate" type="date" th:value="${contract.startDate}" class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm mt-2">End Date</label>
-                  <input
-                    name="endDate"
-                    type="date"
-                    th:value="${contract.endDate}"
-                    class="border rounded px-2 py-1 w-full"
-                  />
+                  <input name="endDate" type="date" th:value="${contract.endDate}" class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm mt-2">Payment</label>
-                  <input
-                    name="payment"
-                    type="number"
-                    th:value="${contract.payment}"
-                    class="border rounded px-2 py-1 w-full"
-                  />
+                  <input name="payment" type="number" th:value="${contract.payment}" class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm mt-2">Type</label>
-                  <input
-                    name="type"
-                    th:value="${contract.type}"
-                    class="border rounded px-2 py-1 w-full"
-                  />
+                  <input name="type" th:value="${contract.type}" class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm mt-2">Active</label>
                   <select name="status" class="border rounded px-2 py-1 w-full">
-                    <option value="true" th:selected="${contract.status}">
-                      True
-                    </option>
-                    <option value="false" th:selected="${!contract.status}">
-                      False
-                    </option>
+                    <option value="true" th:selected="${contract.status}">True</option>
+                    <option value="false" th:selected="${!contract.status}">False</option>
                   </select>
                   <label class="block text-sm mt-2">Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    th:value="${contract.name}"
-                    class="border rounded px-2 py-1 w-full"
-                  />
-                  <input
-                    type="hidden"
-                    name="sponsorName"
-                    th:value="${contract.sponsorName}"
-                  />
+                  <input type="text" name="name" th:value="${contract.name}" class="border rounded px-2 py-1 w-full" />
+                  <input type="hidden" name="sponsorName" th:value="${contract.sponsorName}" />
                   <div class="mt-2">
-                    <button
-                      type="submit"
-                      class="px-3 py-1 bg-green-200 rounded"
-                    >
-                      Save
-                    </button>
-                    <button
-                      type="button"
-                      class="px-3 py-1 ml-2 bg-gray-200 rounded"
-                      th:onclick="|toggleContractEdit(${statC.index})|"
-                    >
-                      Cancel
-                    </button>
+                    <button type="submit" class="px-3 py-1 bg-green-200 rounded">Save</button>
+                    <button type="button" class="px-3 py-1 ml-2 bg-gray-200 rounded" th:onclick="|toggleContractEdit(${statC.index})|">Cancel</button>
                   </div>
                 </form>
               </div>
@@ -507,19 +207,13 @@
         const id = "sponsorEditForm-" + i;
         const el = document.getElementById(id);
         if (!el) return;
-        el.style.display =
-          el.style.display === "none" || el.style.display === ""
-            ? "block"
-            : "none";
+        el.style.display = el.style.display === "none" || el.style.display === "" ? "block" : "none";
       }
       function toggleContractEdit(i) {
         const id = "contractEditForm-" + i;
         const el = document.getElementById(id);
         if (!el) return;
-        el.style.display =
-          el.style.display === "none" || el.style.display === ""
-            ? "block"
-            : "none";
+        el.style.display = el.style.display === "none" || el.style.display === "" ? "block" : "none";
       }
       (function () {
         function attachPhoneHandlers(el) {
@@ -533,8 +227,7 @@
           });
           el.addEventListener("paste", function (e) {
             e.preventDefault();
-            const text =
-              (e.clipboardData || window.clipboardData).getData("text") || "";
+            const text = (e.clipboardData || window.clipboardData).getData("text") || "";
             const filtered = text.replace(/[^0-9]/g, "");
             const start = el.selectionStart;
             const end = el.selectionEnd;
@@ -547,19 +240,14 @@
           el.addEventListener("input", function () {
             const cleaned = el.value.replace(/[^0-9]/g, "");
             if (cleaned !== el.value) {
-              const pos = Math.max(
-                0,
-                el.selectionStart - (el.value.length - cleaned.length)
-              );
+              const pos = Math.max(0, el.selectionStart - (el.value.length - cleaned.length));
               el.value = cleaned;
               el.setSelectionRange(pos, pos);
             }
           });
         }
         attachPhoneHandlers(document.getElementById("phoneNumber"));
-        document
-          .querySelectorAll('input[name="phoneNumber"]')
-          .forEach(attachPhoneHandlers);
+        document.querySelectorAll('input[name="phoneNumber"]').forEach(attachPhoneHandlers);
       })();
     </script>
   </body>
