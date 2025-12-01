@@ -413,9 +413,9 @@
               <div>Payment: ${escapeHtml(payment)}</div>
               <div>Status: ${escapeHtml(status)}</div>
             </div>
-            <div id="editform-${idx}" style="display:none" class="mt-2 text-sm text-gray-700 border-t pt-2">
-              <form action="/update/contract" method="POST" class="space-y-2">
-                <input type="hidden" name="id" value="${escapeHtml(id)}" />
+              <div id="editform-${idx}" style="display:none" class="mt-2 text-sm text-gray-700 border-t pt-2">
+              <form action="/sponsors/editContract" method="POST" class="space-y-2">
+                <input type="hidden" name="contractId" value="${escapeHtml(id)}" />
                 <input type="hidden" name="sponsorName" value="${escapeHtml(sponsorDisplayName)}" />
                 <label class="block text-sm">Sponsor</label>
                 <select id="sponsor-select-${idx}" name="sponsorId" class="border rounded px-2 py-1 w-full">${document.getElementById ? '' : ''}</select>
