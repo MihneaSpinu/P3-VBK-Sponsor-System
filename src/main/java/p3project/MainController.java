@@ -100,6 +100,8 @@ public class MainController {
     // boilerplate update handlers
     @PostMapping("/update/sponsor")
     public ResponseEntity<String> updateSponsorFields(@ModelAttribute Sponsor sponsor) {
+        // updateSponsorFields: generisk opdaterings-handler for Sponsor-objekter
+        // Bruger refleksion (compareFields) til at logge ændringer og gemme kun ændrede felter
         Sponsor storedSponsor = sponsorRepository.findById(sponsor.getId())
         .orElseThrow(() -> new RuntimeException("Unable to retrieve sponsor with id: " + sponsor.getId()));
         return handleUpdateRequest(sponsor, storedSponsor);
@@ -152,6 +154,7 @@ public class MainController {
             }
         }
 
+        // Gem ændringerne i den relevante repository baseret på objekt-type
         if (requestObject instanceof Sponsor)         sponsorRepository.save((Sponsor) storedObject);
         else if (requestObject instanceof Contract)   contractRepository.save((Contract) storedObject);
         else if (requestObject instanceof Service)    serviceRepository.save((Service) storedObject);
@@ -171,6 +174,7 @@ public class MainController {
             @RequestParam(required = false, defaultValue = "false") boolean status,
             @RequestParam(required = false) String comments,
             Model model) {
+        // Valider telefonnummer: kun cifre er tilladt
         if (phoneNumber != null && phoneNumber.length() > 0 && !phoneNumber.matches("^[0-9]+$")) {
             model.addAttribute("error", "Phone number must contain digits only.");
             model.addAttribute("sponsors", sponsorRepository.findAll());
@@ -196,6 +200,7 @@ public class MainController {
             @RequestParam String type,
             @RequestParam String name,
             Model model) {
+        // Prøv at parse datoer og oprette kontrakten. Ved fejl vises en fejlbesked
         try {
             LocalDate start = LocalDate.parse(startDate);
             LocalDate end = LocalDate.parse(endDate);
@@ -206,12 +211,13 @@ public class MainController {
             if (sponsorOpt.isPresent())
                 contract.setSponsorName(sponsorOpt.get().getName());
             contractRepository.save(contract);
-            return "redirect:/sponsors";
+            return "redirect:/sponsors"; // Post/Redirect/Get for at undgå double submit
         } catch (IllegalArgumentException ex) {
+            // Håndterer fejl og viser siden igen med fejlbesked
             model.addAttribute("error", ex.getMessage());
             model.addAttribute("sponsors", sponsorRepository.findAll());
             model.addAttribute("contracts", contractRepository.findAll());
-            return "sponsors";
+            return "sponsors"; // Geninlæs siden og vis sponsors-siden med fejlbesked
         }
     }
 
@@ -283,6 +289,7 @@ public class MainController {
             @RequestParam String type,
             Model model) {
         java.util.Optional<Contract> contractOpt = contractRepository.findById(contractId);
+        // Hent kontrakten, opdater felter og gem. Valider datoer koncentrisk.
         if (contractOpt.isPresent()) {
             Contract contract = contractOpt.get();
             contract.setSponsorId(sponsorId);
@@ -300,7 +307,7 @@ public class MainController {
                 model.addAttribute("error", ex.getMessage());
                 model.addAttribute("sponsors", sponsorRepository.findAll());
                 model.addAttribute("contracts", contractRepository.findAll());
-                return "sponsors";
+                return "sponsors"; // Ved fejl -> vis sponsors-siden med fejl
             }
         }
         return "redirect:/sponsors";

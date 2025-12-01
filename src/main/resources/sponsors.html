@@ -47,6 +47,7 @@
 
           <div class="grid md:grid-cols-2 gap-6">
             <section class="list">
+                  <!-- Filtreringskontrol: viser hvilke sponsorer der skal vises -->
                   <div class="flex items-center mb-2">
                     <h2 class="text-lg font-medium mr-3 m-0">Viser:</h2>
                     <div class="text-sm">
@@ -57,6 +58,7 @@
                       </select>
                     </div>
                   </div>
+              <!-- Liste over sponsorer (gentages via Thymeleaf th:each) -->
               <div th:if="${not #lists.isEmpty(sponsors)}">
                 <div th:each="sponsor, stat : ${sponsors}" th:attr="data-status=${sponsor.status}" class="item sponsor-item relative mb-4 p-3 rounded bg-gray-50">
                   <div class="absolute right-3 top-3 flex space-x-2">
@@ -70,6 +72,7 @@
                   <div class="text-sm">CVR: <span th:text="${sponsor.cvrNumber}">cvr</span></div>
                   <div class="text-sm">Status: <span th:text="${sponsor.status}">status</span></div>
                   <div class="text-sm">Kommentar: <span th:text="${sponsor.comments}">kommentar</span></div>
+                  <!-- Kontroller for sponsor: edit og delete -->
                   <div class="mt-2">
                     <button type="button" class="px-3 py-1 bg-gray-200 rounded" th:onclick="|toggleSponsorEdit(${stat.index})|">Edit</button>
                     <form th:action="@{/sponsors/delete}" method="POST" style="display:inline" th:onsubmit="return confirm('Delete sponsor and its contracts? This cannot be undone.')">
@@ -104,6 +107,7 @@
                   </form>
                 </div>
               </div>
+              <!-- Hvis ingen sponsorer findes, visses en beseked -->
               <div th:if="${#lists.isEmpty(sponsors)}">Ingen Sponsors Inu.</div>
             </section>
 
@@ -134,59 +138,73 @@
             </div>
           </div>
 
-          <!-- Hidden contracts dataset for client-side rendering (used by view modal) -->
+          <!--
+            Skjult data-lager for kontrakter
+            ----------------------------------
+            Thymeleaf render alle kontrakter som usynlige divs med data- attributter.
+            Dette bruges af klient-side JavaScript (populateViewContracts) til at bygge
+            modal-indholdet dynamisk når brugeren ønsker at se en sponsors kontrakter.
+          -->
           <div id="contractsData" style="display:none">
             <div th:each="c : ${contracts}" class="contract-data"
                  th:attr="data-id=${c.id},data-sponsor-id=${c.sponsorId},data-name=${c.name},data-type=${c.type},data-start=${c.startDate},data-end=${c.endDate},data-payment=${c.payment},data-status=${c.status}">
             </div>
           </div>
 
-          <!-- Hidden sponsor options template for edit forms -->
+          <!--
+            Skjult skabelon for sponsor- <option> elementer
+            ------------------------------------------------
+            Indeholder option-elementer for alle sponsorer; JS kopierer denne HTML
+            ind i dynamisk oprettede edit-formularer, så dropdown'en indeholder
+            aktuelle sponsor-navne og id.
+          -->
           <select id="sponsorOptionsTemplate" style="display:none">
             <option th:each="s : ${sponsors}" th:value="${s.id}" th:text="${s.name}"></option>
           </select>
 
-          <!-- Reusable Add Contract Modal -->
+          <!--
+            Genanvendelig modal: Tilføj kontrakt
+            -------------------------------------
+            Denne modal fyldes og vises af openAddModal(buttonEl). Formularen sender
+            POST til /sponsors/addContract (controller håndterer oprettelse og redirect).
+          -->
           <div id="addContractModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display:none">
-            <div class="bg-white rounded p-3 w-11/12 max-w-sm">
+            <div class="bg-white rounded p-4 w-11/12 max-w-md">
               <div class="flex justify-between items-center mb-3">
                 <h3 class="font-semibold">Tilføj Kontrakt for <span id="addModalSponsorName"></span></h3>
                 <button type="button" class="text-gray-600" onclick="closeModal('addContractModal')">✕</button>
               </div>
               <form action="/sponsors/addContract" method="POST" class="space-y-2">
                 <input id="addModalSponsorId" type="hidden" name="sponsorId" />
-                <label class="block text-sm">Contract name:</label>
-                <input name="name" type="text" required class="border rounded px-2 py-1 w-full text-sm" />
-                <label class="block text-sm">Start Date</label>
+                <label class="block text-sm">Kontrakt Navn:</label>
+                <input name="name" type="text" required class="border rounded px-2 py-1 w-full" />
+                <label class="block text-sm">Start Dato</label>
                 <input name="startDate" type="date" required class="border rounded px-2 py-1 w-full" />
-                <label class="block text-sm">End Date</label>
+                <label class="block text-sm">Slut Dato</label>
                 <input name="endDate" type="date" required class="border rounded px-2 py-1 w-full" />
                 <label class="block text-sm">Payment (integer)</label>
                 <input name="payment" type="number" value="0" required class="border rounded px-2 py-1 w-full" />
                 <label class="block text-sm">Type</label>
                 <input name="type" value="Standard" class="border rounded px-2 py-1 w-full" />
-                <label class="block text-sm">Active</label>
+                <label class="block text-sm">Aktive</label>
                 <select name="status" class="border rounded px-2 py-1 w-full">
                   <option value="true">True</option>
                   <option value="false" selected>False</option>
                 </select>
                 <div class="flex justify-end space-x-2 mt-2">
-                  <button type="button" class="px-2 py-1 text-sm bg-gray-200 rounded" onclick="closeModal('addContractModal')">Annuller</button>
-                  <button type="submit" class="px-2 py-1 text-sm bg-green-500 text-white rounded">Opret</button>
+                  <button type="button" class="px-3 py-1 bg-gray-200 rounded" onclick="closeModal('addContractModal')">Annuller</button>
+                  <button type="submit" class="px-3 py-1 bg-green-500 text-white rounded">Opret</button>
                 </div>
               </form>
             </div>
           </div>
-
-          <!-- Reusable View Contracts Modal -->
           <div id="viewContractsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display:none">
-            <div class="bg-white rounded p-3 w-11/12 max-w-md">
+            <div class="bg-white rounded p-4 w-11/12 max-w-lg">
               <div class="flex justify-between items-center mb-3">
                 <h3 class="font-semibold">Kontrakter for <span id="viewModalSponsorName"></span></h3>
                 <button type="button" class="text-gray-600" onclick="closeModal('viewContractsModal')">✕</button>
               </div>
-              <div id="viewContractsList" class="space-y-2 overflow-auto max-h-64 text-sm">
-                <!-- Filled by JS -->
+              <div id="viewContractsList" class="space-y-2 overflow-auto max-h-96">
               </div>
             </div>
           </div>
@@ -195,19 +213,26 @@
     </div>
 
     <script>
+      // ------------------------------------------------------------------
+      // Funktioner til at vise/skjule formularer på sponsorsiden
+      // ------------------------------------------------------------------
+      // toggleSponsorEdit: viser/skjuler inline sponsor-redigeringsformularen
       function toggleSponsorEdit(i) {
         const id = "sponsorEditForm-" + i;
         const el = document.getElementById(id);
         if (!el) return;
         el.style.display = el.style.display === "none" || el.style.display === "" ? "block" : "none";
       }
+      // toggleContractEdit: viser/skjuler inline kontrakt-redigeringsformularen
       function toggleContractEdit(i) {
         const id = "contractEditForm-" + i;
         const el = document.getElementById(id);
         if (!el) return;
         el.style.display = el.style.display === "none" || el.style.display === "" ? "block" : "none";
       }
+      // Selv-eksekverende funktion: sætter event-handlere op for sidefunktioner
       (function () {
+        // attachPhoneHandlers: sikrer at telefon-input kun indeholder cifre (altså tal)
         function attachPhoneHandlers(el) {
           if (!el) return;
           el.addEventListener("keydown", function (e) {
@@ -238,10 +263,14 @@
             }
           });
         }
+        // Hæft telefon-validering på formularfelter
         attachPhoneHandlers(document.getElementById("phoneNumber"));
         document.querySelectorAll('input[name="phoneNumber"]').forEach(attachPhoneHandlers);
 
-        // Sponsor filtering: show/hide sponsor items based on the select
+        // applySponsorFilter: filtreer sponsors baseret på værdien af dropdownen
+        // - 'active' viser kun sponsorer med status true
+        // - 'inactive' viser kun sponsorer med status false
+        // - 'all' viser alle sponsorer
         function applySponsorFilter() {
           const sel = document.getElementById('sponsorFilter');
           if (!sel) return;
@@ -258,7 +287,8 @@
           });
         }
 
-        // xxxxx
+        // Finder filter-dropdownen (filterEl), sætter default til 'active', filtrerer listen ved load,
+        // og aktiverer filtrering når brugeren ændrer dropdown-værdien
         const filterEl = document.getElementById('sponsorFilter');
         if (filterEl) {
           filterEl.value = 'active';
@@ -267,7 +297,12 @@
         }
       })();
 
-      // Modal helpers (exposed globally so inline onclick handlers can call them)
+      // ------------------------------------------------------------------
+      // Modal-hjælpere (bruges når brugeren klikker på knapperne i sponsor-boxen)
+      // ------------------------------------------------------------------
+      // openAddModal: fylder skjult felt med sponsor-id og viser tilføj-modal
+      // Denne funktion kaldes fra hver sponsors "Tilføj Kontrakt"-knap
+      // buttonEl - knappen der blev klikket (har data-sponsor-id/name)
       function openAddModal(buttonEl) {
         try {
           const sid = buttonEl.getAttribute('data-sponsor-id');
@@ -276,10 +311,13 @@
           document.getElementById('addModalSponsorName').textContent = sname;
           document.getElementById('addContractModal').style.display = 'flex';
         } catch (e) {
+          // Log fejl i konsollen hvis noget går galt; dette bør ikke kastes videre til bruger.
           console.error('openAddModal error', e);
         }
       }
 
+      // openViewModal: viser modal med liste over kontrakter for valgt sponsor
+      // Funktionen henter sponsor-id fra knappen og bygger indholdet via populateViewContracts
       function openViewModal(buttonEl) {
         try {
           const sid = buttonEl.getAttribute('data-sponsor-id');
@@ -288,6 +326,7 @@
           populateViewContracts(sid);
           document.getElementById('viewContractsModal').style.display = 'flex';
         } catch (e) {
+          // Vis fejl i konsollen — modal-oprettelse må ikke give et uncaught exception
           console.error('openViewModal error', e);
         }
       }
@@ -298,7 +337,11 @@
         el.style.display = 'none';
       }
 
-      // Build the contract list for a sponsor by reading the hidden contracts dataset
+      // populateViewContracts: bygger og indsætter HTML for hver kontrakt
+      // - Læser data fra #contractsData (server-renderet skjult DOM)
+      // - Bygger en kort visning (Type, Start, End, Payment, Status)
+      // - Tilføjer en 'Edit' knap som viser en indlejret form til at gemme ændringer
+      // Param: sponsorId (String/Number) - id på den sponsor vi skal vise kontrakter for
       function populateViewContracts(sponsorId) {
         const listEl = document.getElementById('viewContractsList');
         if (!listEl) return;
@@ -317,129 +360,100 @@
           return;
         }
         const sponsorDisplayName = (document.getElementById('viewModalSponsorName') || {}).textContent || '';
+        // helper: convert ISO-like date (yyyy-mm-dd or full ISO) to dd-mm-yyyy for display
+        function formatDisplayDate(d) {
+          if (!d && d !== 0) return '';
+          const s = String(d);
+          const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+          if (m) return `${m[3]}-${m[2]}-${m[1]}`;
+          const dt = new Date(s);
+          if (!isNaN(dt.getTime())) {
+            const dd = String(dt.getDate()).padStart(2, '0');
+            const mm = String(dt.getMonth() + 1).padStart(2, '0');
+            const yyyy = dt.getFullYear();
+            return `${dd}-${mm}-${yyyy}`;
+          }
+          return s;
+        }
+
         matches.forEach(function (n, idx) {
           const id = n.getAttribute('data-id');
           const name = n.getAttribute('data-name') || '';
           const type = n.getAttribute('data-type') || '';
           const start = n.getAttribute('data-start') || '';
           const end = n.getAttribute('data-end') || '';
+          const formattedStart = formatDisplayDate(start);
+          const formattedEnd = formatDisplayDate(end);
           const payment = n.getAttribute('data-payment') || '';
           const status = n.getAttribute('data-status') || '';
 
           const item = document.createElement('div');
           item.className = 'border rounded p-2';
-
-          // Build DOM nodes 
-          const header = document.createElement('div');
-          header.className = 'flex justify-between items-center';
-
-          const title = document.createElement('div');
-          title.className = 'font-medium';
-          title.appendChild(document.createTextNode(name + ' '));
-          const idSpan = document.createElement('span');
-          idSpan.className = 'text-xs text-gray-500';
-          idSpan.appendChild(document.createTextNode('( #' + id + ' )'));
-          title.appendChild(idSpan);
-
-          const actions = document.createElement('div');
-          actions.className = 'flex space-x-2';
-
-          const visBtn = document.createElement('button');
-          visBtn.type = 'button';
-          visBtn.className = 'px-2 py-1 text-sm bg-gray-100 rounded';
-          visBtn.appendChild(document.createTextNode('Vis/Skjul'));
-          visBtn.addEventListener('click', function () {
-            const d = document.getElementById('details-' + idx);
-            if (!d) return;
-            d.style.display = d.style.display === 'none' ? 'block' : 'none';
-          });
-
-          const editBtn = document.createElement('button');
-          editBtn.type = 'button';
-          editBtn.className = 'px-2 py-1 text-sm bg-yellow-200 rounded';
-          editBtn.appendChild(document.createTextNode('Edit'));
-          editBtn.addEventListener('click', function () {
-            const e = document.getElementById('editform-' + idx);
-            if (!e) return;
-            e.style.display = e.style.display === 'none' ? 'block' : 'none';
-          });
-
-          actions.appendChild(visBtn);
-          actions.appendChild(editBtn);
-          header.appendChild(title);
-          header.appendChild(actions);
-
-          const detailsDiv = document.createElement('div');
-          detailsDiv.id = 'details-' + idx;
-          detailsDiv.style.display = 'none';
-          detailsDiv.className = 'mt-2 text-sm text-gray-700';
-          ['Type: ' + type, 'Start: ' + start, 'End: ' + end, 'Payment: ' + payment, 'Status: ' + status].forEach(function (txt) {
-            const d = document.createElement('div');
-            d.appendChild(document.createTextNode(txt));
-            detailsDiv.appendChild(d);
-          });
-
-          const editDiv = document.createElement('div');
-          editDiv.id = 'editform-' + idx;
-          editDiv.style.display = 'none';
-          editDiv.className = 'mt-2 text-sm text-gray-700 border-t pt-2';
-
-          const form = document.createElement('form');
-          form.action = '/update/contract';
-          form.method = 'POST';
-          form.className = 'space-y-2';
-
-          const hid = document.createElement('input'); hid.type = 'hidden'; hid.name = 'id'; hid.value = id; form.appendChild(hid);
-          const hsn = document.createElement('input'); hsn.type = 'hidden'; hsn.name = 'sponsorName'; hsn.value = sponsorDisplayName; form.appendChild(hsn);
-
-          const lblSponsor = document.createElement('label'); lblSponsor.className = 'block text-sm'; lblSponsor.appendChild(document.createTextNode('Sponsor')); form.appendChild(lblSponsor);
-          const selSponsor = document.createElement('select'); selSponsor.id = 'sponsor-select-' + idx; selSponsor.name = 'sponsorId'; selSponsor.className = 'border rounded px-2 py-1 w-full'; form.appendChild(selSponsor);
-
-          const lblName = document.createElement('label'); lblName.className = 'block text-sm'; lblName.appendChild(document.createTextNode('Name')); form.appendChild(lblName);
-          const inName = document.createElement('input'); inName.name = 'name'; inName.type = 'text'; inName.value = name; inName.className = 'border rounded px-2 py-1 w-full'; form.appendChild(inName);
-
-          const lblType = document.createElement('label'); lblType.className = 'block text-sm'; lblType.appendChild(document.createTextNode('Type')); form.appendChild(lblType);
-          const inType = document.createElement('input'); inType.name = 'type'; inType.type = 'text'; inType.value = type; inType.className = 'border rounded px-2 py-1 w-full'; form.appendChild(inType);
-
-          const lblStart = document.createElement('label'); lblStart.className = 'block text-sm'; lblStart.appendChild(document.createTextNode('Start Date')); form.appendChild(lblStart);
-          const inStart = document.createElement('input'); inStart.name = 'startDate'; inStart.type = 'date'; inStart.value = start; inStart.className = 'border rounded px-2 py-1 w-full'; form.appendChild(inStart);
-
-          const lblEnd = document.createElement('label'); lblEnd.className = 'block text-sm'; lblEnd.appendChild(document.createTextNode('End Date')); form.appendChild(lblEnd);
-          const inEnd = document.createElement('input'); inEnd.name = 'endDate'; inEnd.type = 'date'; inEnd.value = end; inEnd.className = 'border rounded px-2 py-1 w-full'; form.appendChild(inEnd);
-
-          const lblPayment = document.createElement('label'); lblPayment.className = 'block text-sm'; lblPayment.appendChild(document.createTextNode('Payment')); form.appendChild(lblPayment);
-          const inPayment = document.createElement('input'); inPayment.name = 'payment'; inPayment.type = 'number'; inPayment.value = payment; inPayment.className = 'border rounded px-2 py-1 w-full'; form.appendChild(inPayment);
-
-          const lblStatus = document.createElement('label'); lblStatus.className = 'block text-sm'; lblStatus.appendChild(document.createTextNode('Active')); form.appendChild(lblStatus);
-          const selStatus = document.createElement('select'); selStatus.id = 'status-select-' + idx; selStatus.name = 'status'; selStatus.className = 'border rounded px-2 py-1 w-full';
-          const optTrue = document.createElement('option'); optTrue.value = 'true'; optTrue.appendChild(document.createTextNode('True'));
-          const optFalse = document.createElement('option'); optFalse.value = 'false'; optFalse.appendChild(document.createTextNode('False'));
-          selStatus.appendChild(optTrue); selStatus.appendChild(optFalse); form.appendChild(selStatus);
-
-          const btnWrap = document.createElement('div'); btnWrap.className = 'flex justify-end space-x-2 mt-2';
-          const btnCancel = document.createElement('button'); btnCancel.type = 'button'; btnCancel.className = 'px-3 py-1 bg-gray-200 rounded'; btnCancel.appendChild(document.createTextNode('Cancel'));
-          btnCancel.addEventListener('click', function () { document.getElementById('editform-' + idx).style.display = 'none'; });
-          const btnSave = document.createElement('button'); btnSave.type = 'submit'; btnSave.className = 'px-3 py-1 bg-green-500 text-white rounded'; btnSave.appendChild(document.createTextNode('Save'));
-          btnWrap.appendChild(btnCancel); btnWrap.appendChild(btnSave);
-          form.appendChild(btnWrap);
-
-          editDiv.appendChild(form);
-
-          item.appendChild(header);
-          item.appendChild(detailsDiv);
-          item.appendChild(editDiv);
+         
+          // item.innerHTML:
+          // Sætter (eller overskriver) hele HTML-indholdet inde i 'item'-elementet.
+          // Her bruges det til at opbygge hele kontrakt-kortet dynamisk i én samlet HTML-streng.
+          // - Viser kontraktnavn + id
+          // - Indeholder knapper til at vise/skjule detaljer og til at åbne en inline edit-form
+          // - Har en skjult detalje-sektion (type, datoer, betaling, status)
+          // - Har en skjult redigeringsformular med alle kontraktfelter
+          // - Alle data indsættes dynamisk via template literals og escapeHtml() for sikkerhed
+          item.innerHTML = `
+            <div class="flex justify-between items-center">
+              <div class="font-medium">${escapeHtml(name)} <span class="text-xs text-gray-500">(#${escapeHtml(id)})</span></div>
+              <div class="flex space-x-2">
+                <button type="button" class="px-2 py-1 text-sm bg-gray-100 rounded" onclick="(function(i){const d=document.getElementById('details-'+i); d.style.display = d.style.display==='none'?'block':'none';})('${idx}')">Vis/Skjul</button>
+                <button type="button" class="px-2 py-1 text-sm bg-yellow-200 rounded" onclick="(function(i){const e=document.getElementById('editform-'+i); e.style.display = e.style.display==='none'?'block':'none';})('${idx}')">Edit</button>
+              </div>
+            </div>
+            <div id="details-${idx}" style="display:none" class="mt-2 text-sm text-gray-700">
+              <div>Type: ${escapeHtml(type)}</div>
+              <div>Start: ${escapeHtml(formattedStart)}</div>
+              <div>End: ${escapeHtml(formattedEnd)}</div>
+              <div>Payment: ${escapeHtml(payment)}</div>
+              <div>Status: ${escapeHtml(status)}</div>
+            </div>
+            <div id="editform-${idx}" style="display:none" class="mt-2 text-sm text-gray-700 border-t pt-2">
+              <form action="/update/contract" method="POST" class="space-y-2">
+                <input type="hidden" name="id" value="${escapeHtml(id)}" />
+                <input type="hidden" name="sponsorName" value="${escapeHtml(sponsorDisplayName)}" />
+                <label class="block text-sm">Sponsor</label>
+                <select id="sponsor-select-${idx}" name="sponsorId" class="border rounded px-2 py-1 w-full">${document.getElementById ? '' : ''}</select>
+                <label class="block text-sm">Navn</label>
+                <input name="name" type="text" value="${escapeHtml(name)}" class="border rounded px-2 py-1 w-full" />
+                <label class="block text-sm">Type</label>
+                <input name="type" type="text" value="${escapeHtml(type)}" class="border rounded px-2 py-1 w-full" />
+                <label class="block text-sm">Start Dato</label>
+                <input name="startDate" type="date" value="${escapeHtml(start)}" class="border rounded px-2 py-1 w-full" />
+                <label class="block text-sm">Slut Dato</label>
+                <input name="endDate" type="date" value="${escapeHtml(end)}" class="border rounded px-2 py-1 w-full" />
+                <label class="block text-sm">Payment</label>
+                <input name="payment" type="number" value="${escapeHtml(payment)}" class="border rounded px-2 py-1 w-full" />
+                <label class="block text-sm">Aktive</label>
+                <select id="status-select-${idx}" name="status" class="border rounded px-2 py-1 w-full">
+                  <option value="true">True</option>
+                  <option value="false">False</option>
+                </select>
+                <div class="flex justify-end space-x-2 mt-2">
+                  <button type="button" class="px-3 py-1 bg-gray-200 rounded" onclick="document.getElementById('editform-${idx}').style.display='none'">Cancel</button>
+                  <button type="submit" class="px-3 py-1 bg-green-500 text-white rounded">Save</button>
+                </div>
+              </form>
+            </div>
+          `;
           listEl.appendChild(item);
-          // populate sponsor select and status value after append
+          // udfyld sponsor-dropdown og status-dropdown med rigtige værdier
           try {
             const template = document.getElementById('sponsorOptionsTemplate');
             if (template) {
               const sel = document.getElementById('sponsor-select-'+idx);
-              if (sel) sel.innerHTML = template.innerHTML;
+              if (sel) sel.innerHTML = template.innerHTML; // kopier options fra skjult skabelon
               if (sel) sel.value = n.getAttribute('data-sponsor-id');
             }
             const statusSel = document.getElementById('status-select-'+idx);
             if (statusSel) statusSel.value = String(status) === 'true' || String(status) === 'True' ? 'true' : 'false';
           } catch (err) {
+            // Hvis noget går galt ved udfyldning, log fejl til konsol men fortsæt
             console.error('populateViewContracts: cannot populate selects', err);
           }
         });
