@@ -287,6 +287,7 @@ public class MainController {
             @RequestParam String payment,
             @RequestParam(required = false, defaultValue = "false") boolean status,
             @RequestParam String type,
+            @RequestParam(required = false) String name,
             Model model) {
         java.util.Optional<Contract> contractOpt = contractRepository.findById(contractId);
         // Hent kontrakten, opdater felter og gem. Valider datoer koncentrisk.
@@ -302,6 +303,10 @@ public class MainController {
                 contract.setPayment(payment);
                 contract.setStatus(status);
                 contract.setType(type);
+                // Update kontrakt navn when provided from the edit form
+                if (name != null) {
+                    contract.setName(name);
+                }
                 contractRepository.save(contract);
             } catch (IllegalArgumentException ex) {
                 model.addAttribute("error", ex.getMessage());

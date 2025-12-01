@@ -404,6 +404,7 @@
               <div class="flex space-x-2">
                 <button type="button" class="px-2 py-1 text-sm bg-gray-100 rounded" onclick="(function(i){const d=document.getElementById('details-'+i); d.style.display = d.style.display==='none'?'block':'none';})('${idx}')">Vis/Skjul</button>
                 <button type="button" class="px-2 py-1 text-sm bg-yellow-200 rounded" onclick="(function(i){const e=document.getElementById('editform-'+i); e.style.display = e.style.display==='none'?'block':'none';})('${idx}')">Edit</button>
+                <button type="button" class="px-2 py-1 text-sm bg-red-300 rounded" onclick="if(confirm('Slet denne kontrakt? Dette kan ikke fortrydes.')) postDeleteContract('${escapeHtml(id)}','${escapeHtml(sponsorId)}')">Slet Kontrakt</button>
               </div>
             </div>
             <div id="details-${idx}" style="display:none" class="mt-2 text-sm text-gray-700">
@@ -457,6 +458,31 @@
             console.error('populateViewContracts: cannot populate selects', err);
           }
         });
+      }
+      // Sender en POST-anmodning for at slette en kontrakt ved at oprette og indsende en skjult formular.
+      // Kaldes fra den dynamisk genererede kontraktkortets knap 'Slet Kontrakt'.
+      function postDeleteContract(contractId, sponsorId) {
+        try {
+          const f = document.createElement('form');
+          f.method = 'POST';
+          f.action = '/sponsors/deleteContract';
+          f.style.display = 'none';
+          const inId = document.createElement('input');
+          inId.type = 'hidden';
+          inId.name = 'contractId';
+          inId.value = contractId;
+          f.appendChild(inId);
+          const inSponsor = document.createElement('input');
+          inSponsor.type = 'hidden';
+          inSponsor.name = 'sponsorId';
+          inSponsor.value = sponsorId || '';
+          f.appendChild(inSponsor);
+          document.body.appendChild(f);
+          f.submit();
+        } catch (e) {
+          console.error('postDeleteContract error', e);
+          alert('Kunne ikke slette kontrakt — se konsol for detaljer.');
+        }
       }
 
       // basic escaping to avoid injection when rendering attributes
