@@ -7,6 +7,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -40,11 +41,11 @@ public class MainControllerTest {
         // Arrange - Mock repository to return test users
         User user1 = new User();
         user1.setName("John");
-        user1.setEmail("john@example.com");
+        //user1.setEmail("john@example.com");
         
         User user2 = new User();
         user2.setName("Jane");
-        user2.setEmail("jane@example.com");
+        //user2.setEmail("jane@example.com");
         
         when(userRepository.findAll()).thenReturn(Arrays.asList(user1, user2));
         
@@ -73,7 +74,7 @@ public class MainControllerTest {
         // Arrange - Mock repository
         User user = new User();
         user.setName("API User");
-        user.setEmail("api@example.com");
+        //user.setEmail("api@example.com");
         when(userRepository.findAll()).thenReturn(Arrays.asList(user));
         
         // Act & Assert - Test JSON API
