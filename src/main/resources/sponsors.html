@@ -360,7 +360,7 @@
           return;
         }
         const sponsorDisplayName = (document.getElementById('viewModalSponsorName') || {}).textContent || '';
-        // helper: convert ISO-like date (yyyy-mm-dd or full ISO) to dd-mm-yyyy for display
+        // konventere ISO-like dato (yyyy-mm-dd til dd-mm-yyyy for display
         function formatDisplayDate(d) {
           if (!d && d !== 0) return '';
           const s = String(d);
