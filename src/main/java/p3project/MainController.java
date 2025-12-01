@@ -7,6 +7,8 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.chrono.ChronoLocalDate;
 import java.util.Objects;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -375,7 +377,29 @@ public class MainController {
         return "redirect:/users";
     }
 
+    public boolean isContractActive(Contract contract) {
+        List<Service> services = serviceRepository.findAll();
+        for(Service service : services) {
+            Long contractServiceId = service.getContractId();
+            if(contractServiceId == contract.getId()) {
+                Service contractService = serviceRepository.findById(contractServiceId).orElseThrow();
+                if(!contractService.getEndDate().isAfter("I DAG") || !contractService.getDelivered()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
+
+    public boolean checkForActiveContracts(Sponsor sponsor) {
+        List<Contract> contracts = contractRepository.findAll();
+        for(Contract contract : contracts) {
+            if(sponsor.getId() == contract.getSponsorId() && !contract.getArhived()) {
+            }
+        }
+        return false;
+    }
 
 
 
