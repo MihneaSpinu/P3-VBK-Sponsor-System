@@ -9,18 +9,15 @@ document.getElementById("loginForm").addEventListener("submit", event => {
     // let hashedPassword = bcrypt.hashSync(password, 8);
     // console.log(hashedPassword);
 
-    // Create a FormData object
     let formData = new FormData();
 
-    // Append the data to the FormData object
     formData.append("username", username);
-    formData.append("hashedPassword", password);  // assuming you're sending the raw password here
+    formData.append("hashedPassword", password);
     formData.append("rememberMe", rememberMe);
 
-    // Send the FormData using a POST request
     fetch("/login/confirm", {
         method: "POST",
-        body: formData  // sending FormData in the body
+        body: formData
     })
     .catch(() => {
         errorMessage.textContent = "Wrong username or password";
