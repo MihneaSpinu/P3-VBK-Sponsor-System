@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.WebUtils;
 
 import p3project.classes.Changelog;
 import p3project.classes.Contract;
@@ -25,11 +26,22 @@ import p3project.classes.Eventlog;
 import p3project.classes.Service;
 import p3project.classes.Sponsor;
 import p3project.classes.User;
+import p3project.classes.Token;
 import p3project.repositories.ContractRepository;
 import p3project.repositories.LogRepository;
 import p3project.repositories.ServiceRepository;
 import p3project.repositories.SponsorRepository;
 import p3project.repositories.UserRepository;
+
+import org.springframework.http.HttpCookie;
+import org.springframework.http.ResponseCookie;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
+import java.net.URLEncoder;
+import java.net.URLDecoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Controller
 public class MainController {
@@ -51,7 +63,7 @@ public class MainController {
     public @ResponseBody String addNewUser(@RequestParam String name, @RequestParam String email) {
         User user = new User();
         user.setName(name);
-        user.setEmail(email);
+        //user.setEmail(email);
         userRepository.save(user);
         return "Saved";
     }
@@ -464,9 +476,58 @@ public class MainController {
 
     @GetMapping("/login")
     public String loginPage(Model model) {
+        User user = new User();
+        user.setName("test");
+        //BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(8);
+        //String hashedPassword = passwordEncoder.encode("test123");
+        String hashedPassword = "test123";
+        user.setPassword(hashedPassword);
+        userRepository.save(user);
+        
         return "login"; // Thymeleaf login template
     }
 
+    @PostMapping("/login/confirm")
+    public String confirmLogin(@RequestParam String username, @RequestParam String hashedPassword, @RequestParam boolean rememberMe, Model model, HttpServletResponse response) {
+        User user = userRepository.findByName(username);
+        //BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(8);
+        //if(passwordEncoder.matches(hashedPassword, user.getPassword())) {
+        if(hashedPassword.equals(user.getPassword())) {
+            String id = user.getId().toString();
+            Token token = Token.sign(id);
+            String formattedToken = user.getId().toString() + "." + token.getHash();
+            String encodedToken = URLEncoder.encode(formattedToken, StandardCharsets.UTF_8);
+            int time = rememberMe ? 2_592_000 : 86400; // 1 måned vs 1 dag
+            ResponseCookie cookie = ResponseCookie.from("token", encodedToken)
+            .httpOnly(true)  // javascript kan ikke røre den B-)
+            .secure(true)    // HTTPS only
+            .path("/")       // Bruges til alle sider
+            .maxAge(time)
+            .build();
+            response.addHeader("Set-Cookie", cookie.toString());
+            System.out.println("\n\n\n\nPASSWORDS MATCH\n\n\n\n");
+            return "redirect:/homepage";
+        } else {
+            System.out.println("\n\n\n\nPASSWORDS DO NOT MATCH\n\n\n\n");
+            return "redirect:/login";
+        }
+    }
+
+    private boolean userHasValidToken(HttpServletRequest request) {
+        Cookie cookie = WebUtils.getCookie(request, "token");
+        if (cookie == null) return false;
+
+        String decodedToken = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);        
+        String[] parts = decodedToken.split("\\.");
+
+        String cookieId = parts[0];
+        String cookieHash = parts[1];
+
+        Token token = Token.sign(cookieId);
+        return token.verify(cookieHash);
+    }
+
+    /* 
     @PostMapping("/login/confirm")
     public String confirmLogin(
             @RequestParam String username,
@@ -483,12 +544,19 @@ public class MainController {
         model.addAttribute("user", user);
         return "homepage"; // login success page
     }
+    */
 
     @GetMapping("/homepage")
-    public String showhomepage(Model model) {
-        Iterable<Sponsor> sponsors = sponsorRepository.findAll();
-        model.addAttribute("sponsors", sponsors);
-        return "homepage";
+    public String showhomepage(Model model, HttpServletRequest request) {
+        if(userHasValidToken(request)) {
+            System.out.println("\n\nTOKEN IS VALID\n\n");
+            Iterable<Sponsor> sponsors = sponsorRepository.findAll();
+            model.addAttribute("sponsors", sponsors);
+            return "homepage";
+        } else {
+            System.out.println("\n\n\n\nTOKEN IS NOT VALID\n\n\n\n");
+            return "redirect:/login";
+        }
     }
 
     // Add user with demo sponsor & contract
@@ -520,7 +588,7 @@ public class MainController {
 
         User user = new User();
         user.setName(name);
-        user.setEmail(email);
+        //user.setEmail(email);
         userRepository.save(user);
 
         return "redirect:/users";
