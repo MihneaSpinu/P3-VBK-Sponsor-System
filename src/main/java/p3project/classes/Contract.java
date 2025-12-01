@@ -102,7 +102,7 @@ public class Contract {
     public void setEndDate(LocalDate endDate) {
         // Hvis startDate allerede er sat, sørg for at endDate ikke er før den
         if (endDate != null && this.startDate != null && endDate.isBefore(this.startDate)) {
-            throw new IllegalArgumentException("Contract end date cannot be before start date");
+            throw new IllegalArgumentException("Kontraktens slutdato kan ikke være før startdatoen");
         }
         this.endDate = endDate;
     }
