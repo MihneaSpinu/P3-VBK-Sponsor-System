@@ -64,7 +64,7 @@ public class MainController {
     // ==========================
     @GetMapping("/")
     public String home() {
-        return "redirect:/users";
+        return "redirect:/homepage";
     }
 
     @GetMapping("/users")
