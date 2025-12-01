@@ -47,16 +47,25 @@
 
           <div class="grid md:grid-cols-2 gap-6">
             <section class="list">
-              <h2 class="text-lg font-medium mb-2">All Sponsors</h2>
+                  <div class="flex items-center mb-2">
+                    <h2 class="text-lg font-medium mr-3 m-0">Viser:</h2>
+                    <div class="text-sm">
+                      <select id="sponsorFilter" class="border rounded px-2 py-1 text-sm" onchange="applySponsorFilter()" style="min-width:6rem">
+                        <option value="active" selected>Aktive Sponsor</option>
+                        <option value="inactive">Ikke-aktive Sponsor</option>
+                        <option value="all">Alle Sponsor</option>
+                      </select>
+                    </div>
+                  </div>
               <div th:if="${not #lists.isEmpty(sponsors)}">
-                <div th:each="sponsor, stat : ${sponsors}" class="item mb-4 p-3 rounded bg-gray-50">
-                  <strong class="block text-lg" th:text="${sponsor.name}">Sponsor Name</strong>
-                  <div class="text-sm">Contact: <span th:text="${sponsor.contactPerson}">Contact</span></div>
+                <div th:each="sponsor, stat : ${sponsors}" th:attr="data-status=${sponsor.status}" class="item sponsor-item mb-4 p-3 rounded bg-gray-50">
+                  <strong class="block text-lg" th:text="${sponsor.name}">Sponsor Navn</strong>
+                  <div class="text-sm">Kontaktperson: <span th:text="${sponsor.contactPerson}">Kontaktperson</span></div>
                   <div class="text-sm">Email: <span th:text="${sponsor.email}">email</span></div>
-                  <div class="text-sm">Phone: <span th:text="${sponsor.phoneNumber}">phone</span></div>
+                  <div class="text-sm">Telefon: <span th:text="${sponsor.phoneNumber}">Telefon</span></div>
                   <div class="text-sm">CVR: <span th:text="${sponsor.cvrNumber}">cvr</span></div>
                   <div class="text-sm">Status: <span th:text="${sponsor.status}">status</span></div>
-                  <div class="text-sm">Comments: <span th:text="${sponsor.comments}">comments</span></div>
+                  <div class="text-sm">Kommentar: <span th:text="${sponsor.comments}">kommentar</span></div>
                   <div class="mt-2">
                     <button type="button" class="px-3 py-1 bg-gray-200 rounded" th:onclick="|toggleSponsorEdit(${stat.index})|">Edit</button>
                     <form th:action="@{/sponsors/delete}" method="POST" style="display:inline" th:onsubmit="return confirm('Delete sponsor and its contracts? This cannot be undone.')">
@@ -67,53 +76,53 @@
 
                   <form th:id="|sponsorEditForm-${stat.index}|" th:action="@{/update/sponsor}" method="POST" style="display:none;margin-top:8px" class="form">
                     <input type="hidden" name="id" th:value="${sponsor.id}" />
-                    <label class="block text-sm mt-2">Sponsor Name</label>
+                    <label class="block text-sm mt-2">Sponsor Navn</label>
                     <input name="name" th:value="${sponsor.name}" required class="border rounded px-2 py-1 w-full" />
-                    <label class="block text-sm mt-2">Contact Person</label>
+                    <label class="block text-sm mt-2">Kontaktperson</label>
                     <input name="contactPerson" th:value="${sponsor.contactPerson}" class="border rounded px-2 py-1 w-full" />
                     <label class="block text-sm mt-2">Email</label>
                     <input name="email" type="email" th:value="${sponsor.email}" class="border rounded px-2 py-1 w-full" />
-                    <label class="block text-sm mt-2">Phone</label>
+                    <label class="block text-sm mt-2">Telefon</label>
                     <input name="phoneNumber" type="tel" inputmode="numeric" pattern="^[0-9]+$" title="Digits only" th:value="${sponsor.phoneNumber}" class="border rounded px-2 py-1 w-full" />
                     <label class="block text-sm mt-2">CVR</label>
                     <input name="cvrNumber" th:value="${sponsor.cvrNumber}" class="border rounded px-2 py-1 w-full" />
-                    <label class="block text-sm mt-2">Active</label>
+                    <label class="block text-sm mt-2">Aktiv</label>
                     <select name="status" class="border rounded px-2 py-1 w-full">
                       <option value="true" th:selected="${sponsor.status}">True</option>
                       <option value="false" th:selected="${!sponsor.status}">False</option>
                     </select>
-                    <label class="block text-sm mt-2">Comments</label>
+                    <label class="block text-sm mt-2">Kommentar</label>
                     <input name="comments" th:value="${sponsor.comments}" class="border rounded px-2 py-1 w-full" />
                     <div class="mt-2">
-                      <button type="submit" class="px-3 py-1 bg-green-200 rounded">Save</button>
+                      <button type="submit" class="px-3 py-1 bg-green-200 rounded">Gem</button>
                       <button type="button" class="px-3 py-1 ml-2 bg-gray-200 rounded" th:onclick="|toggleSponsorEdit(${stat.index})|">Cancel</button>
                     </div>
                   </form>
                 </div>
               </div>
-              <div th:if="${#lists.isEmpty(sponsors)}">No sponsors yet.</div>
+              <div th:if="${#lists.isEmpty(sponsors)}">Ingen Sponsors Inu.</div>
             </section>
 
             <div>
               <section class="form mb-6">
-                <h2 class="text-lg font-medium mb-2">Add Sponsor</h2>
+                <h2 class="text-lg font-medium mb-2">Tilføj Sponsor</h2>
                 <form action="/sponsors/add" method="POST" class="space-y-2">
-                  <label class="block text-sm">Sponsor Name</label>
+                  <label class="block text-sm">Sponsor Navn</label>
                   <input id="name" name="name" required class="border rounded px-2 py-1 w-full" />
-                  <label class="block text-sm">Contact Person</label>
+                  <label class="block text-sm">Kontaktperson</label>
                   <input id="contactPerson" name="contactPerson" class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm">Email</label>
                   <input id="email" name="email" type="email" class="border rounded px-2 py-1 w-full" />
-                  <label class="block text-sm">Phone</label>
+                  <label class="block text-sm">Telefon</label>
                   <input id="phoneNumber" name="phoneNumber" type="tel" inputmode="numeric" pattern="^[0-9]+$" title="Digits only" class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm">CVR</label>
                   <input id="cvrNumber" name="cvrNumber" class="border rounded px-2 py-1 w-full" />
-                  <label class="block text-sm">Active</label>
+                  <label class="block text-sm">Aktive</label>
                   <select id="status" name="status" class="border rounded px-2 py-1 w-full">
                     <option value="true">True</option>
                     <option value="false" selected>False</option>
                   </select>
-                  <label class="block text-sm">Comments</label>
+                  <label class="block text-sm">Kommentar</label>
                   <input id="comments" name="comments" class="border rounded px-2 py-1 w-full" />
                   <button type="submit" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded">Add Sponsor</button>
                 </form>
@@ -248,6 +257,31 @@
         }
         attachPhoneHandlers(document.getElementById("phoneNumber"));
         document.querySelectorAll('input[name="phoneNumber"]').forEach(attachPhoneHandlers);
+
+        // Sponsor filtering: show/hide sponsor items based on the select
+        function applySponsorFilter() {
+          const sel = document.getElementById('sponsorFilter');
+          if (!sel) return;
+          const v = sel.value;
+          document.querySelectorAll('.sponsor-item').forEach(function (el) {
+            const status = el.getAttribute('data-status');
+            if (v === 'all') {
+              el.style.display = '';
+            } else if (v === 'active') {
+              el.style.display = status === 'true' || status === 'True' ? '' : 'none';
+            } else if (v === 'inactive') {
+              el.style.display = status === 'false' || status === 'False' ? '' : 'none';
+            }
+          });
+        }
+
+        // xxxxx
+        const filterEl = document.getElementById('sponsorFilter');
+        if (filterEl) {
+          filterEl.value = 'active';
+          applySponsorFilter();
+          filterEl.addEventListener('change', applySponsorFilter);
+        }
       })();
     </script>
   </body>
