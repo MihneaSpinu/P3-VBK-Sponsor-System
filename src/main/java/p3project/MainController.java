@@ -46,7 +46,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.net.URLEncoder;
 import java.net.URLDecoder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Controller
 public class MainController {
@@ -311,22 +310,39 @@ public class MainController {
     }
 
     @GetMapping("/test")
-    public String showTestPage() {
-        return "test";
+    public String showTestPage(Model model, HttpServletRequest request) {
+        if (userHasValidToken(request)) {
+            System.out.println("\n\nTOKEN IS VALID\n\n");
+            return "test";
+        }
+        return "redirect:/login";
     }
 
     @GetMapping("/archive")
-    public String showArchivePage() {
-        return "archive";
+    public String showArchivePage(Model model, HttpServletRequest request) {
+        if (userHasValidToken(request)) {
+            System.out.println("\n\nTOKEN IS VALID\n\n");
+            return "archive";
+        }
+        return "redirect:/login";
     }
 
     @GetMapping("/AdminPanel")
-    public String showAdminPanelPage() {
-        return "AdminPanel";
+    public String showAdminPanelPage(Model model, HttpServletRequest request) {
+        if (userHasValidToken(request)) {
+            System.out.println("\n\nTOKEN IS VALID\n\n");
+            // Add any model attributes needed for the AdminPanel view here
+            return "AdminPanel";  // Return the view name directly (no redirect)
+        }
+        return "redirect:/login";
     }
 
     @GetMapping("/login")
-    public String loginPage(Model model) {
+    public String loginPage(Model model, HttpServletRequest request) {
+        if (userHasValidToken(request)) {
+            System.out.println("\n\nTOKEN IS VALID\n\n");
+            return "redirect:/homepage";
+        }
         User user = new User();
         user.setName("test");
         //BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(8);
@@ -351,7 +367,7 @@ public class MainController {
             int time = rememberMe ? 2_592_000 : 86400; // 1 måned vs 1 dag
             ResponseCookie cookie = ResponseCookie.from("token", encodedToken)
             .httpOnly(true)  // javascript kan ikke røre den B-)
-            .secure(true)    // HTTPS only
+            .secure(false)    // HTTPS only
             .path("/")       // Bruges til alle sider
             .maxAge(time)
             .build();
