@@ -74,7 +74,7 @@
                   <div class="text-sm">Kommentar: <span th:text="${sponsor.comments}">kommentar</span></div>
                   <!-- Kontroller for sponsor: edit og delete -->
                   <div class="mt-2">
-                    <button type="button" class="px-3 py-1 bg-gray-200 rounded" th:onclick="|toggleSponsorEdit(${stat.index})|">Edit</button>
+                    <button type="button" class="px-3 py-1 bg-yellow-200 rounded" th:onclick="|toggleSponsorEdit(${stat.index})|">Edit</button>
                     <form th:action="@{/sponsors/delete}" method="POST" style="display:inline" th:onsubmit="return confirm('Delete sponsor and its contracts? This cannot be undone.')">
                       <input type="hidden" name="sponsorId" th:value="${sponsor.id}" />
                       <button type="submit" class="px-3 py-1 ml-2 bg-red-200 rounded">Delete</button>
@@ -418,17 +418,12 @@
           const btnGroup = document.createElement('div');
           btnGroup.className = 'flex space-x-2';
 
-          // Knap: Vis eller skjul detaljer
-          const btnToggle = document.createElement('button');
-          btnToggle.type = 'button';
-          btnToggle.className = 'px-2 py-1 text-sm bg-gray-100 rounded';
-          btnToggle.textContent = 'Vis/Skjul';
 
           // knap: Åbn/luk redigeringsformular
           const btnEdit = document.createElement('button');
           btnEdit.type = 'button';
           btnEdit.className = 'px-2 py-1 text-sm bg-yellow-200 rounded';
-          btnEdit.textContent = 'Edit';
+          btnEdit.textContent = 'Rediger Kontrakten';
 
           // knap: Slet kontrakt (viser confirm-besked før sletning)
           const btnDelete = document.createElement('button');
@@ -437,7 +432,6 @@
           btnDelete.textContent = 'Slet Kontrakt';
 
           // dette tilføjer knapperne
-          btnGroup.appendChild(btnToggle);
           btnGroup.appendChild(btnEdit);
           btnGroup.appendChild(btnDelete);
 
@@ -448,11 +442,10 @@
 
           // ----------------------------------------------------------
           // DETALJE-OMRÅDE (Type, datoer, betaling, status)
-          // skjult som standard og toggles af btnToggle
           // ----------------------------------------------------------
           const details = document.createElement('div');
           details.id = `details-${idx}`;
-          details.style.display = 'none';
+          details.style.display = 'block';
           details.className = 'mt-2 text-sm text-gray-700';
           // individuelle detailfelter
           const dType = document.createElement('div'); dType.textContent = `Type: ${type}`;
@@ -602,10 +595,7 @@
           container.appendChild(details);
           container.appendChild(editBlock);
 
-          // Wire up events (Vis/Skjul detaljer)
-          btnToggle.addEventListener('click', function () {
-            details.style.display = details.style.display === 'none' ? 'block' : 'none';
-          });
+          // Details always shown; no toggle handler required
           // Åbn/luk redigeringsformular
           btnEdit.addEventListener('click', function () {
             editBlock.style.display = editBlock.style.display === 'none' ? 'block' : 'none';
