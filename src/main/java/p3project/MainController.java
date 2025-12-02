@@ -83,7 +83,7 @@ public class MainController {
     // ==========================
     @GetMapping("/")
     public String home() {
-        return "redirect:/users";
+        return "redirect:/homepage";
     }
 
     @GetMapping("/users")
@@ -135,6 +135,8 @@ public class MainController {
     // boilerplate update handlers
     @PostMapping("/update/sponsor")
     public ResponseEntity<String> updateSponsorFields(@ModelAttribute Sponsor sponsor) {
+        // updateSponsorFields: generisk opdaterings-handler for Sponsor-objekter
+        // Bruger refleksion (compareFields) til at logge ændringer og gemme kun ændrede felter
         Sponsor storedSponsor = sponsorRepository.findById(sponsor.getId())
         .orElseThrow(() -> new RuntimeException("Unable to retrieve sponsor with id: " + sponsor.getId()));
         return handleUpdateRequest(sponsor, storedSponsor);
@@ -190,6 +192,7 @@ public class MainController {
             }
         }
 
+        // Gem ændringerne i den relevante repository baseret på objekt-type
         if (requestObject instanceof Sponsor)         sponsorRepository.save((Sponsor) storedObject);
         else if (requestObject instanceof Contract)   contractRepository.save((Contract) storedObject);
         else if (requestObject instanceof Service)    serviceRepository.save((Service) storedObject);
@@ -237,7 +240,7 @@ public class MainController {
     public String addContractForSponsor(@ModelAttribute Contract contract, Model model) {
         try {
             contractRepository.save(contract);
-            return "redirect:/sponsors";
+            return "redirect:/sponsors"; // Post/Redirect/Get for at undgå double submit
         } catch (IllegalArgumentException ex) {
             // ???
             model.addAttribute("error", ex.getMessage());
