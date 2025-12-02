@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -14,7 +15,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import p3project.classes.Changelog;
@@ -199,6 +204,7 @@ public class MainController {
             @RequestParam(required = false, defaultValue = "false") boolean status,
             @RequestParam String type,
             @RequestParam String name,
+            @RequestParam MultipartFile pdffile,
             Model model) {
         // Prøv at parse datoer og oprette kontrakten. Ved fejl vises en fejlbesked
         try {
@@ -210,6 +216,16 @@ public class MainController {
             java.util.Optional<Sponsor> sponsorOpt = sponsorRepository.findById(sponsorId);
             if (sponsorOpt.isPresent())
                 contract.setSponsorName(sponsorOpt.get().getName());
+
+            // Håndter PDF upload
+            try {
+                contract.setPdfData(pdffile.getBytes());
+                String cleanFilename = Paths.get(pdffile.getOriginalFilename()).getFileName().toString(); //Get the name of the file
+                contract.setFileName(cleanFilename); //save the name of the file in contract
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "error"; // 
+            }
             contractRepository.save(contract);
             return "redirect:/sponsors"; // Post/Redirect/Get for at undgå double submit
         } catch (IllegalArgumentException ex) {
@@ -328,8 +344,12 @@ public class MainController {
     // fjern requestparam?
     @GetMapping("/getFile")
     public ResponseEntity<byte[]> getFile(@RequestParam long contractId) {
+        Optional<Contract> contractOpt = contractRepository.findById(contractId);
+        if (contractOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
         Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new RuntimeException("/uploadFile, Contract not found"));
+                .orElseThrow(() -> new RuntimeException("/getFile, Contract not found"));
         byte[] pdfData = contract.getPdfData();
 
         return ResponseEntity.ok()
@@ -345,6 +365,10 @@ public class MainController {
     // File upload
     @PostMapping("/uploadFile")
     public String uploadFileTo(@RequestParam MultipartFile pdffile, @RequestParam Long contractId) {
+        Optional<Contract> contractOpt = contractRepository.findById(contractId);
+        if (contractOpt.isEmpty()) {
+            return "error"; //
+        }
         Contract contract = contractRepository.findById(contractId)
                 .orElseThrow(() -> new RuntimeException("/uploadFile, Contract not found"));
 
