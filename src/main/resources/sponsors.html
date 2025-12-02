@@ -74,7 +74,7 @@
                   <div class="text-sm">Kommentar: <span th:text="${sponsor.comments}">kommentar</span></div>
                   <!-- Kontroller for sponsor: edit og delete -->
                   <div class="mt-2">
-                    <button type="button" class="px-3 py-1 bg-yellow-200 rounded" th:onclick="|toggleSponsorEdit(${stat.index})|">Edit</button>
+                    <button type="button" class="px-3 py-1 bg-gray-200 rounded" th:onclick="|toggleSponsorEdit(${stat.index})|">Edit</button>
                     <form th:action="@{/sponsors/delete}" method="POST" style="display:inline" th:onsubmit="return confirm('Delete sponsor and its contracts? This cannot be undone.')">
                       <input type="hidden" name="sponsorId" th:value="${sponsor.id}" />
                       <button type="submit" class="px-3 py-1 ml-2 bg-red-200 rounded">Delete</button>
@@ -150,6 +150,12 @@
                  th:attr="data-id=${c.id},data-sponsor-id=${c.sponsorId},data-name=${c.name},data-type=${c.type},data-start=${c.startDate},data-end=${c.endDate},data-payment=${c.payment},data-status=${c.status}">
             </div>
           </div>
+          <!-- Skjult data-lager for tjenester (services) -->
+          <div id="servicesData" style="display:none">
+            <div th:each="s : ${services}" class="service-data"
+                 th:attr="data-id=${s.id},data-contract-id=${s.contractId},data-name=${s.name},data-type=${s.type},data-start=${s.startDate},data-end=${s.endDate},data-amount=${s.amountOrDivision},data-status=${s.status}">
+            </div>
+          </div>
 
           <!--
             Skjult skabelon for sponsor- <option> elementer
@@ -206,6 +212,47 @@
               </div>
               <div id="viewContractsList" class="space-y-2 overflow-auto max-h-96">
               </div>
+            </div>
+          </div>
+          <!-- Add Service Modal -->
+          <div id="addServiceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display:none">
+            <div class="bg-white rounded p-4 w-11/12 max-w-md">
+              <div class="flex justify-between items-center mb-3">
+                <h3 class="font-semibold">Tilføj Tjeneste for <span id="addServiceContractName"></span></h3>
+                <button type="button" class="text-gray-600" onclick="closeModal('addServiceModal')">✕</button>
+              </div>
+              <form action="/sponsors/addService" method="POST" class="space-y-2">
+                <input id="addServiceContractId" type="hidden" name="contractId" />
+                <label class="block text-sm">Info/Kommentar</label>
+                <input name="name" type="text" class="border rounded px-2 py-1 w-full" />
+                <label class="block text-sm">Type</label>
+                <select id="addServiceType" name="type" class="border rounded px-2 py-1 w-full">
+                  <option value="Billeter">Billeter</option>
+                  <option value="Kuponer">Kuponer</option>
+                  <option value="Banner">Banner</option>
+                  <option value="LogoTrojler">Logo på trøjer</option>
+                  <option value="LogoBukser">Logo på bukser</option>
+                </select>
+                <div id="amountOrDivisionWrapper">
+                  <label class="block text-sm">Antal</label>
+                  <input name="amountOrDivision" type="number" value="0" class="border rounded px-2 py-1 w-full" />
+                </div>
+                <label class="block text-sm">Start Dato</label>
+                <input name="startDate" type="date" class="border rounded px-2 py-1 w-full" />
+                <label class="block text-sm">Slut Dato</label>
+                <input name="endDate" type="date" class="border rounded px-2 py-1 w-full" />
+                <label class="block text-sm">Status</label>
+                <select name="status" class="border rounded px-2 py-1 w-full">
+                  <option value="AKTIV">Aktiv</option>
+                  <option value="IGANG">Igang</option>
+                  <option value="UDFORT">Udført</option>
+                  <option value="INAKTIV">Inaktiv</option>
+                </select>
+                <div class="flex justify-end space-x-2 mt-2">
+                  <button type="button" class="px-3 py-1 bg-gray-200 rounded" onclick="closeModal('addServiceModal')">Annuller</button>
+                  <button type="submit" class="px-3 py-1 bg-green-500 text-white rounded">Opret</button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -432,6 +479,12 @@
           btnDelete.textContent = 'Slet Kontrakt';
 
           // dette tilføjer knapperne
+          const btnAddService = document.createElement('button');
+          btnAddService.type = 'button';
+          btnAddService.className = 'px-2 py-1 text-sm bg-blue-500 text-white rounded';
+          btnAddService.textContent = 'Tilføj Tjeneste';
+
+          // dette tilføjer knapperne 
           btnGroup.appendChild(btnEdit);
           btnGroup.appendChild(btnDelete);
 
@@ -459,6 +512,151 @@
           details.appendChild(dEnd);
           details.appendChild(dPayment);
           details.appendChild(dStatus);
+
+          // ----------------------------------------------------------
+          // SERVICES-LISTE: vis tjenester som hører til denne kontrakt
+          // ----------------------------------------------------------
+          const servicesWrapper = document.createElement('div');
+          servicesWrapper.className = 'mt-3';
+
+          // Header: title
+          const servicesHeader = document.createElement('div');
+          servicesHeader.className = 'flex items-center justify-between';
+          const servicesTitle = document.createElement('div');
+          servicesTitle.className = 'text-sm font-medium mb-2';
+          servicesTitle.textContent = 'Tjenester';
+          servicesHeader.appendChild(servicesTitle);
+          // place the add-service button inline with the title
+          btnAddService.className = 'px-3 py-1 text-sm bg-blue-500 text-white rounded';
+          servicesHeader.appendChild(btnAddService);
+          servicesWrapper.appendChild(servicesHeader);
+
+          // container for the service cards (always visible)
+          const servicesList = document.createElement('div');
+          servicesList.className = 'mt-2';
+          servicesList.style.display = 'block';
+          servicesWrapper.appendChild(servicesList);
+
+          // find services from hidden template
+          try {
+            const servicesContainer = document.getElementById('servicesData');
+              if (servicesContainer) {
+              const serviceNodes = servicesContainer.querySelectorAll('.service-data');
+              serviceNodes.forEach(function (sn) {
+                if (String(sn.getAttribute('data-contract-id')) === String(id)) {
+                  const sid = sn.getAttribute('data-id');
+                  const sname = sn.getAttribute('data-name') || '';
+                  const stype = sn.getAttribute('data-type') || '';
+                  const sstart = sn.getAttribute('data-start') || '';
+                  const send = sn.getAttribute('data-end') || '';
+                  const samount = sn.getAttribute('data-amount') || '';
+                  const sstatus = sn.getAttribute('data-status') || '';
+
+                  const sCard = document.createElement('div');
+                  // service cards styled light-grey
+                  sCard.className = 'border rounded p-2 mb-2 bg-gray-100';
+                  const sTop = document.createElement('div');
+                  sTop.className = 'flex justify-between items-center';
+                  const sTitle = document.createElement('div');
+                  sTitle.textContent = sname + ' ( #' + sid + ')';
+                  const sButtons = document.createElement('div');
+                  sButtons.className = 'flex space-x-2';
+
+                  const sEdit = document.createElement('button');
+                  sEdit.type = 'button';
+                  sEdit.className = 'px-2 py-1 text-sm bg-yellow-200 rounded';
+                  sEdit.textContent = 'Edit';
+
+                  const sDelete = document.createElement('button');
+                  sDelete.type = 'button';
+                  sDelete.className = 'px-2 py-1 text-sm bg-red-300 rounded';
+                  sDelete.textContent = 'Slet';
+
+                  sButtons.appendChild(sEdit);
+                  sButtons.appendChild(sDelete);
+                  sTop.appendChild(sTitle);
+                  sTop.appendChild(sButtons);
+                  sCard.appendChild(sTop);
+
+                  const sDetails = document.createElement('div');
+                  sDetails.className = 'text-sm text-gray-700 mt-2';
+                  sDetails.innerHTML = `Type: ${escapeHtml(stype)}<br/>Start: ${escapeHtml(sstart)}<br/>End: ${escapeHtml(send)}<br/>Amount/Division: ${escapeHtml(samount)}<br/>Status: ${escapeHtml(sstatus)}`;
+                  sCard.appendChild(sDetails);
+
+                  // small inline edit block for service
+                  const sEditBlock = document.createElement('div');
+                  sEditBlock.style.display = 'none';
+                  sEditBlock.className = 'mt-2';
+                  // build basic edit form
+                  const sForm = document.createElement('form');
+                  sForm.action = '/update/service';
+                  sForm.method = 'POST';
+                  // hidden id
+                  const sIdInput = document.createElement('input'); sIdInput.type = 'hidden'; sIdInput.name = 'id'; sIdInput.value = sid; sForm.appendChild(sIdInput);
+                  // name
+                  const sNameLab = document.createElement('label'); sNameLab.className = 'block text-sm'; sNameLab.textContent = 'Info/Kommentar'; sForm.appendChild(sNameLab);
+                  const sNameInp = document.createElement('input'); sNameInp.name = 'name'; sNameInp.type = 'text'; sNameInp.value = sname; sNameInp.className='border rounded px-2 py-1 w-full'; sForm.appendChild(sNameInp);
+                  // type 
+                  const sTypeLab = document.createElement('label'); sTypeLab.className='block text-sm'; sTypeLab.textContent='Type'; sForm.appendChild(sTypeLab);
+                  const sTypeSel = document.createElement('select'); sTypeSel.name='type'; sTypeSel.className='border rounded px-2 py-1 w-full';
+                  // copy options from the Add Service modal so labels/values match
+                  const templateType = document.getElementById('addServiceType');
+                  if (templateType) {
+                    const opts = templateType.querySelectorAll('option');
+                    opts.forEach(function(o){ sTypeSel.appendChild(o.cloneNode(true)); });
+                    if (stype) sTypeSel.value = stype;
+                  }
+                  sForm.appendChild(sTypeSel);
+
+                  // amount/division wrapper (we toggle between number input and select for logo types)
+                  const sAmtWrapper = document.createElement('div'); sAmtWrapper.id = 's-amount-wrapper-' + sid; sForm.appendChild(sAmtWrapper);
+                  function updateSAmountWrapper() {
+                    // clear wrapper
+                    sAmtWrapper.innerHTML = '';
+                    const v = sTypeSel.value;
+                    if (v === 'LogoTrojler' || v === 'LogoBukser') {
+                      const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Divisionen'; sAmtWrapper.appendChild(lab);
+                      const divSel = document.createElement('select'); divSel.name='amountOrDivision'; divSel.className='border rounded px-2 py-1 w-full';
+                      // preserve previous numeric value when possible
+                      const prev = parseInt(samount) || 1;
+                      for (let i=1;i<=10;i++) { const o = document.createElement('option'); o.value = String(i); o.textContent = String(i); if(i===prev) o.selected=true; divSel.appendChild(o); }
+                      sAmtWrapper.appendChild(divSel);
+                    } else {
+                      const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Antal'; sAmtWrapper.appendChild(lab);
+                      const inp = document.createElement('input'); inp.name='amountOrDivision'; inp.type='number'; inp.value = (samount || '0'); inp.className='border rounded px-2 py-1 w-full'; sAmtWrapper.appendChild(inp);
+                    }
+                  }
+                  // initialize wrapper based on current type/value
+                  updateSAmountWrapper();
+                  // update when service type changes
+                  sTypeSel.addEventListener('change', updateSAmountWrapper);
+                  // start/end/status
+                  const sStartLab = document.createElement('label'); sStartLab.className='block text-sm'; sStartLab.textContent='Start Dato'; sForm.appendChild(sStartLab);
+                  const sStartInp = document.createElement('input'); sStartInp.name='startDate'; sStartInp.type='date'; sStartInp.value=sstart; sStartInp.className='border rounded px-2 py-1 w-full'; sForm.appendChild(sStartInp);
+                  const sEndLab = document.createElement('label'); sEndLab.className='block text-sm'; sEndLab.textContent='Slut Dato'; sForm.appendChild(sEndLab);
+                  const sEndInp = document.createElement('input'); sEndInp.name='endDate'; sEndInp.type='date'; sEndInp.value=send; sEndInp.className='border rounded px-2 py-1 w-full'; sForm.appendChild(sEndInp);
+                  const sStatusLab = document.createElement('label'); sStatusLab.className='block text-sm'; sStatusLab.textContent='Status'; sForm.appendChild(sStatusLab);
+                  const sStatusSel = document.createElement('select'); sStatusSel.name='status'; sStatusSel.className='border rounded px-2 py-1 w-full'; ['Aktiv','Igang','Udført','Inaktiv'].forEach(function(o){ const opt=document.createElement('option'); opt.value=o; opt.textContent=o; if(o===sstatus) opt.selected=true; sStatusSel.appendChild(opt); }); sForm.appendChild(sStatusSel);
+                  const sBtnRow = document.createElement('div'); sBtnRow.className='flex justify-end space-x-2 mt-2';
+                  const sCancel = document.createElement('button'); sCancel.type='button'; sCancel.className='px-3 py-1 bg-gray-200 rounded'; sCancel.textContent='Cancel';
+                  const sSave = document.createElement('button'); sSave.type='submit'; sSave.className='px-3 py-1 bg-green-500 text-white rounded'; sSave.textContent='Save';
+                  sBtnRow.appendChild(sCancel); sBtnRow.appendChild(sSave); sForm.appendChild(sBtnRow);
+                  sEditBlock.appendChild(sForm);
+                  sCard.appendChild(sEditBlock);
+
+                  sEdit.addEventListener('click', function(){ sEditBlock.style.display = sEditBlock.style.display==='none' ? 'block' : 'none'; });
+                  // cancel should hide the inline edit block
+                  sCancel.addEventListener('click', function () { sEditBlock.style.display = 'none'; });
+                  sDelete.addEventListener('click', function(){ if(confirm('Slet denne tjeneste?')) postDeleteService(sid, id); });
+
+                  servicesList.appendChild(sCard);
+                }
+              });
+            }
+          } catch (e) {
+            console.error('populateViewContracts: services render error', e);
+          }
+
 
           
           // ----------------------------------------------------------
@@ -593,9 +791,26 @@
           // Assemble container
           container.appendChild(topRow);
           container.appendChild(details);
+          // services header + list (if any)
+          container.appendChild(servicesWrapper);
+          // services button is inline in the header; no floating button required
           container.appendChild(editBlock);
 
           // Details always shown; no toggle handler required
+          // Åbn add-service modal
+          btnAddService.addEventListener('click', function () {
+            try {
+              const modal = document.getElementById('addServiceModal');
+              if (!modal) return;
+              document.getElementById('addServiceContractId').value = id;
+              document.getElementById('addServiceContractName').textContent = name || ('#' + id);
+              // reset inputs
+              const form = modal.querySelector('form');
+              if (form) form.reset();
+              modal.style.display = 'flex';
+            } catch (e) { console.error('openAddService error', e); }
+          });
+          // services always visible; no toggle
           // Åbn/luk redigeringsformular
           btnEdit.addEventListener('click', function () {
             editBlock.style.display = editBlock.style.display === 'none' ? 'block' : 'none';
@@ -662,6 +877,49 @@
           alert('Kunne ikke slette kontrakt — se konsol for detaljer.');
         }
       }
+
+      // POST delete service by creating hidden form
+      function postDeleteService(serviceId, contractId) {
+        try {
+          const f = document.createElement('form');
+          f.method = 'POST';
+          f.action = '/sponsors/deleteService';
+          f.style.display = 'none';
+          const inId = document.createElement('input');
+          inId.type = 'hidden';
+          inId.name = 'serviceId';
+          inId.value = serviceId;
+          f.appendChild(inId);
+          document.body.appendChild(f);
+          f.submit();
+        } catch (e) {
+          console.error('postDeleteService error', e);
+          alert('Kunne ikke slette tjeneste — se konsol for detaljer.');
+        }
+      }
+
+      // toggle amount/division input in addService modal
+      (function setupServiceModal() {
+        const sel = document.getElementById('addServiceType');
+        if (!sel) return;
+        const wrapper = document.getElementById('amountOrDivisionWrapper');
+        function updateWrapper() {
+          const v = sel.value;
+          wrapper.innerHTML = '';
+          if (v === 'LogoTrojler' || v === 'LogoBukser') {
+            const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Divisionen'; wrapper.appendChild(lab);
+            const divSel = document.createElement('select'); divSel.name='amountOrDivision'; divSel.className='border rounded px-2 py-1 w-full';
+            for (let i=1;i<=10;i++) { const o = document.createElement('option'); o.value = String(i); o.textContent = String(i); divSel.appendChild(o); }
+            wrapper.appendChild(divSel);
+          } else {
+            const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Antal'; wrapper.appendChild(lab);
+            const inp = document.createElement('input'); inp.name='amountOrDivision'; inp.type='number'; inp.value='0'; inp.className='border rounded px-2 py-1 w-full'; wrapper.appendChild(inp);
+          }
+        }
+        sel.addEventListener('change', updateWrapper);
+        // init
+        updateWrapper();
+      })();
 
       // basic escaping to avoid injection when rendering attributes
       function escapeHtml(s) {
