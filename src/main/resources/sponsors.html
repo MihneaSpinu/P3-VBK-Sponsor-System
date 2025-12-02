@@ -390,68 +390,256 @@
           const item = document.createElement('div');
           item.className = 'border rounded p-2';
          
-          // item.innerHTML:
-          // Sætter (eller overskriver) hele HTML-indholdet inde i 'item'-elementet.
-          // Her bruges det til at opbygge hele kontrakt-kortet dynamisk i én samlet HTML-streng.
-          // - Viser kontraktnavn + id
-          // - Indeholder knapper til at vise/skjule detaljer og til at åbne en inline edit-form
-          // - Har en skjult detalje-sektion (type, datoer, betaling, status)
-          // - Har en skjult redigeringsformular med alle kontraktfelter
-          // - Alle data indsættes dynamisk via template literals og escapeHtml() for sikkerhed
-          item.innerHTML = `
-            <div class="flex justify-between items-center">
-              <div class="font-medium">${escapeHtml(name)} <span class="text-xs text-gray-500">(#${escapeHtml(id)})</span></div>
-              <div class="flex space-x-2">
-                <button type="button" class="px-2 py-1 text-sm bg-gray-100 rounded" onclick="(function(i){const d=document.getElementById('details-'+i); d.style.display = d.style.display==='none'?'block':'none';})('${idx}')">Vis/Skjul</button>
-                <button type="button" class="px-2 py-1 text-sm bg-yellow-200 rounded" onclick="(function(i){const e=document.getElementById('editform-'+i); e.style.display = e.style.display==='none'?'block':'none';})('${idx}')">Edit</button>
-                <button type="button" class="px-2 py-1 text-sm bg-red-300 rounded" onclick="if(confirm('Slet denne kontrakt? Dette kan ikke fortrydes.')) postDeleteContract('${escapeHtml(id)}','${escapeHtml(sponsorId)}')">Slet Kontrakt</button>
-              </div>
-            </div>
-            <div id="details-${idx}" style="display:none" class="mt-2 text-sm text-gray-700">
-              <div>Type: ${escapeHtml(type)}</div>
-              <div>Start: ${escapeHtml(formattedStart)}</div>
-              <div>End: ${escapeHtml(formattedEnd)}</div>
-              <div>Payment: ${escapeHtml(payment)}</div>
-              <div>Status: ${escapeHtml(status)}</div>
-            </div>
-              <div id="editform-${idx}" style="display:none" class="mt-2 text-sm text-gray-700 border-t pt-2">
-              <form action="/sponsors/editContract" method="POST" class="space-y-2">
-                <input type="hidden" name="contractId" value="${escapeHtml(id)}" />
-                <input type="hidden" name="sponsorName" value="${escapeHtml(sponsorDisplayName)}" />
-                <label class="block text-sm">Sponsor</label>
-                <select id="sponsor-select-${idx}" name="sponsorId" class="border rounded px-2 py-1 w-full">${document.getElementById ? '' : ''}</select>
-                <label class="block text-sm">Navn</label>
-                <input name="name" type="text" value="${escapeHtml(name)}" class="border rounded px-2 py-1 w-full" />
-                <label class="block text-sm">Type</label>
-                <input name="type" type="text" value="${escapeHtml(type)}" class="border rounded px-2 py-1 w-full" />
-                <label class="block text-sm">Start Dato</label>
-                <input name="startDate" type="date" value="${escapeHtml(start)}" class="border rounded px-2 py-1 w-full" />
-                <label class="block text-sm">Slut Dato</label>
-                <input name="endDate" type="date" value="${escapeHtml(end)}" class="border rounded px-2 py-1 w-full" />
-                <label class="block text-sm">Payment</label>
-                <input name="payment" type="number" value="${escapeHtml(payment)}" class="border rounded px-2 py-1 w-full" />
-                <label class="block text-sm">Aktive</label>
-                <select id="status-select-${idx}" name="status" class="border rounded px-2 py-1 w-full">
-                  <option value="true">True</option>
-                  <option value="false">False</option>
-                </select>
-                <div class="flex justify-end space-x-2 mt-2">
-                  <button type="button" class="px-3 py-1 bg-gray-200 rounded" onclick="document.getElementById('editform-${idx}').style.display='none'">Cancel</button>
-                  <button type="submit" class="px-3 py-1 bg-green-500 text-white rounded">Save</button>
-                </div>
-              </form>
-            </div>
-          `;
-          listEl.appendChild(item);
+          // Opretter et container-element som indeholder hele kontrakt-blokken (titel, detaljer og edit-form)
+          const container = document.createElement('div');
+          container.className = 'border rounded p-2';
+
+          // ----------------------------------------------------------
+          // TOP-LINJE: Kontraktnavn + ID + knapper
+          // ----------------------------------------------------------
+          const topRow = document.createElement('div');
+          topRow.className = 'flex justify-between items-center';
+
+          // wrapper til navn + ID
+          const title = document.createElement('div');
+          title.className = 'font-medium';
+          // kontraktens navn (tekst)
+          const nameText = document.createElement('span');
+          nameText.textContent = name;
+          // kontraktens ID i parentes
+          const idSpan = document.createElement('span');
+          idSpan.className = 'text-xs text-gray-500';
+          idSpan.textContent = ` (#${id})`;
+          // Saml navn og ID
+          title.appendChild(nameText);
+          title.appendChild(idSpan);
+
+          // gruppe til de tre knapper: Vis/Skjul, Edit, Slet
+          const btnGroup = document.createElement('div');
+          btnGroup.className = 'flex space-x-2';
+
+          // Knap: Vis eller skjul detaljer
+          const btnToggle = document.createElement('button');
+          btnToggle.type = 'button';
+          btnToggle.className = 'px-2 py-1 text-sm bg-gray-100 rounded';
+          btnToggle.textContent = 'Vis/Skjul';
+
+          // knap: Åbn/luk redigeringsformular
+          const btnEdit = document.createElement('button');
+          btnEdit.type = 'button';
+          btnEdit.className = 'px-2 py-1 text-sm bg-yellow-200 rounded';
+          btnEdit.textContent = 'Edit';
+
+          // knap: Slet kontrakt (viser confirm-besked før sletning)
+          const btnDelete = document.createElement('button');
+          btnDelete.type = 'button';
+          btnDelete.className = 'px-2 py-1 text-sm bg-red-300 rounded';
+          btnDelete.textContent = 'Slet Kontrakt';
+
+          // dette tilføjer knapperne
+          btnGroup.appendChild(btnToggle);
+          btnGroup.appendChild(btnEdit);
+          btnGroup.appendChild(btnDelete);
+
+          // og dette tilføjer titel + knapgruppe til top-linjen
+          topRow.appendChild(title);
+          topRow.appendChild(btnGroup);
+
+
+          // ----------------------------------------------------------
+          // DETALJE-OMRÅDE (Type, datoer, betaling, status)
+          // skjult som standard og toggles af btnToggle
+          // ----------------------------------------------------------
+          const details = document.createElement('div');
+          details.id = `details-${idx}`;
+          details.style.display = 'none';
+          details.className = 'mt-2 text-sm text-gray-700';
+          // individuelle detailfelter
+          const dType = document.createElement('div'); dType.textContent = `Type: ${type}`;
+          const dStart = document.createElement('div'); dStart.textContent = `Start: ${formattedStart}`;
+          const dEnd = document.createElement('div'); dEnd.textContent = `End: ${formattedEnd}`;
+          const dPayment = document.createElement('div'); dPayment.textContent = `Payment: ${payment}`;
+          const dStatus = document.createElement('div'); dStatus.textContent = `Status: ${status}`;
+          // Saml detailfelter
+          details.appendChild(dType);
+          details.appendChild(dStart);
+          details.appendChild(dEnd);
+          details.appendChild(dPayment);
+          details.appendChild(dStatus);
+
+          
+          // ----------------------------------------------------------
+          // REDIGERINGS-FORMULAR (skjult indtil "Edit" klikkes)
+          // ----------------------------------------------------------
+          const editBlock = document.createElement('div');
+          editBlock.id = `editform-${idx}`;
+          editBlock.style.display = 'none';
+          editBlock.className = 'mt-2 text-sm text-gray-700 border-t pt-2';
+
+          // sender POST til /sponsors/editContract
+          const form = document.createElement('form');
+          form.action = '/sponsors/editContract';
+          form.method = 'POST';
+          form.className = 'space-y-2';
+
+          // skjulte felter: kontrakt-ID + sponsor-navnet (bruges til redirect)
+          const hiddenId = document.createElement('input');
+          hiddenId.type = 'hidden'; 
+          hiddenId.name = 'contractId'; 
+          hiddenId.value = id;
+          
+          const hiddenSponsorName = document.createElement('input');
+          hiddenSponsorName.type = 'hidden'; 
+          hiddenSponsorName.name = 'sponsorName'; 
+          hiddenSponsorName.value = sponsorDisplayName || '';
+
+          // iføjer så de skulte felter
+          form.appendChild(hiddenId);
+          form.appendChild(hiddenSponsorName);
+
+          
+          // ----------------------------------------------------------
+          // Helperfunktion til at tilføje label + input-felt i ét trin
+          // ----------------------------------------------------------
+          function addLabelAndControl(parent, labelText, control) {
+            const lab = document.createElement('label');
+            lab.className = 'block text-sm';
+            lab.textContent = labelText;
+            parent.appendChild(lab);
+            parent.appendChild(control);
+          }
+
+          // ----------------------------------------------------------
+          // Sponsor dropdown (fyldes senere via cloneNode fra template)
+          // ----------------------------------------------------------
+          const sponsorSelect = document.createElement('select');
+          sponsorSelect.id = `sponsor-select-${idx}`;
+          sponsorSelect.name = 'sponsorId';
+          sponsorSelect.className = 'border rounded px-2 py-1 w-full';
+          addLabelAndControl(form, 'Sponsor', sponsorSelect);
+
+          // Inputfelt: kontrakt-navn
+          const nameInput = document.createElement('input');
+          nameInput.name = 'name'; 
+          nameInput.type = 'text'; 
+          nameInput.value = name; 
+          nameInput.className = 'border rounded px-2 py-1 w-full';
+          addLabelAndControl(form, 'Navn', nameInput);
+
+          // Inputfelt: kontrakt-type
+          const typeInput = document.createElement('input');
+          typeInput.name = 'type'; 
+          typeInput.type = 'text'; 
+          typeInput.value = type; 
+          typeInput.className = 'border rounded px-2 py-1 w-full';
+          addLabelAndControl(form, 'Type', typeInput);
+
+          // Startdato-felt
+          const startInput = document.createElement('input');
+          startInput.name = 'startDate'; 
+          startInput.type = 'date'; 
+          startInput.value = start || '' ; 
+          startInput.className = 'border rounded px-2 py-1 w-full';
+          addLabelAndControl(form, 'Start Dato', startInput);
+
+          // Slutdato-felt
+          const endInput = document.createElement('input');
+          endInput.name = 'endDate'; 
+          endInput.type = 'date'; 
+          endInput.value = end || '' ; 
+          endInput.className = 'border rounded px-2 py-1 w-full';
+          addLabelAndControl(form, 'Slut Dato', endInput);
+
+          // Betaling-felt
+          const paymentInput = document.createElement('input');
+          paymentInput.name = 'payment'; 
+          paymentInput.type = 'number'; 
+          paymentInput.value = payment; 
+          paymentInput.className = 'border rounded px-2 py-1 w-full';
+          addLabelAndControl(form, 'Payment', paymentInput);
+
+          // Status-dropdown (true/false)
+          const statusSelect = document.createElement('select');
+          statusSelect.id = `status-select-${idx}`; 
+          statusSelect.name = 'status'; 
+          statusSelect.className = 'border rounded px-2 py-1 w-full';
+          
+          const optTrue = document.createElement('option'); 
+          optTrue.value = 'true'; 
+          optTrue.textContent = 'True';
+          
+          const optFalse = document.createElement('option'); 
+          optFalse.value = 'false'; 
+          optFalse.textContent = 'False';
+          
+          statusSelect.appendChild(optTrue); statusSelect.appendChild(optFalse);
+          if (String(status) === 'true' || status === true) statusSelect.value = 'true'; else statusSelect.value = 'false';
+          addLabelAndControl(form, 'Aktive', statusSelect);
+
+
+          // ----------------------------------------------------------
+          // Knapper nederst (Save og Cancel)
+          // ----------------------------------------------------------
+          const btnRow = document.createElement('div'); 
+          btnRow.className = 'flex justify-end space-x-2 mt-2';
+          
+          const btnCancel = document.createElement('button'); 
+          btnCancel.type = 'button'; 
+          btnCancel.className = 'px-3 py-1 bg-gray-200 rounded'; 
+          btnCancel.textContent = 'Cancel';
+
+          const btnSave = document.createElement('button'); 
+          btnSave.type = 'submit'; 
+          btnSave.className = 'px-3 py-1 bg-green-500 text-white rounded'; 
+          btnSave.textContent = 'Save';
+          btnRow.appendChild(btnCancel); btnRow.appendChild(btnSave);
+          form.appendChild(btnRow);
+
+          editBlock.appendChild(form);
+
+          // Assemble container
+          container.appendChild(topRow);
+          container.appendChild(details);
+          container.appendChild(editBlock);
+
+          // Wire up events (Vis/Skjul detaljer)
+          btnToggle.addEventListener('click', function () {
+            details.style.display = details.style.display === 'none' ? 'block' : 'none';
+          });
+          // Åbn/luk redigeringsformular
+          btnEdit.addEventListener('click', function () {
+            editBlock.style.display = editBlock.style.display === 'none' ? 'block' : 'none';
+          });
+          // Slet kontrakt (kalder back-end via postDeleteContract)
+          btnDelete.addEventListener('click', function () {
+            if (confirm('Slet denne kontrakt? Dette kan ikke fortrydes.')) {
+              postDeleteContract(id, sponsorId);
+            }
+          });
+          // Luk redigeringsformular uden at gemme
+          btnCancel.addEventListener('click', function () { editBlock.style.display = 'none'; });
+
+          // Tilføj containeren til modal-listen
+          listEl.appendChild(container);
+
           // udfyld sponsor-dropdown og status-dropdown med rigtige værdier
+          // Gør det ved at klone <option>-elementer fra skjult template 
           try {
             const template = document.getElementById('sponsorOptionsTemplate');
             if (template) {
-              const sel = document.getElementById('sponsor-select-'+idx);
-              if (sel) sel.innerHTML = template.innerHTML; // kopier options fra skjult skabelon
-              if (sel) sel.value = n.getAttribute('data-sponsor-id');
+              const sel = document.getElementById('sponsor-select-' + idx);
+              if (sel) {
+                // clone option nodes from template
+                const opts = template.querySelectorAll('option');
+                opts.forEach(function (o) {
+                  sel.appendChild(o.cloneNode(true));
+                });
+                // Sæt sponsorId som valgt værdi
+                sel.value = n.getAttribute('data-sponsor-id');
+              }
             }
-            const statusSel = document.getElementById('status-select-'+idx);
+            // Sæt korrekt status i status-select
+            const statusSel = document.getElementById('status-select-' + idx);
             if (statusSel) statusSel.value = String(status) === 'true' || String(status) === 'True' ? 'true' : 'false';
           } catch (err) {
             // Hvis noget går galt ved udfyldning, log fejl til konsol men fortsæt
