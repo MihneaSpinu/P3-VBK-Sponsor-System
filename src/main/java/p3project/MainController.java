@@ -87,6 +87,7 @@ public class MainController {
     public String showSponsors(Model model) {
         model.addAttribute("sponsors", sponsorRepository.findAll());
         model.addAttribute("contracts", contractRepository.findAll());
+        model.addAttribute("services", serviceRepository.findAll());
         return "sponsors";
     }
 
@@ -219,6 +220,41 @@ public class MainController {
             model.addAttribute("contracts", contractRepository.findAll());
             return "sponsors"; // Geninlæs siden og vis sponsors-siden med fejlbesked
         }
+    }
+
+    // Handles creating a new service for a contract
+    @PostMapping("/sponsors/addService")
+    public String addServiceForContract(
+            @RequestParam Long contractId,
+            @RequestParam(required = false) String name,
+            @RequestParam String type,
+            @RequestParam(required = false, defaultValue = "0") int amountOrDivision,
+            @RequestParam String startDate,
+            @RequestParam String endDate,
+            @RequestParam(required = false, defaultValue = "AKTIV") String status,
+            Model model) {
+        try {
+            java.time.LocalDate start = startDate == null || startDate.isEmpty() ? null : java.time.LocalDate.parse(startDate);
+            java.time.LocalDate end = endDate == null || endDate.isEmpty() ? null : java.time.LocalDate.parse(endDate);
+            p3project.classes.ServiceType st = p3project.classes.ServiceType.valueOf(type);
+            Service.ServiceStatus ss = Service.ServiceStatus.valueOf(status);
+            p3project.classes.Service service = new p3project.classes.Service(contractId, name == null ? "" : name, st, ss, amountOrDivision, start, end);
+            serviceRepository.save(service);
+            return "redirect:/sponsors";
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("error", "Invalid data for service: " + ex.getMessage());
+            model.addAttribute("sponsors", sponsorRepository.findAll());
+            model.addAttribute("contracts", contractRepository.findAll());
+            model.addAttribute("services", serviceRepository.findAll());
+            return "sponsors";
+        }
+    }
+
+    // Deletes a service by ID
+    @PostMapping("/sponsors/deleteService")
+    public String deleteService(@RequestParam Long serviceId) {
+        serviceRepository.deleteById(serviceId);
+        return "redirect:/sponsors";
     }
 
     // Handles editing an existing sponsor

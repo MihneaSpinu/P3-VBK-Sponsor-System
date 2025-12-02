@@ -1,5 +1,6 @@
 package p3project.classes;
 
+import java.time.LocalDate;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,57 +14,82 @@ public class Service {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Long contractId;
     private String name;
     private ServiceType type;
-    private boolean status;
-    private int amountOrDuration;
+    private ServiceStatus status;
+    private int amountOrDivision;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
-    // changed code: no-arg constructor required by JPA
+    // no-arg constructor required by JPA
     protected Service() {}
 
     // Constructor
+    public Service(Long contractId, String name, ServiceType type, ServiceStatus status, int amountOrDivision, LocalDate startDate, LocalDate endDate) {
+        this.contractId = contractId;
+        this.name = name;
+        this.type = type;
+        this.status = status;
+        this.amountOrDivision = amountOrDivision;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+
+    public Long getId() { 
+        return id; 
+    }
+
+    public Long getContractId() {
+        return contractId; 
+    }
+    public void setContractId(Long contractId) { 
+        this.contractId = contractId; 
+    }
+
+    public String getName() { 
+        return name; 
+    }
+    public void setName(String name) { 
+        this.name = name; 
+    }
+
+    public ServiceType getType() { 
+        return type; 
+    }
+    public void setType(ServiceType type) { this.type = type; }
+
     public Service(ServiceType type, boolean status, int amountOrDuration) {
         this.type = type;
-        this.status = status;
-        this.amountOrDuration = amountOrDuration;
+        this.setStatus(status);
+        this.amountOrDivision = amountOrDuration;
     }
 
+    public boolean getStatus() { return this.status == ServiceStatus.AKTIV; }
+    public void setStatus(boolean active) { this.status = active ? ServiceStatus.AKTIV : ServiceStatus.INAKTIV; }
 
 
-    public Long getId() {
-        return this.id;
-    }
-    // Getters and Setters
+    public ServiceStatus getStatusEnum() { return status; }
+    public void setStatus(ServiceStatus status) { this.status = status; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public int getAmountOrDuration() { return amountOrDivision; }
+    public void setAmountOrDuration(int amount) { this.amountOrDivision = amount; }
 
-    public String getName() {
-        return this.name;
-    }
+    public int getAmountOrDivision() { return amountOrDivision; }
+    public void setAmountOrDivision(int amountOrDivision) { this.amountOrDivision = amountOrDivision; }
 
-    public ServiceType getType() {
-        return type;
-    }
+    public LocalDate getStartDate() { return startDate; }
+    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
 
-    public void setType(ServiceType type) {
-        this.type = type;
-    }
+    public LocalDate getEndDate() { return endDate; }
+    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
 
-    public boolean getStatus() {
-        return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
-    public int getAmountOrDuration() {
-        return amountOrDuration;
-    }
-
-    public void setAmountOrDuration(int amountOrDuration) {
-        this.amountOrDuration = amountOrDuration;
+    // Nested enum for service status (AKTIV, IGANG, UDFORT, INAKTIV)
+    public static enum ServiceStatus {
+        AKTIV,
+        IGANG,
+        UDFORT,
+        INAKTIV
     }
 }

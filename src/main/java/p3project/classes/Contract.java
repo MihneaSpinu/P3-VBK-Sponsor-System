@@ -111,8 +111,23 @@ public class Contract {
         return payment;
     }
 
+
+    public int getPaymentAsInt() {
+        if (this.payment == null || this.payment.isEmpty()) return 0;
+        try {
+            return Integer.parseInt(this.payment);
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
+    }
+
     public void setPayment(String payment) {
         this.payment = payment;
+    }
+
+
+    public void setPayment(int payment) {
+        this.payment = String.valueOf(payment);
     }
 
     public boolean isStatus() {
