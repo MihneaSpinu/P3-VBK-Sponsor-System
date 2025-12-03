@@ -396,7 +396,7 @@
         function populateViewContracts(sponsorId) {
           const listEl = document.getElementById('viewContractsList');
           if (!listEl) return;
-          listEl.innerHTML = '';
+          while (listEl.firstChild) listEl.removeChild(listEl.firstChild);
           const container = document.getElementById('contractsData');
           if (!container) return;
           const nodes = container.querySelectorAll('.contract-data');
@@ -407,7 +407,10 @@
             }
           });
           if (matches.length === 0) {
-            listEl.innerHTML = '<div class="text-sm text-gray-600">Ingen kontrakter for denne sponsor.</div>';
+            const noDiv = document.createElement('div');
+            noDiv.className = 'text-sm text-gray-600';
+            noDiv.textContent = 'Ingen kontrakter for denne sponsor.';
+            listEl.appendChild(noDiv);
             return;
           }
           const sponsorDisplayName = (document.getElementById('viewModalSponsorName') || {}).textContent || '';
@@ -623,7 +626,16 @@
                     const displayStart = formatDisplayDate(sstart);
                     const displayEnd = formatDisplayDate(send);
                     const displayStatus = statusLabels[String(sstatus)] || sstatus || '';
-                    sDetails.innerHTML = `Type: ${escapeHtml(displayType)}<br/>Start: ${escapeHtml(displayStart)}<br/>End: ${escapeHtml(displayEnd)}<br/>Amount/Division: ${escapeHtml(samount)}<br/>Status: ${escapeHtml(displayStatus)}`;
+                    function addDetailLine(parent, label, value) {
+                      const line = document.createElement('div');
+                      line.textContent = label + ': ' + (value !== undefined && value !== null ? String(value) : '');
+                      parent.appendChild(line);
+                    }
+                    addDetailLine(sDetails, 'Type', displayType);
+                    addDetailLine(sDetails, 'Start', displayStart);
+                    addDetailLine(sDetails, 'End', displayEnd);
+                    addDetailLine(sDetails, 'Amount/Division', samount);
+                    addDetailLine(sDetails, 'Status', displayStatus);
                     sCard.appendChild(sDetails);
 
                     // small inline edit block for service
@@ -655,7 +667,7 @@
                     const sAmtWrapper = document.createElement('div'); sAmtWrapper.id = 's-amount-wrapper-' + sid; sForm.appendChild(sAmtWrapper);
                     function updateSAmountWrapper() {
                       // clear wrapper
-                      sAmtWrapper.innerHTML = '';
+                      while (sAmtWrapper.firstChild) sAmtWrapper.removeChild(sAmtWrapper.firstChild);
                       const v = sTypeSel.value;
                       if (v === 'LogoTrojler' || v === 'LogoBukser') {
                         const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Divisionen'; sAmtWrapper.appendChild(lab);
@@ -965,7 +977,7 @@
           const wrapper = document.getElementById('amountOrDivisionWrapper');
           function updateWrapper() {
             const v = sel.value;
-            wrapper.innerHTML = '';
+            while (wrapper.firstChild) wrapper.removeChild(wrapper.firstChild);
             if (v === 'LogoTrojler' || v === 'LogoBukser') {
               const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Divisionen'; wrapper.appendChild(lab);
               const divSel = document.createElement('select'); divSel.name='amountOrDivision'; divSel.className='border rounded px-2 py-1 w-full';
