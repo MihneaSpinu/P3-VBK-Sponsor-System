@@ -814,6 +814,14 @@
             const optFalse = document.createElement('option'); 
             optFalse.value = 'false'; 
             optFalse.textContent = 'False';
+
+            // PDF upload field
+            const pdfInput = document.createElement('input');
+            pdfInput.type = 'file';
+            pdfInput.name = 'pdffile';
+            pdfInput.accept = 'application/pdf';
+            pdfInput.className = 'border rounded px-2 py-1 w-full';
+            addLabelAndControl(form, 'Upload PDF', pdfInput);
             
             statusSelect.appendChild(optTrue); statusSelect.appendChild(optFalse);
             if (String(status) === 'true' || status === true) statusSelect.value = 'true'; else statusSelect.value = 'false';

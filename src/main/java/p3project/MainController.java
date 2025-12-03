@@ -305,6 +305,7 @@ public class MainController {
             @RequestParam(required = false, defaultValue = "false") boolean status,
             @RequestParam String type,
             @RequestParam(required = false) String name,
+            @RequestParam MultipartFile pdffile,
             Model model) {
         java.util.Optional<Contract> contractOpt = contractRepository.findById(contractId);
         // Hent kontrakten, opdater felter og gem. Valider datoer koncentrisk.
@@ -323,6 +324,15 @@ public class MainController {
                 // Update kontrakt navn when provided from the edit form
                 if (name != null) {
                     contract.setName(name);
+                }
+            // Håndter PDF upload
+                try {   
+                    contract.setPdfData(pdffile.getBytes());
+                    String cleanFilename = Paths.get(pdffile.getOriginalFilename()).getFileName().toString(); //Get the name of the file
+                    contract.setFileName(cleanFilename); //save the name of the file in contract
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return "error"; // 
                 }
                 contractRepository.save(contract);
             } catch (IllegalArgumentException ex) {
