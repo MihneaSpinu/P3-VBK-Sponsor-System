@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -14,7 +15,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import p3project.classes.Changelog;
@@ -49,7 +55,7 @@ public class MainController {
     public @ResponseBody String addNewUser(@RequestParam String name, @RequestParam String email) {
         User user = new User();
         user.setName(name);
-        user.setEmail(email);
+        user.setPassword(email);
         userRepository.save(user);
         return "Saved";
     }
@@ -87,7 +93,6 @@ public class MainController {
     public String showSponsors(Model model) {
         model.addAttribute("sponsors", sponsorRepository.findAll());
         model.addAttribute("contracts", contractRepository.findAll());
-        model.addAttribute("services", serviceRepository.findAll());
         return "sponsors";
     }
 
@@ -200,6 +205,7 @@ public class MainController {
             @RequestParam(required = false, defaultValue = "false") boolean status,
             @RequestParam String type,
             @RequestParam String name,
+            @RequestParam MultipartFile pdffile,
             Model model) {
         // Prøv at parse datoer og oprette kontrakten. Ved fejl vises en fejlbesked
         try {
@@ -211,6 +217,17 @@ public class MainController {
             java.util.Optional<Sponsor> sponsorOpt = sponsorRepository.findById(sponsorId);
             if (sponsorOpt.isPresent())
                 contract.setSponsorName(sponsorOpt.get().getName());
+
+            // Håndter PDF upload
+            try {
+                contract.setPdfData(pdffile.getBytes());
+                String cleanFilename = Paths.get(pdffile.getOriginalFilename()).getFileName().toString(); //Get the name of the file
+                contract.setFileName(cleanFilename); //save the name of the file in contract
+                contract.setMimeType(pdffile.getContentType()); //Save the type of file
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "error"; // 
+            }
             contractRepository.save(contract);
             return "redirect:/sponsors"; // Post/Redirect/Get for at undgå double submit
         } catch (IllegalArgumentException ex) {
@@ -220,41 +237,6 @@ public class MainController {
             model.addAttribute("contracts", contractRepository.findAll());
             return "sponsors"; // Geninlæs siden og vis sponsors-siden med fejlbesked
         }
-    }
-
-    // Handles creating a new service for a contract
-    @PostMapping("/sponsors/addService")
-    public String addServiceForContract(
-            @RequestParam Long contractId,
-            @RequestParam(required = false) String name,
-            @RequestParam String type,
-            @RequestParam(required = false, defaultValue = "0") int amountOrDivision,
-            @RequestParam String startDate,
-            @RequestParam String endDate,
-            @RequestParam(required = false, defaultValue = "AKTIV") String status,
-            Model model) {
-        try {
-            java.time.LocalDate start = startDate == null || startDate.isEmpty() ? null : java.time.LocalDate.parse(startDate);
-            java.time.LocalDate end = endDate == null || endDate.isEmpty() ? null : java.time.LocalDate.parse(endDate);
-            p3project.classes.ServiceType st = p3project.classes.ServiceType.valueOf(type);
-            Service.ServiceStatus ss = Service.ServiceStatus.valueOf(status);
-            p3project.classes.Service service = new p3project.classes.Service(contractId, name == null ? "" : name, st, ss, amountOrDivision, start, end);
-            serviceRepository.save(service);
-            return "redirect:/sponsors";
-        } catch (IllegalArgumentException ex) {
-            model.addAttribute("error", "Invalid data for service: " + ex.getMessage());
-            model.addAttribute("sponsors", sponsorRepository.findAll());
-            model.addAttribute("contracts", contractRepository.findAll());
-            model.addAttribute("services", serviceRepository.findAll());
-            return "sponsors";
-        }
-    }
-
-    // Deletes a service by ID
-    @PostMapping("/sponsors/deleteService")
-    public String deleteService(@RequestParam Long serviceId) {
-        serviceRepository.deleteById(serviceId);
-        return "redirect:/sponsors";
     }
 
     // Handles editing an existing sponsor
@@ -324,6 +306,7 @@ public class MainController {
             @RequestParam(required = false, defaultValue = "false") boolean status,
             @RequestParam String type,
             @RequestParam(required = false) String name,
+            @RequestParam MultipartFile pdffile,
             Model model) {
         java.util.Optional<Contract> contractOpt = contractRepository.findById(contractId);
         // Hent kontrakten, opdater felter og gem. Valider datoer koncentrisk.
@@ -342,6 +325,16 @@ public class MainController {
                 // Update kontrakt navn when provided from the edit form
                 if (name != null) {
                     contract.setName(name);
+                }
+            // Håndter PDF upload
+                try {   
+                    contract.setPdfData(pdffile.getBytes());
+                    String cleanFilename = Paths.get(pdffile.getOriginalFilename()).getFileName().toString(); //Get the name of the file
+                    contract.setFileName(cleanFilename); //save the name of the file in contract
+                    contract.setMimeType(pdffile.getContentType()); //Save the type of file
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return "error"; // 
                 }
                 contractRepository.save(contract);
             } catch (IllegalArgumentException ex) {
@@ -362,18 +355,24 @@ public class MainController {
     }
 
     // fjern requestparam?
-    @GetMapping("/getFile")
-    public ResponseEntity<byte[]> getFile(@RequestParam long contractId) {
+    @GetMapping("/getFile/{contractId}")
+    public ResponseEntity<byte[]> getFile(@PathVariable long contractId) {
+        Optional<Contract> contractOpt = contractRepository.findById(contractId);
+        if (contractOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
         Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new RuntimeException("/uploadFile, Contract not found"));
+                .orElseThrow(() -> new RuntimeException("/getFile, Contract not found"));
         byte[] pdfData = contract.getPdfData();
-
+        String mime = contract.getMimeType() != null
+            ? contract.getMimeType()
+            : "application/octet-stream";
         return ResponseEntity.ok()
             .header(
                 HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + contract.getFileName() + ".pdf\""
+                "attachment; filename=\"" + contract.getFileName() + "\""
             )
-            .contentType(MediaType.APPLICATION_PDF)
+            .contentType(MediaType.parseMediaType(mime))
             .body(pdfData);
 
     }
@@ -381,6 +380,10 @@ public class MainController {
     // File upload
     @PostMapping("/uploadFile")
     public String uploadFileTo(@RequestParam MultipartFile pdffile, @RequestParam Long contractId) {
+        Optional<Contract> contractOpt = contractRepository.findById(contractId);
+        if (contractOpt.isEmpty()) {
+            return "error"; //
+        }
         Contract contract = contractRepository.findById(contractId)
                 .orElseThrow(() -> new RuntimeException("/uploadFile, Contract not found"));
 
@@ -427,7 +430,7 @@ public class MainController {
 
         User user = userRepository.findByName(username);
 
-        if (user == null || !Objects.equals(email, user.getEmail())) {
+        if (user == null || !Objects.equals(email, user.getPassword())) {
             model.addAttribute("error", "Invalid username or email");
             return "login";
         }
@@ -446,33 +449,10 @@ public class MainController {
     // Add user with demo sponsor & contract
     @PostMapping("/users/add")
     public String addUserFromWeb(@RequestParam String name, @RequestParam String email) {
-        Sponsor sponsor = new Sponsor(
-                "Demo",
-                "DemoName",
-                "Demo Email",
-                "12345678",
-                "12345678",
-                false,
-                "Demo Comment");
-        sponsorRepository.save(sponsor);
-
-        Contract contract = new Contract(
-                LocalDate.of(2025, 1, 1),
-                LocalDate.of(2025, 12, 31),
-                "2000",
-                true,
-                "Standard");
-        try {
-            byte[] pdfBytes = Files.readAllBytes(Paths.get("C:\\Users\\mathi\\Downloads\\easyFIle.pdf"));
-            contract.setPdfData(pdfBytes);
-        } catch (IOException e) {
-            System.out.println("Could not set PDF data: " + e.getMessage());
-        }
-        contractRepository.save(contract);
 
         User user = new User();
         user.setName(name);
-        user.setEmail(email);
+        user.setPassword(email);
         userRepository.save(user);
 
         return "redirect:/users";
