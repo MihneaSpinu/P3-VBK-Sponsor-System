@@ -116,10 +116,56 @@ public class MainController {
     }
 
     @PostMapping("/update/service")
-    public ResponseEntity<String> updateServiceFields(@ModelAttribute Service service) {
-        Service storedService = serviceRepository.findById(service.getId())
-        .orElseThrow(() -> new RuntimeException("Unable to retrieve sponsor with id: " + service.getId()));
-        return handleUpdateRequest(service, storedService);
+    public ResponseEntity<String> updateServiceFields(
+            @RequestParam Long id,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Integer amountOrDivision,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+
+        Service storedService = serviceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Unable to retrieve service with id: " + id));
+
+        // Build a request Service object using stored values as defaults
+        p3project.classes.Service requestService;
+        try {
+            p3project.classes.ServiceType st = null;
+            p3project.classes.Service.ServiceStatus ss = null;
+            java.time.LocalDate sd = null;
+            java.time.LocalDate ed = null;
+
+            if (type != null && !type.isEmpty()) {
+                try { st = p3project.classes.ServiceType.valueOf(type); } catch (Exception e) { st = storedService.getType(); }
+            } else {
+                st = storedService.getType();
+            }
+
+            if (status != null && !status.isEmpty()) {
+                try { ss = p3project.classes.Service.ServiceStatus.valueOf(status); } catch (Exception e) { ss = storedService.getStatusEnum(); }
+            } else {
+                ss = storedService.getStatusEnum();
+            }
+
+            if (startDate != null && !startDate.isEmpty()) sd = java.time.LocalDate.parse(startDate); else sd = storedService.getStartDate();
+            if (endDate != null && !endDate.isEmpty()) ed = java.time.LocalDate.parse(endDate); else ed = storedService.getEndDate();
+
+            int amt = amountOrDivision == null ? storedService.getAmountOrDivision() : amountOrDivision;
+            String nm = name == null ? storedService.getName() : name;
+
+            requestService = new p3project.classes.Service(storedService.getContractId(), nm, st, ss, amt, sd, ed);
+
+            // set private id field via reflection so compareFields can inspect it
+            java.lang.reflect.Field idField = requestService.getClass().getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(requestService, id);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("Bad request: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+        return handleUpdateRequest(requestService, storedService);
     }
 
     private <T> ResponseEntity<String> handleUpdateRequest(T requestObject, T storedObject) {

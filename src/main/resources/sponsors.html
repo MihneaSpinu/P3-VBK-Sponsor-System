@@ -152,8 +152,8 @@
           </div>
           <!-- Skjult data-lager for tjenester (services) -->
           <div id="servicesData" style="display:none">
-            <div th:each="s : ${services}" class="service-data"
-                 th:attr="data-id=${s.id},data-contract-id=${s.contractId},data-name=${s.name},data-type=${s.type},data-start=${s.startDate},data-end=${s.endDate},data-amount=${s.amountOrDivision},data-status=${s.status}">
+              <div th:each="s : ${services}" class="service-data"
+                th:attr="data-id=${s.id},data-contract-id=${s.contractId},data-name=${s.name},data-type=${s.type},data-start=${s.startDate},data-end=${s.endDate},data-amount=${s.amountOrDivision},data-status=${s.statusEnum}">
             </div>
           </div>
 
@@ -580,7 +580,29 @@
 
                   const sDetails = document.createElement('div');
                   sDetails.className = 'text-sm text-gray-700 mt-2';
-                  sDetails.innerHTML = `Type: ${escapeHtml(stype)}<br/>Start: ${escapeHtml(sstart)}<br/>End: ${escapeHtml(send)}<br/>Amount/Division: ${escapeHtml(samount)}<br/>Status: ${escapeHtml(sstatus)}`;
+                  // Map type and status to human-friendly labels and format dates as dd-mm-yyyy
+                  const typeLabels = {
+                    'Billeter': 'Billeter',
+                    'Kuponer': 'Kuponer',
+                    'Banner': 'Banner',
+                    'LogoTrojler': 'Logo på trøjer',
+                    'LogoBukser': 'Logo på bukser',
+                    'Tickets': 'Tickets',
+                    'Coupons': 'Coupons'
+                  };
+                  const statusLabels = {
+                    'AKTIV': 'Aktiv',
+                    'IGANG': 'Igang',
+                    'UDFORT': 'Udført',
+                    'INAKTIV': 'Inaktiv',
+                    'true': 'Aktiv',
+                    'false': 'Inaktiv'
+                  };
+                  const displayType = typeLabels[stype] || stype || '';
+                  const displayStart = formatDisplayDate(sstart);
+                  const displayEnd = formatDisplayDate(send);
+                  const displayStatus = statusLabels[String(sstatus)] || sstatus || '';
+                  sDetails.innerHTML = `Type: ${escapeHtml(displayType)}<br/>Start: ${escapeHtml(displayStart)}<br/>End: ${escapeHtml(displayEnd)}<br/>Amount/Division: ${escapeHtml(samount)}<br/>Status: ${escapeHtml(displayStatus)}`;
                   sCard.appendChild(sDetails);
 
                   // small inline edit block for service
@@ -636,7 +658,15 @@
                   const sEndLab = document.createElement('label'); sEndLab.className='block text-sm'; sEndLab.textContent='Slut Dato'; sForm.appendChild(sEndLab);
                   const sEndInp = document.createElement('input'); sEndInp.name='endDate'; sEndInp.type='date'; sEndInp.value=send; sEndInp.className='border rounded px-2 py-1 w-full'; sForm.appendChild(sEndInp);
                   const sStatusLab = document.createElement('label'); sStatusLab.className='block text-sm'; sStatusLab.textContent='Status'; sForm.appendChild(sStatusLab);
-                  const sStatusSel = document.createElement('select'); sStatusSel.name='status'; sStatusSel.className='border rounded px-2 py-1 w-full'; ['Aktiv','Igang','Udført','Inaktiv'].forEach(function(o){ const opt=document.createElement('option'); opt.value=o; opt.textContent=o; if(o===sstatus) opt.selected=true; sStatusSel.appendChild(opt); }); sForm.appendChild(sStatusSel);
+                  const sStatusSel = document.createElement('select'); sStatusSel.name='status'; sStatusSel.className='border rounded px-2 py-1 w-full';
+                  // Use enum names as values so Spring can bind to Service.ServiceStatus
+                  const statusOptions = [
+                    { value: 'AKTIV', label: 'Aktiv' },
+                    { value: 'IGANG', label: 'Igang' },
+                    { value: 'UDFORT', label: 'Udført' },
+                    { value: 'INAKTIV', label: 'Inaktiv' }
+                  ];
+                  statusOptions.forEach(function(o){ const opt=document.createElement('option'); opt.value=o.value; opt.textContent=o.label; if(o.value===sstatus) opt.selected=true; sStatusSel.appendChild(opt); }); sForm.appendChild(sStatusSel);
                   const sBtnRow = document.createElement('div'); sBtnRow.className='flex justify-end space-x-2 mt-2';
                   const sCancel = document.createElement('button'); sCancel.type='button'; sCancel.className='px-3 py-1 bg-gray-200 rounded'; sCancel.textContent='Cancel';
                   const sSave = document.createElement('button'); sSave.type='submit'; sSave.className='px-3 py-1 bg-green-500 text-white rounded'; sSave.textContent='Save';
