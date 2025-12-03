@@ -636,7 +636,15 @@
                   const sEndLab = document.createElement('label'); sEndLab.className='block text-sm'; sEndLab.textContent='Slut Dato'; sForm.appendChild(sEndLab);
                   const sEndInp = document.createElement('input'); sEndInp.name='endDate'; sEndInp.type='date'; sEndInp.value=send; sEndInp.className='border rounded px-2 py-1 w-full'; sForm.appendChild(sEndInp);
                   const sStatusLab = document.createElement('label'); sStatusLab.className='block text-sm'; sStatusLab.textContent='Status'; sForm.appendChild(sStatusLab);
-                  const sStatusSel = document.createElement('select'); sStatusSel.name='status'; sStatusSel.className='border rounded px-2 py-1 w-full'; ['Aktiv','Igang','Udført','Inaktiv'].forEach(function(o){ const opt=document.createElement('option'); opt.value=o; opt.textContent=o; if(o===sstatus) opt.selected=true; sStatusSel.appendChild(opt); }); sForm.appendChild(sStatusSel);
+                  const sStatusSel = document.createElement('select'); sStatusSel.name='status'; sStatusSel.className='border rounded px-2 py-1 w-full';
+                  // Use enum names as values so Spring can bind to Service.ServiceStatus
+                  const statusOptions = [
+                    { value: 'AKTIV', label: 'Aktiv' },
+                    { value: 'IGANG', label: 'Igang' },
+                    { value: 'UDFORT', label: 'Udført' },
+                    { value: 'INAKTIV', label: 'Inaktiv' }
+                  ];
+                  statusOptions.forEach(function(o){ const opt=document.createElement('option'); opt.value=o.value; opt.textContent=o.label; if(o.value===sstatus) opt.selected=true; sStatusSel.appendChild(opt); }); sForm.appendChild(sStatusSel);
                   const sBtnRow = document.createElement('div'); sBtnRow.className='flex justify-end space-x-2 mt-2';
                   const sCancel = document.createElement('button'); sCancel.type='button'; sCancel.className='px-3 py-1 bg-gray-200 rounded'; sCancel.textContent='Cancel';
                   const sSave = document.createElement('button'); sSave.type='submit'; sSave.className='px-3 py-1 bg-green-500 text-white rounded'; sSave.textContent='Save';
