@@ -5,6 +5,8 @@ import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.chrono.ChronoLocalDate;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.WebUtils;
 
 import p3project.classes.Changelog;
 import p3project.classes.Contract;
@@ -28,11 +31,21 @@ import p3project.classes.Eventlog;
 import p3project.classes.Service;
 import p3project.classes.Sponsor;
 import p3project.classes.User;
+import p3project.classes.Token;
 import p3project.repositories.ContractRepository;
 import p3project.repositories.LogRepository;
 import p3project.repositories.ServiceRepository;
 import p3project.repositories.SponsorRepository;
 import p3project.repositories.UserRepository;
+
+import org.springframework.http.HttpCookie;
+import org.springframework.http.ResponseCookie;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
+import java.net.URLEncoder;
+import java.net.URLDecoder;
 
 @Controller
 public class MainController {
@@ -54,7 +67,7 @@ public class MainController {
     public @ResponseBody String addNewUser(@RequestParam String name, @RequestParam String email) {
         User user = new User();
         user.setName(name);
-        user.setEmail(email);
+        //user.setEmail(email);
         userRepository.save(user);
         return "Saved";
     }
@@ -92,6 +105,7 @@ public class MainController {
     public String showSponsors(Model model) {
         model.addAttribute("sponsors", sponsorRepository.findAll());
         model.addAttribute("contracts", contractRepository.findAll());
+        model.addAttribute("services", serviceRepository.findAll());
         return "sponsors";
     }
 
@@ -120,10 +134,56 @@ public class MainController {
     }
 
     @PostMapping("/update/service")
-    public ResponseEntity<String> updateServiceFields(@ModelAttribute Service service) {
-        Service storedService = serviceRepository.findById(service.getId())
-        .orElseThrow(() -> new RuntimeException("Unable to retrieve sponsor with id: " + service.getId()));
-        return handleUpdateRequest(service, storedService);
+    public ResponseEntity<String> updateServiceFields(
+            @RequestParam Long id,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Integer amountOrDivision,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+
+        Service storedService = serviceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Unable to retrieve service with id: " + id));
+
+        // Build a request Service object using stored values as defaults
+        p3project.classes.Service requestService;
+        try {
+            p3project.classes.ServiceType st = null;
+            p3project.classes.Service.ServiceStatus ss = null;
+            java.time.LocalDate sd = null;
+            java.time.LocalDate ed = null;
+
+            if (type != null && !type.isEmpty()) {
+                try { st = p3project.classes.ServiceType.valueOf(type); } catch (Exception e) { st = storedService.getType(); }
+            } else {
+                st = storedService.getType();
+            }
+
+            if (status != null && !status.isEmpty()) {
+                try { ss = p3project.classes.Service.ServiceStatus.valueOf(status); } catch (Exception e) { ss = storedService.getStatusEnum(); }
+            } else {
+                ss = storedService.getStatusEnum();
+            }
+
+            if (startDate != null && !startDate.isEmpty()) sd = java.time.LocalDate.parse(startDate); else sd = storedService.getStartDate();
+            if (endDate != null && !endDate.isEmpty()) ed = java.time.LocalDate.parse(endDate); else ed = storedService.getEndDate();
+
+            int amt = amountOrDivision == null ? storedService.getAmountOrDivision() : amountOrDivision;
+            String nm = name == null ? storedService.getName() : name;
+
+            requestService = new p3project.classes.Service(storedService.getContractId(), nm, st, ss, amt, sd, ed);
+
+            // set private id field via reflection so compareFields can inspect it
+            java.lang.reflect.Field idField = requestService.getClass().getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(requestService, id);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("Bad request: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+        return handleUpdateRequest(requestService, storedService);
     }
 
     private <T> ResponseEntity<String> handleUpdateRequest(T requestObject, T storedObject) {
@@ -235,6 +295,41 @@ public class MainController {
             model.addAttribute("contracts", contractRepository.findAll());
             return "sponsors"; // Geninlæs siden og vis sponsors-siden med fejlbesked
         }
+    }
+
+    // Handles creating a new service for a contract
+    @PostMapping("/sponsors/addService")
+    public String addServiceForContract(
+            @RequestParam Long contractId,
+            @RequestParam(required = false) String name,
+            @RequestParam String type,
+            @RequestParam(required = false, defaultValue = "0") int amountOrDivision,
+            @RequestParam String startDate,
+            @RequestParam String endDate,
+            @RequestParam(required = false, defaultValue = "AKTIV") String status,
+            Model model) {
+        try {
+            java.time.LocalDate start = startDate == null || startDate.isEmpty() ? null : java.time.LocalDate.parse(startDate);
+            java.time.LocalDate end = endDate == null || endDate.isEmpty() ? null : java.time.LocalDate.parse(endDate);
+            p3project.classes.ServiceType st = p3project.classes.ServiceType.valueOf(type);
+            Service.ServiceStatus ss = Service.ServiceStatus.valueOf(status);
+            p3project.classes.Service service = new p3project.classes.Service(contractId, name == null ? "" : name, st, ss, amountOrDivision, start, end);
+            serviceRepository.save(service);
+            return "redirect:/sponsors";
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("error", "Invalid data for service: " + ex.getMessage());
+            model.addAttribute("sponsors", sponsorRepository.findAll());
+            model.addAttribute("contracts", contractRepository.findAll());
+            model.addAttribute("services", serviceRepository.findAll());
+            return "sponsors";
+        }
+    }
+
+    // Deletes a service by ID
+    @PostMapping("/sponsors/deleteService")
+    public String deleteService(@RequestParam Long serviceId) {
+        serviceRepository.deleteById(serviceId);
+        return "redirect:/sponsors";
     }
 
     // Handles editing an existing sponsor
@@ -388,25 +483,91 @@ public class MainController {
     }
 
     @GetMapping("/test")
-    public String showTestPage() {
-        return "test";
+    public String showTestPage(Model model, HttpServletRequest request) {
+        if (userHasValidToken(request)) {
+            System.out.println("\n\nTOKEN IS VALID\n\n");
+            return "test";
+        }
+        return "redirect:/login";
     }
 
     @GetMapping("/archive")
-    public String showArchivePage() {
-        return "archive";
+    public String showArchivePage(Model model, HttpServletRequest request) {
+        if (userHasValidToken(request)) {
+            System.out.println("\n\nTOKEN IS VALID\n\n");
+            return "archive";
+        }
+        return "redirect:/login";
     }
 
     @GetMapping("/AdminPanel")
-    public String showAdminPanelPage() {
-        return "AdminPanel";
+    public String showAdminPanelPage(Model model, HttpServletRequest request) {
+        if (userHasValidToken(request)) {
+            System.out.println("\n\nTOKEN IS VALID\n\n");
+            // Add any model attributes needed for the AdminPanel view here
+            return "AdminPanel";  // Return the view name directly (no redirect)
+        }
+        return "redirect:/login";
     }
 
     @GetMapping("/login")
-    public String loginPage(Model model) {
+    public String loginPage(Model model, HttpServletRequest request) {
+        if (userHasValidToken(request)) {
+            System.out.println("\n\nTOKEN IS VALID\n\n");
+            return "redirect:/homepage";
+        }
+        User user = new User();
+        user.setName("test");
+        //BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(8);
+        //String hashedPassword = passwordEncoder.encode("test123");
+        String hashedPassword = "test123";
+        user.setPassword(hashedPassword);
+        userRepository.save(user);
+        
         return "login"; // Thymeleaf login template
     }
 
+    @PostMapping("/login/confirm")
+    public String confirmLogin(@RequestParam String username, @RequestParam String hashedPassword, @RequestParam boolean rememberMe, Model model, HttpServletResponse response) {
+        User user = userRepository.findByName(username);
+        //BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(8);
+        //if(passwordEncoder.matches(hashedPassword, user.getPassword())) {
+        if(hashedPassword.equals(user.getPassword())) {
+            String id = user.getId().toString();
+            Token token = Token.sign(id);
+            String formattedToken = user.getId().toString() + "." + token.getHash();
+            String encodedToken = URLEncoder.encode(formattedToken, StandardCharsets.UTF_8);
+            int time = rememberMe ? 2_592_000 : 86400; // 1 måned vs 1 dag
+            ResponseCookie cookie = ResponseCookie.from("token", encodedToken)
+            .httpOnly(true)  // javascript kan ikke røre den B-)
+            .secure(false)    // HTTPS only
+            .path("/")       // Bruges til alle sider
+            .maxAge(time)
+            .build();
+            response.addHeader("Set-Cookie", cookie.toString());
+            System.out.println("\n\n\n\nPASSWORDS MATCH\n\n\n\n");
+            return "redirect:/homepage";
+        } else {
+            System.out.println("\n\n\n\nPASSWORDS DO NOT MATCH\n\n\n\n");
+            return "redirect:/login";
+        }
+    }
+
+    private boolean userHasValidToken(HttpServletRequest request) {
+        Cookie cookie = WebUtils.getCookie(request, "token");
+        if (cookie == null) return false;
+
+        String decodedToken = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);        
+        String[] parts = decodedToken.split("\\.");
+
+        String cookieId = parts[0];
+        String cookieHash = parts[1];
+
+        Token token = Token.sign(cookieId);
+        return token.verify(cookieHash);
+    }
+
+    /* 
     @PostMapping("/login/confirm")
     public String confirmLogin(
             @RequestParam String username,
@@ -423,12 +584,19 @@ public class MainController {
         model.addAttribute("user", user);
         return "homepage"; // login success page
     }
+    */
 
     @GetMapping("/homepage")
-    public String showhomepage(Model model) {
-        Iterable<Sponsor> sponsors = sponsorRepository.findAll();
-        model.addAttribute("sponsors", sponsors);
-        return "homepage";
+    public String showhomepage(Model model, HttpServletRequest request) {
+        if(userHasValidToken(request)) {
+            System.out.println("\n\nTOKEN IS VALID\n\n");
+            Iterable<Sponsor> sponsors = sponsorRepository.findAll();
+            model.addAttribute("sponsors", sponsors);
+            return "homepage";
+        } else {
+            System.out.println("\n\n\n\nTOKEN IS NOT VALID\n\n\n\n");
+            return "redirect:/login";
+        }
     }
 
     // Add user with demo sponsor & contract
@@ -460,7 +628,7 @@ public class MainController {
 
         User user = new User();
         user.setName(name);
-        user.setEmail(email);
+        //user.setEmail(email);
         userRepository.save(user);
 
         return "redirect:/users";

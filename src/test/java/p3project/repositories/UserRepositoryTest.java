@@ -26,7 +26,7 @@ class UserRepositoryTest {
         // Given
         User user = new User();
         user.setName("John Doe");
-        user.setEmail("john.doe@example.com");
+        //user.setEmail("john.doe@example.com");
 
         // When
         User savedUser = userRepository.save(user);
@@ -34,7 +34,7 @@ class UserRepositoryTest {
         // Then
         assertThat(savedUser.getId()).isNotNull();
         assertThat(savedUser.getName()).isEqualTo("John Doe");
-        assertThat(savedUser.getEmail()).isEqualTo("john.doe@example.com");
+        //assertThat(savedUser.getEmail()).isEqualTo("john.doe@example.com");
     }
 
     @Test
@@ -42,7 +42,7 @@ class UserRepositoryTest {
         // Given
         User user = new User();
         user.setName("Jane Smith");
-        user.setEmail("jane.smith@example.com");
+        //user.setEmail("jane.smith@example.com");
         User persistedUser = entityManager.persistAndFlush(user);
 
         // When
@@ -51,7 +51,7 @@ class UserRepositoryTest {
         // Then
         assertThat(foundUser).isPresent();
         assertThat(foundUser.get().getName()).isEqualTo("Jane Smith");
-        assertThat(foundUser.get().getEmail()).isEqualTo("jane.smith@example.com");
+        //assertThat(foundUser.get().getEmail()).isEqualTo("jane.smith@example.com");
     }
 
     @Test
@@ -59,7 +59,7 @@ class UserRepositoryTest {
         // Given
         User user = new User();
         user.setName("Alice Brown");
-        user.setEmail("alice.brown@example.com");
+        //user.setEmail("alice.brown@example.com");
         entityManager.persistAndFlush(user);
 
         // When
@@ -68,7 +68,7 @@ class UserRepositoryTest {
         // Then
         assertThat(foundUser).isNotNull();
         assertThat(foundUser.getName()).isEqualTo("Alice Brown");
-        assertThat(foundUser.getEmail()).isEqualTo("alice.brown@example.com");
+        //assertThat(foundUser.getEmail()).isEqualTo("alice.brown@example.com");
     }
 
     @Test
@@ -85,12 +85,12 @@ class UserRepositoryTest {
         // Given
         User user1 = new User();
         user1.setName("User One");
-        user1.setEmail("user1@example.com");
+        //user1.setEmail("user1@example.com");
         entityManager.persistAndFlush(user1);
 
         User user2 = new User();
         user2.setName("User Two");
-        user2.setEmail("user2@example.com");
+        //user2.setEmail("user2@example.com");
         entityManager.persistAndFlush(user2);
 
         // When
@@ -106,18 +106,18 @@ class UserRepositoryTest {
         // Given
         User user = new User();
         user.setName("Original Name");
-        user.setEmail("original@example.com");
+        //user.setEmail("original@example.com");
         User savedUser = entityManager.persistAndFlush(user);
 
         // When
         savedUser.setName("Updated Name");
-        savedUser.setEmail("updated@example.com");
+        //savedUser.setEmail("updated@example.com");
         User updatedUser = userRepository.save(savedUser);
 
         // Then
         assertThat(updatedUser.getId()).isEqualTo(savedUser.getId());
         assertThat(updatedUser.getName()).isEqualTo("Updated Name");
-        assertThat(updatedUser.getEmail()).isEqualTo("updated@example.com");
+        //assertThat(updatedUser.getEmail()).isEqualTo("updated@example.com");
     }
 
     @Test
@@ -125,7 +125,7 @@ class UserRepositoryTest {
         // Given
         User user = new User();
         user.setName("To Delete");
-        user.setEmail("delete@example.com");
+        //user.setEmail("delete@example.com");
         User savedUser = entityManager.persistAndFlush(user);
         Integer userId = savedUser.getId();
 
@@ -142,12 +142,12 @@ class UserRepositoryTest {
         // Given
         User user1 = new User();
         user1.setName("Count User 1");
-        user1.setEmail("count1@example.com");
+        //user1.setEmail("count1@example.com");
         entityManager.persistAndFlush(user1);
 
         User user2 = new User();
         user2.setName("Count User 2");
-        user2.setEmail("count2@example.com");
+        //user2.setEmail("count2@example.com");
         entityManager.persistAndFlush(user2);
 
         // When
