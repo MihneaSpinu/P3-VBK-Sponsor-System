@@ -223,6 +223,7 @@ public class MainController {
                 contract.setPdfData(pdffile.getBytes());
                 String cleanFilename = Paths.get(pdffile.getOriginalFilename()).getFileName().toString(); //Get the name of the file
                 contract.setFileName(cleanFilename); //save the name of the file in contract
+                contract.setMimeType(pdffile.getContentType()); //Save the type of file
             } catch (IOException e) {
                 e.printStackTrace();
                 return "error"; // 
@@ -330,6 +331,7 @@ public class MainController {
                     contract.setPdfData(pdffile.getBytes());
                     String cleanFilename = Paths.get(pdffile.getOriginalFilename()).getFileName().toString(); //Get the name of the file
                     contract.setFileName(cleanFilename); //save the name of the file in contract
+                    contract.setMimeType(pdffile.getContentType()); //Save the type of file
                 } catch (IOException e) {
                     e.printStackTrace();
                     return "error"; // 
@@ -362,13 +364,15 @@ public class MainController {
         Contract contract = contractRepository.findById(contractId)
                 .orElseThrow(() -> new RuntimeException("/getFile, Contract not found"));
         byte[] pdfData = contract.getPdfData();
-
+        String mime = contract.getMimeType() != null
+            ? contract.getMimeType()
+            : "application/octet-stream";
         return ResponseEntity.ok()
             .header(
                 HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + contract.getFileName() + ".pdf\""
+                "attachment; filename=\"" + contract.getFileName() + "\""
             )
-            .contentType(MediaType.APPLICATION_PDF)
+            .contentType(MediaType.parseMediaType(mime))
             .body(pdfData);
 
     }
