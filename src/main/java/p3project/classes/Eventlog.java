@@ -1,7 +1,7 @@
 package p3project.classes;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -35,14 +35,13 @@ public class Eventlog {
     protected Eventlog() {};
 
     public <T> Eventlog(User user, T changedObject, String action) {
-        this.username = "Test";
+        this.username = user.getName();
         this.objectType = changedObject.getClass().getSimpleName(); // oversæt til dansk på frontend xd
         try {
             Method getName = changedObject.getClass().getMethod("getName"); // jank
             this.objectName = getName.invoke(changedObject).toString();
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException error) {
             this.objectName = "-";
-            throw new RuntimeException("Error getting name of target object: " + error);
         }
 
         LocalDateTime unformattedTimestamp = LocalDateTime.now();

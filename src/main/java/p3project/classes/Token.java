@@ -21,9 +21,9 @@ public class Token {
         return token;
     }
 
-    public boolean verify(String candidateHash) {
+    public boolean verify(String inputHash) {
         String computedHash = hash(this.SECRET, this.payload);
-        return computedHash.equals(candidateHash);
+        return computedHash.equals(inputHash);
     }
 
     // SHA256 implementation stjålet fra: https://medium.com/@AlexanderObregon/what-is-sha-256-hashing-in-java-0d46dfb83888

@@ -2,50 +2,46 @@ package p3project;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.util.Objects;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.WebUtils;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import p3project.classes.Changelog;
 import p3project.classes.Contract;
 import p3project.classes.Eventlog;
 import p3project.classes.Service;
 import p3project.classes.Sponsor;
-import p3project.classes.User;
 import p3project.classes.Token;
+import p3project.classes.User;
 import p3project.repositories.ContractRepository;
 import p3project.repositories.LogRepository;
 import p3project.repositories.ServiceRepository;
 import p3project.repositories.SponsorRepository;
 import p3project.repositories.UserRepository;
-
-import org.springframework.http.HttpCookie;
-import org.springframework.http.ResponseCookie;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import java.nio.charset.StandardCharsets;
-import java.net.URLEncoder;
-import java.net.URLDecoder;
 
 @Controller
 public class MainController {
@@ -60,29 +56,10 @@ public class MainController {
     @Autowired
     private ServiceRepository serviceRepository;
 
-    // ==========================
-    // API endpoints (JSON)
-    // ==========================
-    @PostMapping(path = "/demo/add")
-    public @ResponseBody String addNewUser(@RequestParam String name, @RequestParam String email) {
-        User user = new User();
-        user.setName(name);
-        //user.setEmail(email);
-        userRepository.save(user);
-        return "Saved";
-    }
 
-    @GetMapping(path = "/demo/all")
-    public @ResponseBody Iterable<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    // ==========================
-    // Web page endpoints (HTML)
-    // ==========================
     @GetMapping("/")
     public String home() {
-        return "redirect:/users";
+        return "redirect:/login";
     }
 
     @GetMapping("/users")
@@ -102,13 +79,16 @@ public class MainController {
 
     // Displays the sponsors page with lists of sponsors and contracts
     @GetMapping("/sponsors")
-    public String showSponsors(Model model) {
-        model.addAttribute("sponsors", sponsorRepository.findAll());
-        model.addAttribute("contracts", contractRepository.findAll());
+    public String showSponsors(Model model, HttpServletRequest request) {
+        if(userHasValidToken(request)) {
+            model.addAttribute("sponsors", sponsorRepository.findAll());
+            model.addAttribute("contracts", contractRepository.findAll());
 
-        Iterable<String> sponsorNames = fetchContractSponsorNames();
-        model.addAttribute("sponsorNames", sponsorNames);
-        return "sponsors";
+            Iterable<String> sponsorNames = fetchContractSponsorNames();
+            model.addAttribute("sponsorNames", sponsorNames);
+            return "sponsors";
+        }
+        return "redirect:/login";
     }
 
     private List<String> fetchContractSponsorNames() {
@@ -126,45 +106,48 @@ public class MainController {
 
     // Changelog page
     @GetMapping("/changelog")
-    public String changelogPage(Model model) {
-        model.addAttribute("changelogs", logRepository.findAll());
-        return "changelog";
+    public String changelogPage(Model model, HttpServletRequest request) {
+        if(userHasValidToken(request)) {
+            model.addAttribute("changelogs", logRepository.findAll());
+            return "changelog";
+        }
+        return "redirect:/login";
     }
 
     // boilerplate update handlers
     @PostMapping("/update/sponsor")
-    public ResponseEntity<String> updateSponsorFields(@ModelAttribute Sponsor sponsor) {
+    public ResponseEntity<String> updateSponsorFields(@ModelAttribute Sponsor sponsor, HttpServletRequest request) {
         Sponsor storedSponsor = sponsorRepository.findById(sponsor.getId())
         .orElseThrow(() -> new RuntimeException("Unable to retrieve sponsor with id: " + sponsor.getId()));
-        return handleUpdateRequest(sponsor, storedSponsor);
+        return handleUpdateRequest(sponsor, storedSponsor, request);
     }
 
     @PostMapping("/update/contract")
-    public ResponseEntity<String> updateContractFields(@ModelAttribute Contract contract) { // pdfdata dead on arrival
+    public ResponseEntity<String> updateContractFields(@ModelAttribute Contract contract, HttpServletRequest request) { // pdfdata dead on arrival
         Contract storedContract = contractRepository.findById(contract.getId())
-        .orElseThrow(() -> new RuntimeException("Unable to retrieve sponsor with id: " + contract.getId()));
-        return handleUpdateRequest(contract, storedContract);
+        .orElseThrow(() -> new RuntimeException("Unable to retrieve contract with id: " + contract.getId()));
+        return handleUpdateRequest(contract, storedContract, request);
     }
 
     @PostMapping("/update/service")
-    public ResponseEntity<String> updateServiceFields(@ModelAttribute Service service) {
+    public ResponseEntity<String> updateServiceFields(@ModelAttribute Service service, HttpServletRequest request) {
         Service storedService = serviceRepository.findById(service.getId())
-        .orElseThrow(() -> new RuntimeException("Unable to retrieve sponsor with id: " + service.getId()));
-        return handleUpdateRequest(service, storedService);
+        .orElseThrow(() -> new RuntimeException("Unable to retrieve service with id: " + service.getId()));
+        return handleUpdateRequest(service, storedService, request);
     }
 
-    private <T> ResponseEntity<String> handleUpdateRequest(T requestObject, T storedObject) {
+    private <T> ResponseEntity<String> handleUpdateRequest(T requestObject, T storedObject, HttpServletRequest request) {
         Integer fieldsChanged;
         try {
-            fieldsChanged = compareFields(requestObject, storedObject);
+            fieldsChanged = compareFields(requestObject, storedObject, request);
         } catch (ClassNotFoundException error) {
-            return new ResponseEntity<>("Internal server error: " + error, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("redirect:/sponsors");
         }
-        return new ResponseEntity<>(fieldsChanged.toString(), HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body("redirect:/sponsors");
     }
 
     // fejl håndtering tba, if(==null) etc...
-    private <T> Integer compareFields(T requestObject, T storedObject) throws ClassNotFoundException {
+    private <T> Integer compareFields(T requestObject, T storedObject, HttpServletRequest request) throws ClassNotFoundException {
 
         Integer fieldsChanged = 0;
         Field[] fields = requestObject.getClass().getDeclaredFields();
@@ -175,14 +158,13 @@ public class MainController {
                 Object before = field.get(storedObject);
                 Object after = field.get(requestObject);
                 if (!Objects.equals(before, after)) { // indbygget null håndtering
-
-                    Changelog log = new Changelog(new User(), requestObject, field, before, after);
+                    User user = getUserFromToken(request);
+                    Changelog log = new Changelog(user, requestObject, field, before, after);
                     // handleSpecialFields(field, log, storedObject, requestObject);
                     logRepository.save(log);
                     field.set(storedObject, after);
 
                     fieldsChanged++;
-                    // System.out.println("Updated " + field.getName() + ": " + before.toString() + " -> " + after.toString());
                 }
             } catch (IllegalAccessException error) {
                 throw new RuntimeException(error);
@@ -290,13 +272,13 @@ public class MainController {
 
     // File upload
     @PostMapping("/uploadFile")
-    public String uploadFileTo(@RequestParam MultipartFile pdffile, @RequestParam Long contractId) {
+    public String uploadFileTo(@RequestParam MultipartFile pdfFile, @RequestParam Long contractId) {
         Contract contract = contractRepository.findById(contractId)
                 .orElseThrow(() -> new RuntimeException("/uploadFile, Contract not found"));
 
         try {
-            contract.setPdfData(pdffile.getBytes());
-			String cleanFilename = Paths.get(pdffile.getOriginalFilename()).getFileName().toString(); //Get the name of the file
+            contract.setPdfData(pdfFile.getBytes());
+			String cleanFilename = Paths.get(pdfFile.getOriginalFilename()).getFileName().toString(); //Get the name of the file
 			contract.setFileName(cleanFilename); //save the name of the file in contract
             System.out.println("\n\nPDF file loaded successfully!\n\n");
         } catch (IOException e) {
@@ -331,8 +313,7 @@ public class MainController {
     public String showAdminPanelPage(Model model, HttpServletRequest request) {
         if (userHasValidToken(request)) {
             System.out.println("\n\nTOKEN IS VALID\n\n");
-            // Add any model attributes needed for the AdminPanel view here
-            return "AdminPanel";  // Return the view name directly (no redirect)
+            return "AdminPanel";
         }
         return "redirect:/login";
     }
@@ -341,17 +322,27 @@ public class MainController {
     public String loginPage(Model model, HttpServletRequest request) {
         if (userHasValidToken(request)) {
             System.out.println("\n\nTOKEN IS VALID\n\n");
-            return "redirect:/homepage";
-        }
+            return "redirect:/homepage"; // må ikke logge ind igen
+        }        
+        return "login";
+    }
+
+    @GetMapping("/testuser")
+    public String testUser(HttpServletResponse response) {
         User user = new User();
-        user.setName("test");
-        //BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(8);
-        //String hashedPassword = passwordEncoder.encode("test123");
+        user.setName("testnavn123");
         String hashedPassword = "test123";
         user.setPassword(hashedPassword);
         userRepository.save(user);
-        
-        return "login"; // Thymeleaf login template
+        ResponseCookie cookie = ResponseCookie.from("token", user.getId() + ".fihuayr78108hfnhfnhubr801gh89")
+        .httpOnly(true)  // javascript kan ikke røre den B-)
+        .secure(false)    // HTTPS only
+        .path("/")       // Bruges til alle sider
+        .maxAge(3600)
+        .build();
+        response.addHeader("Set-Cookie", cookie.toString());
+
+        return "redirect:/login";
     }
 
     @PostMapping("/login/confirm")
@@ -362,9 +353,9 @@ public class MainController {
         if(hashedPassword.equals(user.getPassword())) {
             String id = user.getId().toString();
             Token token = Token.sign(id);
-            String formattedToken = user.getId().toString() + "." + token.getHash();
+            String formattedToken = id + "." + token.getHash();
             String encodedToken = URLEncoder.encode(formattedToken, StandardCharsets.UTF_8);
-            int time = rememberMe ? 2_592_000 : 86400; // 1 måned vs 1 dag
+            int time = rememberMe ? (60 * 60 * 24 * 365) : (60 * 60 * 24); // 1 måned vs 1 dag
             ResponseCookie cookie = ResponseCookie.from("token", encodedToken)
             .httpOnly(true)  // javascript kan ikke røre den B-)
             .secure(false)    // HTTPS only
@@ -380,38 +371,46 @@ public class MainController {
         }
     }
 
-    private boolean userHasValidToken(HttpServletRequest request) {
+    @GetMapping("/logout") 
+    public String logout(HttpServletRequest request) {
         Cookie cookie = WebUtils.getCookie(request, "token");
-        if (cookie == null) return false;
+        if(cookie != null) cookie.setMaxAge(0);
+        return "redirect:/login";
+    }
 
-        String decodedToken = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);        
-        String[] parts = decodedToken.split("\\.");
-
-        String cookieId = parts[0];
-        String cookieHash = parts[1];
-
+    private boolean userHasValidToken(HttpServletRequest request) {
+        String cookieId;
+        String cookieHash;
+        try {
+            String[] parsedCookie = parseCookie(request);
+            cookieId = parsedCookie[0];
+            cookieHash = parsedCookie[1];
+        } catch(RuntimeException e) {
+            return false;
+        }
         Token token = Token.sign(cookieId);
         return token.verify(cookieHash);
     }
 
-    /* 
-    @PostMapping("/login/confirm")
-    public String confirmLogin(
-            @RequestParam String username,
-            @RequestParam String email,
-            Model model) {
+    private String[] parseCookie(HttpServletRequest request) throws RuntimeException{
+        Cookie cookie = WebUtils.getCookie(request, "token");
+        if (cookie == null) throw new RuntimeException();
+        
+        String decodedToken = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);        
+        String[] splitCookie = decodedToken.split("\\.");
+        if(splitCookie.length != 2) throw new RuntimeException();
 
-        User user = userRepository.findByName(username);
-
-        if (user == null || !Objects.equals(email, user.getEmail())) {
-            model.addAttribute("error", "Invalid username or email");
-            return "login";
-        }
-
-        model.addAttribute("user", user);
-        return "homepage"; // login success page
+        return splitCookie;
     }
-    */
+
+    private User getUserFromToken(HttpServletRequest request) throws RuntimeException {
+        String[] parsedCookie = parseCookie(request);
+        Integer userId = Integer.valueOf(parsedCookie[0]);
+        User user = userRepository.findById((userId))
+        .orElseThrow(() -> new RuntimeException("Unable to retrieve username"));
+        return user;
+    }
+
 
     @GetMapping("/homepage")
     public String showhomepage(Model model, HttpServletRequest request) {
@@ -428,7 +427,21 @@ public class MainController {
 
     // Add user with demo sponsor & contract
     @PostMapping("/users/add")
-    public String addUserFromWeb(@RequestParam String name, @RequestParam String email) {
+    public String addUserFromWeb(@RequestParam String name, @RequestParam String password, Model model) {
+        List<User> users = userRepository.findAll();
+        for(User user : users) {
+            if(name.equals(user.getName())) {
+                model.addAttribute("errorMessage", "Username already exists");
+                return "redirect:/AdminPanel";
+            }
+        }
+        User user = new User();
+        user.setName(name);
+        user.setPassword(password);
+        
+
+
+
         Sponsor sponsor = new Sponsor(
                 "Demo",
                 "DemoName",
@@ -452,10 +465,6 @@ public class MainController {
             System.out.println("Could not set PDF data: " + e.getMessage());
         }
         contractRepository.save(contract);
-
-        User user = new User();
-        user.setName(name);
-        //user.setEmail(email);
         userRepository.save(user);
 
         return "redirect:/users";
@@ -486,98 +495,4 @@ public class MainController {
         return false;
     }
     */
-
-
-
-
-    // =================================================================================================================
-    // DEPRECATED LEGACY CODE
-    
-    // Handles editing an existing sponsor
-    @PostMapping("/sponsors/edit")
-    public String editSponsor(
-            @RequestParam Long sponsorId,
-            @RequestParam String name,
-            @RequestParam(required = false) String contactPerson,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String phoneNumber,
-            @RequestParam(required = false) String cvrNumber,
-            @RequestParam(required = false, defaultValue = "false") boolean status,
-            @RequestParam(required = false) String comments,
-            Model model) {
-        if (phoneNumber != null && phoneNumber.length() > 0 && !phoneNumber.matches("^[0-9]+$")) {
-            model.addAttribute("error", "Phone number must contain digits only.");
-            model.addAttribute("sponsors", sponsorRepository.findAll());
-            model.addAttribute("contracts", contractRepository.findAll());
-            Iterable<String> sponsorNames = fetchContractSponsorNames();
-            model.addAttribute("sponsorNames", sponsorNames);
-            return "sponsors";
-        }
-        java.util.Optional<Sponsor> sponsorOpt = sponsorRepository.findById(sponsorId);
-        if (sponsorOpt.isPresent()) {
-            Sponsor sponsor = sponsorOpt.get();
-            // update fields (keep generated id)
-            sponsor.setName(name == null ? sponsor.getName() : name);
-            sponsor.setContactPerson(contactPerson == null ? sponsor.getContactPerson() : contactPerson);
-            sponsor.setEmail(email == null ? sponsor.getEmail() : email);
-            sponsor.setPhoneNumber(phoneNumber == null ? sponsor.getPhoneNumber() : phoneNumber);
-            sponsor.setCvrNumber(cvrNumber == null ? sponsor.getCvrNumber() : cvrNumber);
-            sponsor.setStatus(status);
-            sponsor.setComments(comments == null ? sponsor.getComments() : comments);
-            sponsorRepository.save(sponsor);
-
-            // update stored name copy on contracts
-            Iterable<Contract> contracts = contractRepository.findAll();
-            for (Contract contract : contracts) {
-                if (sponsorId.equals(contract.getSponsorId())) {
-                    // contract.setSponsorName(sponsor.getName());
-                    contractRepository.save(contract);
-                }
-            }
-        }
-        return "redirect:/sponsors";
-    }
-    // =================================================================================================================
-
-
-    // =================================================================================================================
-    // DEPRECATED LEGACY CODE
-
-    // Handles editing an existing contract
-    @PostMapping("/sponsors/editContract")
-    public String editContract(
-            @RequestParam Long contractId,
-            @RequestParam Long sponsorId,
-            @RequestParam String startDate,
-            @RequestParam String endDate,
-            @RequestParam String payment,
-            @RequestParam(required = false, defaultValue = "false") boolean status,
-            @RequestParam String type,
-            Model model) {
-        java.util.Optional<Contract> contractOpt = contractRepository.findById(contractId);
-        if (contractOpt.isPresent()) {
-            Contract contract = contractOpt.get();
-            contract.setSponsorId(sponsorId);
-            try {
-                contract.setStartDate(LocalDate.parse(startDate));
-                contract.setEndDate(LocalDate.parse(endDate));
-                contract.setPayment(payment);
-                contract.setStatus(status);
-                contract.setType(type);
-                contractRepository.save(contract);
-            } catch (IllegalArgumentException ex) {
-                model.addAttribute("error", ex.getMessage());
-                model.addAttribute("sponsors", sponsorRepository.findAll());
-                model.addAttribute("contracts", contractRepository.findAll());
-                Iterable<String> sponsorNames = fetchContractSponsorNames();
-                model.addAttribute("sponsorNames", sponsorNames);
-                return "sponsors";
-            }
-        }
-        return "redirect:/sponsors";
-    }
-
-    // =================================================================================================================
-
-
 }

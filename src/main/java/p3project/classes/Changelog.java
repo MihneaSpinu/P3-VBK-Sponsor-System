@@ -1,13 +1,10 @@
 package p3project.classes;
 
 import java.lang.reflect.Field;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.DiscriminatorValue;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.time.LocalDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("Changelog") // "Changelog" bliver værdien til "logType" kolonnen
