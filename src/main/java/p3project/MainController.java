@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Optional;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import p3project.classes.Changelog;
 import p3project.classes.Contract;
@@ -82,7 +85,7 @@ public class MainController {
     // ==========================
     @GetMapping("/")
     public String home() {
-        return "redirect:/homepage";
+        return "redirect:/login";
     }
 
     @GetMapping("/users")
@@ -100,41 +103,64 @@ public class MainController {
         return "users";
     }
 
+  
     // Displays the sponsors page with lists of sponsors and contracts
     @GetMapping("/sponsors")
-    public String showSponsors(Model model) {
-        model.addAttribute("sponsors", sponsorRepository.findAll());
-        model.addAttribute("contracts", contractRepository.findAll());
-        model.addAttribute("services", serviceRepository.findAll());
-        return "sponsors";
+    public String showSponsors(Model model, HttpServletRequest request) {
+        if(userHasValidToken(request)) {
+            model.addAttribute("sponsors", sponsorRepository.findAll());
+            model.addAttribute("contracts", contractRepository.findAll());
+            model.addAttribute("services", serviceRepository.findAll());
+
+            Iterable<String> sponsorNames = fetchContractSponsorNames();
+            model.addAttribute("sponsorNames", sponsorNames);
+            return "sponsors";
+        }
+        return "redirect:/login";
     }
 
+    private List<String> fetchContractSponsorNames() {
+        Iterable<Contract> contracts = contractRepository.findAll();
+        List<String> sponsorNames = new ArrayList<>();
+
+        for(Contract contract : contracts) {
+            Long sponsorId = contract.getSponsorId();
+            Sponsor sponsor = sponsorRepository.findById(sponsorId).orElseThrow();
+            String name = sponsor.getName();
+            sponsorNames.add(name);
+        }
+        return sponsorNames;
+    }
+    
     // Changelog page
     @GetMapping("/changelog")
-    public String changelogPage(Model model) {
-        model.addAttribute("changelogs", logRepository.findAll());
-        return "changelog";
+    public String changelogPage(Model model, HttpServletRequest request) {
+        if(userHasValidToken(request)) {
+            model.addAttribute("changelogs", logRepository.findAll());
+            return "changelog";
+        }
+        return "redirect:/login";
     }
 
     // boilerplate update handlers
     @PostMapping("/update/sponsor")
-    public ResponseEntity<String> updateSponsorFields(@ModelAttribute Sponsor sponsor) {
+    public ResponseEntity<String> updateSponsorFields(@ModelAttribute Sponsor sponsor, HttpServletRequest request) {
         // updateSponsorFields: generisk opdaterings-handler for Sponsor-objekter
         // Bruger refleksion (compareFields) til at logge ændringer og gemme kun ændrede felter
         Sponsor storedSponsor = sponsorRepository.findById(sponsor.getId())
         .orElseThrow(() -> new RuntimeException("Unable to retrieve sponsor with id: " + sponsor.getId()));
-        return handleUpdateRequest(sponsor, storedSponsor);
+        return handleUpdateRequest(sponsor, storedSponsor, request);
     }
 
     @PostMapping("/update/contract")
-    public ResponseEntity<String> updateContractFields(@ModelAttribute Contract contract) {
+    public ResponseEntity<String> updateContractFields(@ModelAttribute Contract contract, HttpServletRequest request) { // pdfdata dead on arrival
         Contract storedContract = contractRepository.findById(contract.getId())
-        .orElseThrow(() -> new RuntimeException("Unable to retrieve sponsor with id: " + contract.getId()));
-        return handleUpdateRequest(contract, storedContract);
+        .orElseThrow(() -> new RuntimeException("Unable to retrieve contract with id: " + contract.getId()));
+        return handleUpdateRequest(contract, storedContract, request);
     }
 
     @PostMapping("/update/service")
-    public ResponseEntity<String> updateServiceFields(
+    public ResponseEntity<String> updateServiceFields(HttpServletRequest request,
             @RequestParam Long id,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String type,
@@ -183,13 +209,13 @@ public class MainController {
             return new ResponseEntity<>("Bad request: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
-        return handleUpdateRequest(requestService, storedService);
+        return handleUpdateRequest(requestService, storedService, request);
     }
 
-    private <T> ResponseEntity<String> handleUpdateRequest(T requestObject, T storedObject) {
+    private <T> ResponseEntity<String> handleUpdateRequest(T requestObject, T storedObject, HttpServletRequest request) {
         Integer fieldsChanged;
         try {
-            fieldsChanged = compareFields(requestObject, storedObject);
+            fieldsChanged = compareFields(requestObject, storedObject, request);
         } catch (ClassNotFoundException error) {
             return new ResponseEntity<>("Internal server error: " + error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -197,7 +223,7 @@ public class MainController {
     }
 
     // fejl håndtering tba, if(==null) etc...
-    private <T> Integer compareFields(T requestObject, T storedObject) throws ClassNotFoundException {
+    private <T> Integer compareFields(T requestObject, T storedObject, HttpServletRequest request) throws ClassNotFoundException {
 
         Integer fieldsChanged = 0;
         Field[] fields = requestObject.getClass().getDeclaredFields();
@@ -208,7 +234,8 @@ public class MainController {
                 Object after = field.get(requestObject);
                 if(before == null || after == null) continue; // WIP
                 if (!before.equals(after)) {
-                    Changelog log = new Changelog(new User(), requestObject, field, before, after);
+                    User user = getUserFromToken(request);
+                    Changelog log = new Changelog(user, requestObject, field, before, after);
                     logRepository.save(log);
                     field.set(storedObject, after);
                     fieldsChanged++;
@@ -529,17 +556,27 @@ public class MainController {
     public String loginPage(Model model, HttpServletRequest request) {
         if (userHasValidToken(request)) {
             System.out.println("\n\nTOKEN IS VALID\n\n");
-            return "redirect:/homepage";
-        }
+            return "redirect:/homepage"; // må ikke logge ind igen
+        }        
+        return "login";
+    }
+
+    @GetMapping("/testuser")
+    public String testUser(HttpServletResponse response) {
         User user = new User();
-        user.setName("test");
-        //BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(8);
-        //String hashedPassword = passwordEncoder.encode("test123");
+        user.setName("testnavn123");
         String hashedPassword = "test123";
         user.setPassword(hashedPassword);
         userRepository.save(user);
-        
-        return "login"; // Thymeleaf login template
+        ResponseCookie cookie = ResponseCookie.from("token", user.getId() + ".fihuayr78108hfnhfnhubr801gh89")
+        .httpOnly(true)  // javascript kan ikke røre den B-)
+        .secure(false)    // HTTPS only
+        .path("/")       // Bruges til alle sider
+        .maxAge(3600)
+        .build();
+        response.addHeader("Set-Cookie", cookie.toString());
+
+        return "redirect:/login";
     }
 
     @PostMapping("/login/confirm")
@@ -550,9 +587,9 @@ public class MainController {
         if(hashedPassword.equals(user.getPassword())) {
             String id = user.getId().toString();
             Token token = Token.sign(id);
-            String formattedToken = user.getId().toString() + "." + token.getHash();
+            String formattedToken = id + "." + token.getHash();
             String encodedToken = URLEncoder.encode(formattedToken, StandardCharsets.UTF_8);
-            int time = rememberMe ? 2_592_000 : 86400; // 1 måned vs 1 dag
+            int time = rememberMe ? (60 * 60 * 24 * 365) : (60 * 60 * 24); // 1 år vs 1 dag
             ResponseCookie cookie = ResponseCookie.from("token", encodedToken)
             .httpOnly(true)  // javascript kan ikke røre den B-)
             .secure(false)    // HTTPS only
@@ -568,19 +605,65 @@ public class MainController {
         }
     }
 
-    private boolean userHasValidToken(HttpServletRequest request) {
+     @GetMapping("/logout") 
+    public String logout(HttpServletRequest request) {
         Cookie cookie = WebUtils.getCookie(request, "token");
-        if (cookie == null) return false;
+        if(cookie != null) cookie.setMaxAge(0);
+        return "redirect:/login";
+    }
 
-        String decodedToken = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);        
-        String[] parts = decodedToken.split("\\.");
-
-        String cookieId = parts[0];
-        String cookieHash = parts[1];
-
+       private boolean userHasValidToken(HttpServletRequest request) {
+        String cookieId;
+        String cookieHash;
+        try {
+            String[] parsedCookie = parseCookie(request);
+            cookieId = parsedCookie[0];
+            cookieHash = parsedCookie[1];
+        } catch(RuntimeException e) {
+            return false;
+        }
         Token token = Token.sign(cookieId);
         return token.verify(cookieHash);
+    }   
+    
+        private String[] parseCookie(HttpServletRequest request) throws RuntimeException{
+        Cookie cookie = WebUtils.getCookie(request, "token");
+        if (cookie == null) throw new RuntimeException();
+        
+        String decodedToken = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);        
+        String[] splitCookie = decodedToken.split("\\.");
+        if(splitCookie.length != 2) throw new RuntimeException();
+
+
+        return splitCookie;
     }
+
+      private User getUserFromToken(HttpServletRequest request) throws RuntimeException {
+        String[] parsedCookie = parseCookie(request);
+        Integer userId = Integer.valueOf(parsedCookie[0]);
+        User user = userRepository.findById((userId))
+        .orElseThrow(() -> new RuntimeException("Unable to retrieve username"));
+        return user;
+    }
+
+
+    
+
+
+    //    public String addUserFromWeb(@RequestParam String name, @RequestParam String password, Model model) {
+    //     List<User> users = userRepository.findAll();
+    //     for(User user : users) {
+    //         if(name.equals(user.getName())) {
+    //             model.addAttribute("errorMessage", "Username already exists");
+    //             return "redirect:/AdminPanel";
+    //         }
+    //     }
+    //     User user = new User();
+    //     user.setName(name);
+    //     user.setPassword(password);
+        
+
+
 
     @GetMapping("/homepage")
     public String showhomepage(Model model, HttpServletRequest request) {
