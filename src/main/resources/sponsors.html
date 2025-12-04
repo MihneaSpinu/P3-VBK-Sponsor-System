@@ -110,7 +110,7 @@
                   </div>
                 </div>
                 <!-- Hvis ingen sponsorer findes, visses en beseked -->
-                <div th:if="${#lists.isEmpty(sponsors)}">Ingen Sponsors Inu.</div>
+                <div th:if="${#lists.isEmpty(sponsors)}">Ingen Sponsorsnu.</div>
               </section>
 
               <div>
@@ -209,7 +209,7 @@
                     <option value="true">True</option>
                     <option value="false" selected>False</option>
                   </select>
-                  <input type="file" id="fileyesyes" name = "pdffile">
+                  <input type="file" accept=".pdf" id="fileyesyes" name = "pdffile">
                   
                   <div class="flex justify-end space-x-2 mt-2">
                     <button type="button" class="px-3 py-1 bg-gray-200 rounded" onclick="closeModal('addContractModal')">Annuller</button>
