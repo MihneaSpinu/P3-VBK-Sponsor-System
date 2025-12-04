@@ -80,6 +80,8 @@ public class Contract {
         this.mimeType = mimeType;
     }
 
+
+
     public void setSponsorId(Long sponsorId) {
         this.sponsorId = sponsorId;
     }
