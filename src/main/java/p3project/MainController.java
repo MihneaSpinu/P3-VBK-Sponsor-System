@@ -102,6 +102,7 @@ public class MainController {
             sponsorNames.add(name);
         }
         return sponsorNames;
+
     }
 
     // Changelog page
@@ -117,6 +118,7 @@ public class MainController {
     // boilerplate update handlers
     @PostMapping("/update/sponsor")
     public ResponseEntity<String> updateSponsorFields(@ModelAttribute Sponsor sponsor, HttpServletRequest request) {
+
         Sponsor storedSponsor = sponsorRepository.findById(sponsor.getId())
         .orElseThrow(() -> new RuntimeException("Unable to retrieve sponsor with id: " + sponsor.getId()));
         return handleUpdateRequest(sponsor, storedSponsor, request);
@@ -133,7 +135,45 @@ public class MainController {
     public ResponseEntity<String> updateServiceFields(@ModelAttribute Service service, HttpServletRequest request) {
         Service storedService = serviceRepository.findById(service.getId())
         .orElseThrow(() -> new RuntimeException("Unable to retrieve service with id: " + service.getId()));
-        return handleUpdateRequest(service, storedService, request);
+
+        // Build a request Service object using stored values as defaults
+        p3project.classes.Service requestService;
+        try {
+            p3project.classes.ServiceType st = null;
+            p3project.classes.Service.ServiceStatus ss = null;
+            java.time.LocalDate sd = null;
+            java.time.LocalDate ed = null;
+
+            if (type != null && !type.isEmpty()) {
+                try { st = p3project.classes.ServiceType.valueOf(type); } catch (Exception e) { st = storedService.getType(); }
+            } else {
+                st = storedService.getType();
+            }
+
+            if (status != null && !status.isEmpty()) {
+                try { ss = p3project.classes.Service.ServiceStatus.valueOf(status); } catch (Exception e) { ss = storedService.getStatusEnum(); }
+            } else {
+                ss = storedService.getStatusEnum();
+            }
+
+            if (startDate != null && !startDate.isEmpty()) sd = java.time.LocalDate.parse(startDate); else sd = storedService.getStartDate();
+            if (endDate != null && !endDate.isEmpty()) ed = java.time.LocalDate.parse(endDate); else ed = storedService.getEndDate();
+
+            int amt = amountOrDivision == null ? storedService.getAmountOrDivision() : amountOrDivision;
+            String nm = name == null ? storedService.getName() : name;
+
+            requestService = new p3project.classes.Service(storedService.getContractId(), nm, st, ss, amt, sd, ed);
+
+            // set private id field via reflection so compareFields can inspect it
+            java.lang.reflect.Field idField = requestService.getClass().getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(requestService, id);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("Bad request: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+        return handleUpdateRequest(requestService, storedService);
     }
 
     private <T> ResponseEntity<String> handleUpdateRequest(T requestObject, T storedObject, HttpServletRequest request) {
@@ -171,6 +211,7 @@ public class MainController {
             }
         }
 
+        // Gem ændringerne i den relevante repository baseret på objekt-type
         if (requestObject instanceof Sponsor)         sponsorRepository.save((Sponsor) storedObject);
         else if (requestObject instanceof Contract)   contractRepository.save((Contract) storedObject);
         else if (requestObject instanceof Service)    serviceRepository.save((Service) storedObject);
@@ -218,15 +259,71 @@ public class MainController {
     public String addContractForSponsor(@ModelAttribute Contract contract, Model model) {
         try {
             contractRepository.save(contract);
-            return "redirect:/sponsors";
+            return "redirect:/sponsors"; // Post/Redirect/Get for at undgå double submit
         } catch (IllegalArgumentException ex) {
-            // ???
+
+            // Håndterer fejl og viser siden igen med fejlbesked
             model.addAttribute("error", ex.getMessage());
             model.addAttribute("sponsors", sponsorRepository.findAll());
             model.addAttribute("contracts", contractRepository.findAll());
-
+          
             Iterable<String> sponsorNames = fetchContractSponsorNames();
             model.addAttribute("sponsorNames", sponsorNames);
+            return "sponsors"; // Geninlæs siden og vis sponsors-siden med fejlbesked
+        }
+    }
+
+    // Handles creating a new service for a contract
+    @PostMapping("/sponsors/addService")
+    public String addServiceForContract(
+            @RequestParam Long contractId,
+            @RequestParam(required = false) String name,
+            @RequestParam String type,
+            @RequestParam(required = false, defaultValue = "0") int amountOrDivision,
+            @RequestParam String startDate,
+            @RequestParam String endDate,
+            @RequestParam(required = false, defaultValue = "AKTIV") String status,
+            Model model) {
+        try {
+            java.time.LocalDate start = startDate == null || startDate.isEmpty() ? null : java.time.LocalDate.parse(startDate);
+            java.time.LocalDate end = endDate == null || endDate.isEmpty() ? null : java.time.LocalDate.parse(endDate);
+            p3project.classes.ServiceType st = p3project.classes.ServiceType.valueOf(type);
+            Service.ServiceStatus ss = Service.ServiceStatus.valueOf(status);
+            p3project.classes.Service service = new p3project.classes.Service(contractId, name == null ? "" : name, st, ss, amountOrDivision, start, end);
+            serviceRepository.save(service);
+            return "redirect:/sponsors";
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("error", "Invalid data for service: " + ex.getMessage());
+            model.addAttribute("sponsors", sponsorRepository.findAll());
+            model.addAttribute("contracts", contractRepository.findAll());
+            model.addAttribute("services", serviceRepository.findAll());
+            return "sponsors";
+        }
+    }
+
+    // Deletes a service by ID
+    @PostMapping("/sponsors/deleteService")
+    public String deleteService(@RequestParam Long serviceId) {
+        serviceRepository.deleteById(serviceId);
+        return "redirect:/sponsors";
+    }
+
+    // Handles editing an existing sponsor
+    @PostMapping("/sponsors/edit")
+    public String editSponsor(
+            @RequestParam Long sponsorId,
+            @RequestParam String name,
+            @RequestParam(required = false) String contactPerson,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String phoneNumber,
+            @RequestParam(required = false) String cvrNumber,
+            @RequestParam(required = false, defaultValue = "false") boolean status,
+            @RequestParam(required = false) String comments,
+            Model model) {
+        if (phoneNumber != null && phoneNumber.length() > 0 && !phoneNumber.matches("^[0-9]+$")) {
+            model.addAttribute("error", "Phone number must contain digits only.");
+            model.addAttribute("sponsors", sponsorRepository.findAll());
+            model.addAttribute("contracts", contractRepository.findAll());
             return "sponsors";
         }
     }
@@ -245,6 +342,47 @@ public class MainController {
         return "redirect:/sponsors";
     }
 
+
+//     // Handles editing an existing contract
+//     @PostMapping("/sponsors/editContract")
+//     public String editContract(
+//             @RequestParam Long contractId,
+//             @RequestParam Long sponsorId,
+//             @RequestParam String startDate,
+//             @RequestParam String endDate,
+//             @RequestParam String payment,
+//             @RequestParam(required = false, defaultValue = "false") boolean status,
+//             @RequestParam String type,
+//             @RequestParam(required = false) String name,
+//             Model model) {
+//         java.util.Optional<Contract> contractOpt = contractRepository.findById(contractId);
+//         // Hent kontrakten, opdater felter og gem. Valider datoer koncentrisk.
+//         if (contractOpt.isPresent()) {
+//             Contract contract = contractOpt.get();
+//             contract.setSponsorId(sponsorId);
+//             java.util.Optional<Sponsor> sponsorOpt = sponsorRepository.findById(sponsorId);
+//             if (sponsorOpt.isPresent())
+//                 contract.setSponsorName(sponsorOpt.get().getName());
+//             try {
+//                 contract.setStartDate(LocalDate.parse(startDate));
+//                 contract.setEndDate(LocalDate.parse(endDate));
+//                 contract.setPayment(payment);
+//                 contract.setStatus(status);
+//                 contract.setType(type);
+//                 // Update kontrakt navn when provided from the edit form
+//                 if (name != null) {
+//                     contract.setName(name);
+//                 }
+//                 contractRepository.save(contract);
+//             } catch (IllegalArgumentException ex) {
+//                 model.addAttribute("error", ex.getMessage());
+//                 model.addAttribute("sponsors", sponsorRepository.findAll());
+//                 model.addAttribute("contracts", contractRepository.findAll());
+//                 return "sponsors"; // Ved fejl -> vis sponsors-siden med fejl
+//             }
+//         }
+//         return "redirect:/sponsors";
+//     }
 
     // Deletes a contract by ID
     @PostMapping("/sponsors/deleteContract")

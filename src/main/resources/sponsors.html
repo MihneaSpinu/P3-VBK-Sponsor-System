@@ -4,320 +4,294 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sponsors</title>
-    <link
-      rel="stylesheet"
-      th:href="@{/css/sponsors.css}"
-      href="static/css/sponsors.css"
-    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/Sidebar.css}" href="static/css/Sidebar.css">
+    <link rel="stylesheet" th:href="@{/css/Modal.css}" href="static/css/Modal.css">
+    <link rel="stylesheet" th:href="@{/css/Table.css}" href="static/css/Table.css">
+    <link rel="stylesheet" th:href="@{/css/sponsors.css}" href="static/css/sponsors.css">
   </head>
-  <body>
-    <div class="container">
-      <h1>Sponsors</h1>
+  <body class="bg-gray-100 text-gray-900">
+    <div class="flex min-h-screen">
 
-      <!-- Error besked area (Vis validation eller errors) -->
-      <div
-        th:if="${error}"
-        style="
-          background: #ffe6e6;
-          border: 1px solid #ff8080;
-          padding: 10px;
-          margin: 12px 0;
-          border-radius: 6px;
-        "
-      >
-        <strong style="color: #a80000">Error:</strong>
-        <span th:text="${error}" style="margin-left: 8px; color: #600"></span>
-      </div>
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div>
+          <div class="logo">VBK Sponsor System</div>
 
-      <section class="list">
-        <h2>All Sponsors</h2>
-        <div th:if="${not #lists.isEmpty(sponsors)}">
-          <div th:each="sponsor, stat : ${sponsors}" class="item">
-            <strong th:text="${sponsor.name}">Sponsor Name</strong>
-            <div>
-              Contact: <span th:text="${sponsor.contactPerson}">Contact</span>
-            </div>
-            <div>Email: <span th:text="${sponsor.email}">email</span></div>
-            <div>
-              Phone: <span th:text="${sponsor.phoneNumber}">phone</span>
-            </div>
-            <div>CVR: <span th:text="${sponsor.cvrNumber}">cvr</span></div>
-            <div>Status: <span th:text="${sponsor.status}">status</span></div>
-            <div>
-              Comments: <span th:text="${sponsor.comments}">comments</span>
-            </div>
-            <div style="margin-top: 8px">
-              <button
-                type="button"
-                th:onclick="|toggleSponsorEdit(${stat.index})|"
-              >
-                Edit
-              </button>
-              <form
-                th:action="@{/sponsors/delete}"
-                method="POST"
-                style="display: inline"
-                th:onsubmit="return confirm('Delete sponsor and its contracts? This cannot be undone.')"
-              >
-                <input
-                  type="hidden"
-                  name="sponsorId"
-                  th:value="${sponsor.id}"
-                />
-                <button type="submit">Delete</button>
-              </form>
-            </div>
-
-            <form
-              th:id="|sponsorEditForm-${stat.index}|"
-              th:action="@{/update/sponsor}"
-              method="POST"
-              style="display: none; margin-top: 8px"
-              class="form"
-            >
-              <input type="hidden" name="id" th:value="${sponsor.id}" />
-              <label>Sponsor Name</label>
-              <input
-                name="name"
-                th:value="${sponsor.name}"
-                required
-              />
-              <label>Contact Person</label>
-              <input name="contactPerson" th:value="${sponsor.contactPerson}" />
-              <label>Email</label>
-              <input name="email" type="email" th:value="${sponsor.email}" />
-              <label>Phone</label>
-              <input
-                name="phoneNumber"
-                type="tel"
-                inputmode="numeric"
-                pattern="^[0-9]+$"
-                title="Digits only"
-                th:value="${sponsor.phoneNumber}"
-              />
-              <label>CVR</label>
-              <input name="cvrNumber" th:value="${sponsor.cvrNumber}" />
-              <label>Active</label>
-              <select name="status">
-                <option value="true" th:selected="${sponsor.status}">
-                  True
-                </option>
-                <option value="false" th:selected="${!sponsor.status}">
-                  False
-                </option>
-              </select>
-              <label>Comments</label>
-              <input name="comments" th:value="${sponsor.comments}" />
-              <button type="submit">Save</button>
-              <button
-                type="button"
-                th:onclick="|toggleSponsorEdit(${stat.index})|"
-              >
-                Cancel
-              </button>
-            </form>
+          <div class="menu">
+            <button class="menu-btn" onclick="location.href='/homepage'">Forside</button>
+            <button class="menu-btn" onclick="location.href='/sponsors'">Sponsors</button>
+            <button class="menu-btn" onclick="location.href='/changelog'">Change log</button>
+            <button class="menu-btn" onclick="location.href='/archive'">Arkiv</button>
+            <button class="menu-btn" onclick="location.href='/AdminPanel'">Admin panel</button>
           </div>
         </div>
-        <div th:if="${#lists.isEmpty(sponsors)}">No sponsors yet.</div>
-      </section>
 
-      <section class="form">
-        <h2>Add Sponsor</h2>
-        <form action="/sponsors/add" method="POST">
-          <label for="name">Sponsor Name</label>
-          <input id="name" name="name" required />
-          <label for="contactPerson">Contact Person</label>
-          <input id="contactPerson" name="contactPerson" />
-          <label for="email">Email</label>
-          <input id="email" name="email" type="email" />
-          <label for="phoneNumber">Phone</label>
-          <input
-            id="phoneNumber"
-            name="phoneNumber"
-            type="tel"
-            inputmode="numeric"
-            pattern="^[0-9]+$"
-            title="Digits only"
-          />
-          <label for="cvrNumber">CVR</label>
-          <input id="cvrNumber" name="cvrNumber" />
-          <label for="status">Active</label>
-          <select id="status" name="status">
-            <option value="true">True</option>
-            <option value="false" selected>False</option>
+        <button class="logout-btn" onclick="location.href='/login'">Log ud</button>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="flex-1 p-6">
+        <div class="container bg-white rounded shadow p-6">
+          <h1 class="text-2xl font-semibold mb-4">Sponsors</h1>
+
+          <!-- Error besked area (Vis validation eller errors) -->
+          <div
+            th:if="${error}"
+            class="mb-4 rounded p-3"
+            style="background:#ffe6e6;border:1px solid #ff8080;color:#600"
+          >
+            <strong class="text-red-700">Error:</strong>
+            <span th:text="${error}" class="ml-2"></span>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-6">
+            <section class="list">
+                  <!-- Filtreringskontrol: viser hvilke sponsorer der skal vises -->
+                  <div class="flex items-center mb-2">
+                    <h2 class="text-lg font-medium mr-3 m-0">Viser:</h2>
+                    <div class="text-sm">
+                      <select id="sponsorFilter" class="border rounded px-2 py-1 text-sm" onchange="applySponsorFilter()" style="min-width:6rem">
+                        <option value="active" selected>Aktive Sponsor</option>
+                        <option value="inactive">Ikke-aktive Sponsor</option>
+                        <option value="all">Alle Sponsor</option>
+                      </select>
+                    </div>
+                  </div>
+              <!-- Liste over sponsorer (gentages via Thymeleaf th:each) -->
+              <div th:if="${not #lists.isEmpty(sponsors)}">
+                <div th:each="sponsor, stat : ${sponsors}" th:attr="data-status=${sponsor.status}" class="item sponsor-item relative mb-4 p-3 rounded bg-gray-50">
+                  <div class="absolute right-3 top-3 flex space-x-2">
+                    <button type="button" class="px-2 py-1 text-sm bg-blue-500 text-white rounded" th:attr="data-sponsor-id=${sponsor.id},data-sponsor-name=${sponsor.name}" onclick="openAddModal(this)">Tilføj Kontrakt</button>
+                    <button type="button" class="px-2 py-1 text-sm bg-gray-200 rounded" th:attr="data-sponsor-id=${sponsor.id},data-sponsor-name=${sponsor.name}" onclick="openViewModal(this)">Se Kontrakterne</button>
+                  </div>
+                  <strong class="block text-lg" th:text="${sponsor.name}">Sponsor Navn</strong>
+                  <div class="text-sm">Kontaktperson: <span th:text="${sponsor.contactPerson}">Kontaktperson</span></div>
+                  <div class="text-sm">Email: <span th:text="${sponsor.email}">email</span></div>
+                  <div class="text-sm">Telefon: <span th:text="${sponsor.phoneNumber}">Telefon</span></div>
+                  <div class="text-sm">CVR: <span th:text="${sponsor.cvrNumber}">cvr</span></div>
+                  <div class="text-sm">Status: <span th:text="${sponsor.status}">status</span></div>
+                  <div class="text-sm">Kommentar: <span th:text="${sponsor.comments}">kommentar</span></div>
+                  <!-- Kontroller for sponsor: edit og delete -->
+                  <div class="mt-2">
+                    <button type="button" class="px-3 py-1 bg-gray-200 rounded" th:onclick="|toggleSponsorEdit(${stat.index})|">Edit</button>
+                    <form th:action="@{/sponsors/delete}" method="POST" style="display:inline" th:onsubmit="return confirm('Delete sponsor and its contracts? This cannot be undone.')">
+                      <input type="hidden" name="sponsorId" th:value="${sponsor.id}" />
+                      <button type="submit" class="px-3 py-1 ml-2 bg-red-200 rounded">Delete</button>
+                    </form>
+                  </div>
+
+                  <form th:id="|sponsorEditForm-${stat.index}|" th:action="@{/update/sponsor}" method="POST" style="display:none;margin-top:8px" class="form">
+                    <input type="hidden" name="id" th:value="${sponsor.id}" />
+                    <label class="block text-sm mt-2">Sponsor Navn</label>
+                    <input name="name" th:value="${sponsor.name}" required class="border rounded px-2 py-1 w-full" />
+                    <label class="block text-sm mt-2">Kontaktperson</label>
+                    <input name="contactPerson" th:value="${sponsor.contactPerson}" class="border rounded px-2 py-1 w-full" />
+                    <label class="block text-sm mt-2">Email</label>
+                    <input name="email" type="email" th:value="${sponsor.email}" class="border rounded px-2 py-1 w-full" />
+                    <label class="block text-sm mt-2">Telefon</label>
+                    <input name="phoneNumber" type="tel" inputmode="numeric" pattern="^[0-9]+$" title="Digits only" th:value="${sponsor.phoneNumber}" class="border rounded px-2 py-1 w-full" />
+                    <label class="block text-sm mt-2">CVR</label>
+                    <input name="cvrNumber" th:value="${sponsor.cvrNumber}" class="border rounded px-2 py-1 w-full" />
+                    <label class="block text-sm mt-2">Aktiv</label>
+                    <select name="status" class="border rounded px-2 py-1 w-full">
+                      <option value="true" th:selected="${sponsor.status}">True</option>
+                      <option value="false" th:selected="${!sponsor.status}">False</option>
+                    </select>
+                    <label class="block text-sm mt-2">Kommentar</label>
+                    <input name="comments" th:value="${sponsor.comments}" class="border rounded px-2 py-1 w-full" />
+                    <div class="mt-2">
+                      <button type="submit" class="px-3 py-1 bg-green-200 rounded">Gem</button>
+                      <button type="button" class="px-3 py-1 ml-2 bg-gray-200 rounded" th:onclick="|toggleSponsorEdit(${stat.index})|">Cancel</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <!-- Hvis ingen sponsorer findes, visses en beseked -->
+              <div th:if="${#lists.isEmpty(sponsors)}">Ingen Sponsors Inu.</div>
+            </section>
+
+            <div>
+              <section class="form mb-6">
+                <h2 class="text-lg font-medium mb-2">Tilføj Sponsor</h2>
+                <form action="/sponsors/add" method="POST" class="space-y-2">
+                  <label class="block text-sm">Sponsor Navn</label>
+                  <input id="name" name="name" required class="border rounded px-2 py-1 w-full" />
+                  <label class="block text-sm">Kontaktperson</label>
+                  <input id="contactPerson" name="contactPerson" class="border rounded px-2 py-1 w-full" />
+                  <label class="block text-sm">Email</label>
+                  <input id="email" name="email" type="email" class="border rounded px-2 py-1 w-full" />
+                  <label class="block text-sm">Telefon</label>
+                  <input id="phoneNumber" name="phoneNumber" type="tel" inputmode="numeric" pattern="^[0-9]+$" title="Digits only" class="border rounded px-2 py-1 w-full" />
+                  <label class="block text-sm">CVR</label>
+                  <input id="cvrNumber" name="cvrNumber" class="border rounded px-2 py-1 w-full" />
+                  <label class="block text-sm">Aktive</label>
+                  <select id="status" name="status" class="border rounded px-2 py-1 w-full">
+                    <option value="true">True</option>
+                    <option value="false" selected>False</option>
+                  </select>
+                  <label class="block text-sm">Kommentar</label>
+                  <input id="comments" name="comments" class="border rounded px-2 py-1 w-full" />
+                  <button type="submit" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded">Add Sponsor</button>
+                </form>
+              </section>
+            </div>
+          </div>
+
+          <!--
+            Skjult data-lager for kontrakter
+            ----------------------------------
+            Thymeleaf render alle kontrakter som usynlige divs med data- attributter.
+            Dette bruges af klient-side JavaScript (populateViewContracts) til at bygge
+            modal-indholdet dynamisk når brugeren ønsker at se en sponsors kontrakter.
+          -->
+          <div id="contractsData" style="display:none">
+            <div th:each="c : ${contracts}" class="contract-data"
+                 th:attr="data-id=${c.id},data-sponsor-id=${c.sponsorId},data-name=${c.name},data-type=${c.type},data-start=${c.startDate},data-end=${c.endDate},data-payment=${c.payment},data-status=${c.status}">
+            </div>
+          </div>
+          <!-- Skjult data-lager for tjenester (services) -->
+          <div id="servicesData" style="display:none">
+              <div th:each="s : ${services}" class="service-data"
+                th:attr="data-id=${s.id},data-contract-id=${s.contractId},data-name=${s.name},data-type=${s.type},data-start=${s.startDate},data-end=${s.endDate},data-amount=${s.amountOrDivision},data-status=${s.statusEnum}">
+            </div>
+          </div>
+
+          <!--
+            Skjult skabelon for sponsor- <option> elementer
+            ------------------------------------------------
+            Indeholder option-elementer for alle sponsorer; JS kopierer denne HTML
+            ind i dynamisk oprettede edit-formularer, så dropdown'en indeholder
+            aktuelle sponsor-navne og id.
+          -->
+          <select id="sponsorOptionsTemplate" style="display:none">
+            <option th:each="s : ${sponsors}" th:value="${s.id}" th:text="${s.name}"></option>
           </select>
-          <label for="comments">Comments</label>
-          <input id="comments" name="comments" />
-          <button type="submit">Add Sponsor</button>
-        </form>
-      </section>
 
-      <section class="form">
-        <h2>Create Contract For Sponsor</h2>
-        <form action="/sponsors/addContract" method="POST">
-          <label for="sponsorSelect">Sponsor</label>
-          <select id="sponsorSelect" name="sponsorId" required>
-            <option
-              th:each="sponsor : ${sponsors}"
-              th:value="${sponsor.id}"
-              th:text="${sponsor.name}"
-            ></option>
-          </select>
-
-          <label for="startDate">Start Date</label>
-          <input id="startDate" name="startDate" type="date" required />
-          <label for="endDate">End Date</label>
-          <input id="endDate" name="endDate" type="date" required />
-          <label for="payment">Payment</label>
-          <input id="payment" name="payment" type="number" value="0" required />
-          <label for="type">Type</label>
-          <input id="type" name="type" value="Standard" />
-          <label for="statusC">Active</label>
-          <select id="statusC" name="status">
-            <option value="true">True</option>
-            <option value="false" selected>False</option>
-          </select>
-            <label for="name">Contract name:</label>
-            <input id="contractName" name="name" type="text" required>
-          <button type="submit">Create Contract</button>
-        </form>
-      </section>
-
-      <section class="list">
-        <h2>Contracts</h2>
-        <div th:if="${not #lists.isEmpty(contracts)}">
-          <div th:each="contract, i : ${contracts}" class="item">
-            <div>Contract ID: <span th:text="${contract.id}">1</span></div>
-            <div>Sponsor: <span th:text="${sponsorNames[i.index]}">sponsor</span></div>
-            <div>Type: <span th:text="${contract.type}">type</span></div>
-            <div>Start: <span th:text="${contract.startDate}">start</span></div>
-            <div>End: <span th:text="${contract.endDate}">end</span></div>
-            <div>Payment: <span th:text="${contract.payment}">0</span></div>
-            <div>Status: <span th:text="${contract.status}">false</span></div>
-            <div>Name: <span th:text="${contract.name}">name</span></div>
-
-            <div style="margin-top: 8px">
-              <button
-                type="button"
-                th:onclick="|toggleContractEdit(${i.index})|"
-              >
-                Edit
-              </button>
-              <form
-                th:action="@{/sponsors/deleteContract}"
-                method="POST"
-                style="display: inline"
-                th:onsubmit="return confirm('Delete this contract? This cannot be undone.')"
-              >
-                <input
-                  type="hidden"
-                  name="contractId"
-                  th:value="${contract.id}"
-                />
-                <button type="submit">Delete</button>
+          <!--
+            Genanvendelig modal: Tilføj kontrakt
+            -------------------------------------
+            Denne modal fyldes og vises af openAddModal(buttonEl). Formularen sender
+            POST til /sponsors/addContract (controller håndterer oprettelse og redirect).
+          -->
+          <div id="addContractModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display:none">
+            <div class="bg-white rounded p-4 w-11/12 max-w-md">
+              <div class="flex justify-between items-center mb-3">
+                <h3 class="font-semibold">Tilføj Kontrakt for <span id="addModalSponsorName"></span></h3>
+                <button type="button" class="text-gray-600" onclick="closeModal('addContractModal')">✕</button>
+              </div>
+              <form action="/sponsors/addContract" method="POST" class="space-y-2">
+                <input id="addModalSponsorId" type="hidden" name="sponsorId" />
+                <label class="block text-sm">Kontrakt Navn:</label>
+                <input name="name" type="text" required class="border rounded px-2 py-1 w-full" />
+                <label class="block text-sm">Start Dato</label>
+                <input name="startDate" type="date" required class="border rounded px-2 py-1 w-full" />
+                <label class="block text-sm">Slut Dato</label>
+                <input name="endDate" type="date" required class="border rounded px-2 py-1 w-full" />
+                <label class="block text-sm">Payment (integer)</label>
+                <input name="payment" type="number" value="0" required class="border rounded px-2 py-1 w-full" />
+                <label class="block text-sm">Type</label>
+                <input name="type" value="Standard" class="border rounded px-2 py-1 w-full" />
+                <label class="block text-sm">Aktive</label>
+                <select name="status" class="border rounded px-2 py-1 w-full">
+                  <option value="true">True</option>
+                  <option value="false" selected>False</option>
+                </select>
+                <div class="flex justify-end space-x-2 mt-2">
+                  <button type="button" class="px-3 py-1 bg-gray-200 rounded" onclick="closeModal('addContractModal')">Annuller</button>
+                  <button type="submit" class="px-3 py-1 bg-green-500 text-white rounded">Opret</button>
+                </div>
               </form>
             </div>
-
-            <form
-              th:id="|contractEditForm-${i.index}|"
-              th:action="@{/update/contract}"
-              method="POST"
-              style="display: none; margin-top: 8px"
-              class="form"
-            >
-              <input
-                type="hidden"
-                name="id"
-                th:value="${contract.id}"
-              />
-              <label>Sponsor</label>
-              <select name="sponsorId">
-                <option
-                  th:each="sponsor : ${sponsors}"
-                  th:value="${sponsor.id}"  
-                  th:text="${sponsor.name}"
-                  th:selected="${sponsor.id == contract.sponsorId}"
-                ></option>
-              </select>
-              <label>Start Date</label>
-              <input
-                name="startDate"
-                type="date"
-                th:value="${contract.startDate}"
-              />
-              <label>End Date</label>
-              <input
-                name="endDate"
-                type="date"
-                th:value="${contract.endDate}"
-              />
-              <label>Payment</label>
-              <input
-                name="payment"
-                type="number"
-                th:value="${contract.payment}"
-              />
-              <label>Type</label>
-              <input name="type" th:value="${contract.type}" />
-              <label>Active</label>
-              <select name="status">
-                <option value="true" th:selected="${contract.status}">
-                  True
-                </option>
-                <option value="false" th:selected="${!contract.status}">
-                  False
-                </option>
-              </select>
-                <label>Name</label>
-                <input type="text" name="name" th:value="${contract.name}" />
-                <input type="hidden" name="sponsorName" th:value="${sponsorNames[i.index]}" />
-              <button type="submit">Save</button>
-              <button
-                type="button"
-                th:onclick="|toggleContractEdit(${i.index})|"
-              >
-                Cancel
-              </button>
-            </form>
+          </div>
+          <div id="viewContractsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display:none">
+            <div class="bg-white rounded p-4 w-11/12 max-w-lg">
+              <div class="flex justify-between items-center mb-3">
+                <h3 class="font-semibold">Kontrakter for <span id="viewModalSponsorName"></span></h3>
+                <button type="button" class="text-gray-600" onclick="closeModal('viewContractsModal')">✕</button>
+              </div>
+              <div id="viewContractsList" class="space-y-2 overflow-auto max-h-96">
+              </div>
+            </div>
+          </div>
+          <!-- Add Service Modal -->
+          <div id="addServiceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display:none">
+            <div class="bg-white rounded p-4 w-11/12 max-w-md">
+              <div class="flex justify-between items-center mb-3">
+                <h3 class="font-semibold">Tilføj Tjeneste for <span id="addServiceContractName"></span></h3>
+                <button type="button" class="text-gray-600" onclick="closeModal('addServiceModal')">✕</button>
+              </div>
+              <form action="/sponsors/addService" method="POST" class="space-y-2">
+                <input id="addServiceContractId" type="hidden" name="contractId" />
+                <label class="block text-sm">Info/Kommentar</label>
+                <input name="name" type="text" class="border rounded px-2 py-1 w-full" />
+                <label class="block text-sm">Type</label>
+                <select id="addServiceType" name="type" class="border rounded px-2 py-1 w-full">
+                  <option value="Billeter">Billeter</option>
+                  <option value="Kuponer">Kuponer</option>
+                  <option value="Banner">Banner</option>
+                  <option value="LogoTrojler">Logo på trøjer</option>
+                  <option value="LogoBukser">Logo på bukser</option>
+                </select>
+                <div id="amountOrDivisionWrapper">
+                  <label class="block text-sm">Antal</label>
+                  <input name="amountOrDivision" type="number" value="0" class="border rounded px-2 py-1 w-full" />
+                </div>
+                <label class="block text-sm">Start Dato</label>
+                <input name="startDate" type="date" class="border rounded px-2 py-1 w-full" />
+                <label class="block text-sm">Slut Dato</label>
+                <input name="endDate" type="date" class="border rounded px-2 py-1 w-full" />
+                <label class="block text-sm">Status</label>
+                <select name="status" class="border rounded px-2 py-1 w-full">
+                  <option value="AKTIV">Aktiv</option>
+                  <option value="IGANG">Igang</option>
+                  <option value="UDFORT">Udført</option>
+                  <option value="INAKTIV">Inaktiv</option>
+                </select>
+                <div class="flex justify-end space-x-2 mt-2">
+                  <button type="button" class="px-3 py-1 bg-gray-200 rounded" onclick="closeModal('addServiceModal')">Annuller</button>
+                  <button type="submit" class="px-3 py-1 bg-green-500 text-white rounded">Opret</button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
-        <div th:if="${#lists.isEmpty(contracts)}">No contracts yet.</div>
-      </section>
+      </main>
     </div>
+
     <script>
+      // ------------------------------------------------------------------
+      // Funktioner til at vise/skjule formularer på sponsorsiden
+      // ------------------------------------------------------------------
+      // toggleSponsorEdit: viser/skjuler inline sponsor-redigeringsformularen
       function toggleSponsorEdit(i) {
         const id = "sponsorEditForm-" + i;
         const el = document.getElementById(id);
         if (!el) return;
-        el.style.display =
-          el.style.display === "none" || el.style.display === ""
-            ? "block"
-            : "none";
+        el.style.display = el.style.display === "none" || el.style.display === "" ? "block" : "none";
       }
+      // toggleContractEdit: viser/skjuler inline kontrakt-redigeringsformularen
       function toggleContractEdit(i) {
         const id = "contractEditForm-" + i;
         const el = document.getElementById(id);
         if (!el) return;
-        el.style.display =
-          el.style.display === "none" || el.style.display === ""
-            ? "block"
-            : "none";
+        el.style.display = el.style.display === "none" || el.style.display === "" ? "block" : "none";
       }
-      // Block non-digit characters in phone inputs and clean pasted values
+      // Selv-eksekverende funktion: sætter event-handlere op for sidefunktioner
       (function () {
+        // attachPhoneHandlers: sikrer at telefon-input kun indeholder cifre (altså tal)
         function attachPhoneHandlers(el) {
           if (!el) return;
           el.addEventListener("keydown", function (e) {
             const k = e.key;
-            if (k.length !== 1) return; // allow control keys
+            if (k.length !== 1) return;
             if (!/^[0-9]$/.test(k)) {
               e.preventDefault();
             }
           });
           el.addEventListener("paste", function (e) {
             e.preventDefault();
-            const text =
-              (e.clipboardData || window.clipboardData).getData("text") || "";
+            const text = (e.clipboardData || window.clipboardData).getData("text") || "";
             const filtered = text.replace(/[^0-9]/g, "");
             const start = el.selectionStart;
             const end = el.selectionEnd;
@@ -330,21 +304,658 @@
           el.addEventListener("input", function () {
             const cleaned = el.value.replace(/[^0-9]/g, "");
             if (cleaned !== el.value) {
-              const pos = Math.max(
-                0,
-                el.selectionStart - (el.value.length - cleaned.length)
-              );
+              const pos = Math.max(0, el.selectionStart - (el.value.length - cleaned.length));
               el.value = cleaned;
               el.setSelectionRange(pos, pos);
             }
           });
         }
-        // attach to the add form phone and any edit phone inputs
+        // Hæft telefon-validering på formularfelter
         attachPhoneHandlers(document.getElementById("phoneNumber"));
-        document
-          .querySelectorAll('input[name="phoneNumber"]')
-          .forEach(attachPhoneHandlers);
+        document.querySelectorAll('input[name="phoneNumber"]').forEach(attachPhoneHandlers);
+
+        // applySponsorFilter: filtreer sponsors baseret på værdien af dropdownen
+        // - 'active' viser kun sponsorer med status true
+        // - 'inactive' viser kun sponsorer med status false
+        // - 'all' viser alle sponsorer
+        function applySponsorFilter() {
+          const sel = document.getElementById('sponsorFilter');
+          if (!sel) return;
+          const v = sel.value;
+          document.querySelectorAll('.sponsor-item').forEach(function (el) {
+            const status = el.getAttribute('data-status');
+            if (v === 'all') {
+              el.style.display = '';
+            } else if (v === 'active') {
+              el.style.display = status === 'true' || status === 'True' ? '' : 'none';
+            } else if (v === 'inactive') {
+              el.style.display = status === 'false' || status === 'False' ? '' : 'none';
+            }
+          });
+        }
+
+        // Finder filter-dropdownen (filterEl), sætter default til 'active', filtrerer listen ved load,
+        // og aktiverer filtrering når brugeren ændrer dropdown-værdien
+        const filterEl = document.getElementById('sponsorFilter');
+        if (filterEl) {
+          filterEl.value = 'active';
+          applySponsorFilter();
+          filterEl.addEventListener('change', applySponsorFilter);
+        }
       })();
+
+      // ------------------------------------------------------------------
+      // Modal-hjælpere (bruges når brugeren klikker på knapperne i sponsor-boxen)
+      // ------------------------------------------------------------------
+      // openAddModal: fylder skjult felt med sponsor-id og viser tilføj-modal
+      // Denne funktion kaldes fra hver sponsors "Tilføj Kontrakt"-knap
+      // buttonEl - knappen der blev klikket (har data-sponsor-id/name)
+      function openAddModal(buttonEl) {
+        try {
+          const sid = buttonEl.getAttribute('data-sponsor-id');
+          const sname = buttonEl.getAttribute('data-sponsor-name') || '';
+          document.getElementById('addModalSponsorId').value = sid;
+          document.getElementById('addModalSponsorName').textContent = sname;
+          document.getElementById('addContractModal').style.display = 'flex';
+        } catch (e) {
+          // Log fejl i konsollen hvis noget går galt; dette bør ikke kastes videre til bruger.
+          console.error('openAddModal error', e);
+        }
+      }
+
+      // openViewModal: viser modal med liste over kontrakter for valgt sponsor
+      // Funktionen henter sponsor-id fra knappen og bygger indholdet via populateViewContracts
+      function openViewModal(buttonEl) {
+        try {
+          const sid = buttonEl.getAttribute('data-sponsor-id');
+          const sname = buttonEl.getAttribute('data-sponsor-name') || '';
+          document.getElementById('viewModalSponsorName').textContent = sname || ('#' + sid);
+          populateViewContracts(sid);
+          document.getElementById('viewContractsModal').style.display = 'flex';
+        } catch (e) {
+          // Vis fejl i konsollen — modal-oprettelse må ikke give et uncaught exception
+          console.error('openViewModal error', e);
+        }
+      }
+
+      function closeModal(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.display = 'none';
+      }
+
+      // populateViewContracts: bygger og indsætter HTML for hver kontrakt
+      // - Læser data fra #contractsData (server-renderet skjult DOM)
+      // - Bygger en kort visning (Type, Start, End, Payment, Status)
+      // - Tilføjer en 'Edit' knap som viser en indlejret form til at gemme ændringer
+      // Param: sponsorId (String/Number) - id på den sponsor vi skal vise kontrakter for
+      function populateViewContracts(sponsorId) {
+        const listEl = document.getElementById('viewContractsList');
+        if (!listEl) return;
+        listEl.innerHTML = '';
+        const container = document.getElementById('contractsData');
+        if (!container) return;
+        const nodes = container.querySelectorAll('.contract-data');
+        const matches = [];
+        nodes.forEach(function (n) {
+          if (String(n.getAttribute('data-sponsor-id')) === String(sponsorId)) {
+            matches.push(n);
+          }
+        });
+        if (matches.length === 0) {
+          listEl.innerHTML = '<div class="text-sm text-gray-600">Ingen kontrakter for denne sponsor.</div>';
+          return;
+        }
+        const sponsorDisplayName = (document.getElementById('viewModalSponsorName') || {}).textContent || '';
+        // konventere ISO-like dato (yyyy-mm-dd til dd-mm-yyyy for display
+        function formatDisplayDate(d) {
+          if (!d && d !== 0) return '';
+          const s = String(d);
+          const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+          if (m) return `${m[3]}-${m[2]}-${m[1]}`;
+          const dt = new Date(s);
+          if (!isNaN(dt.getTime())) {
+            const dd = String(dt.getDate()).padStart(2, '0');
+            const mm = String(dt.getMonth() + 1).padStart(2, '0');
+            const yyyy = dt.getFullYear();
+            return `${dd}-${mm}-${yyyy}`;
+          }
+          return s;
+        }
+
+        matches.forEach(function (n, idx) {
+          const id = n.getAttribute('data-id');
+          const name = n.getAttribute('data-name') || '';
+          const type = n.getAttribute('data-type') || '';
+          const start = n.getAttribute('data-start') || '';
+          const end = n.getAttribute('data-end') || '';
+          const formattedStart = formatDisplayDate(start);
+          const formattedEnd = formatDisplayDate(end);
+          const payment = n.getAttribute('data-payment') || '';
+          const status = n.getAttribute('data-status') || '';
+
+          const item = document.createElement('div');
+          item.className = 'border rounded p-2';
+         
+          // Opretter et container-element som indeholder hele kontrakt-blokken (titel, detaljer og edit-form)
+          const container = document.createElement('div');
+          container.className = 'border rounded p-2';
+
+          // ----------------------------------------------------------
+          // TOP-LINJE: Kontraktnavn + ID + knapper
+          // ----------------------------------------------------------
+          const topRow = document.createElement('div');
+          topRow.className = 'flex justify-between items-center';
+
+          // wrapper til navn + ID
+          const title = document.createElement('div');
+          title.className = 'font-medium';
+          // kontraktens navn (tekst)
+          const nameText = document.createElement('span');
+          nameText.textContent = name;
+          // kontraktens ID i parentes
+          const idSpan = document.createElement('span');
+          idSpan.className = 'text-xs text-gray-500';
+          idSpan.textContent = ` (#${id})`;
+          // Saml navn og ID
+          title.appendChild(nameText);
+          title.appendChild(idSpan);
+
+          // gruppe til de tre knapper: Vis/Skjul, Edit, Slet
+          const btnGroup = document.createElement('div');
+          btnGroup.className = 'flex space-x-2';
+
+
+          // knap: Åbn/luk redigeringsformular
+          const btnEdit = document.createElement('button');
+          btnEdit.type = 'button';
+          btnEdit.className = 'px-2 py-1 text-sm bg-yellow-200 rounded';
+          btnEdit.textContent = 'Rediger Kontrakten';
+
+          // knap: Slet kontrakt (viser confirm-besked før sletning)
+          const btnDelete = document.createElement('button');
+          btnDelete.type = 'button';
+          btnDelete.className = 'px-2 py-1 text-sm bg-red-300 rounded';
+          btnDelete.textContent = 'Slet Kontrakt';
+
+          // dette tilføjer knapperne
+          const btnAddService = document.createElement('button');
+          btnAddService.type = 'button';
+          btnAddService.className = 'px-2 py-1 text-sm bg-blue-500 text-white rounded';
+          btnAddService.textContent = 'Tilføj Tjeneste';
+
+          // dette tilføjer knapperne 
+          btnGroup.appendChild(btnEdit);
+          btnGroup.appendChild(btnDelete);
+
+          // og dette tilføjer titel + knapgruppe til top-linjen
+          topRow.appendChild(title);
+          topRow.appendChild(btnGroup);
+
+
+          // ----------------------------------------------------------
+          // DETALJE-OMRÅDE (Type, datoer, betaling, status)
+          // ----------------------------------------------------------
+          const details = document.createElement('div');
+          details.id = `details-${idx}`;
+          details.style.display = 'block';
+          details.className = 'mt-2 text-sm text-gray-700';
+          // individuelle detailfelter
+          const dType = document.createElement('div'); dType.textContent = `Type: ${type}`;
+          const dStart = document.createElement('div'); dStart.textContent = `Start: ${formattedStart}`;
+          const dEnd = document.createElement('div'); dEnd.textContent = `End: ${formattedEnd}`;
+          const dPayment = document.createElement('div'); dPayment.textContent = `Payment: ${payment}`;
+          const dStatus = document.createElement('div'); dStatus.textContent = `Status: ${status}`;
+          // Saml detailfelter
+          details.appendChild(dType);
+          details.appendChild(dStart);
+          details.appendChild(dEnd);
+          details.appendChild(dPayment);
+          details.appendChild(dStatus);
+
+          // ----------------------------------------------------------
+          // SERVICES-LISTE: vis tjenester som hører til denne kontrakt
+          // ----------------------------------------------------------
+          const servicesWrapper = document.createElement('div');
+          servicesWrapper.className = 'mt-3';
+
+          // Header: title
+          const servicesHeader = document.createElement('div');
+          servicesHeader.className = 'flex items-center justify-between';
+          const servicesTitle = document.createElement('div');
+          servicesTitle.className = 'text-sm font-medium mb-2';
+          servicesTitle.textContent = 'Tjenester';
+          servicesHeader.appendChild(servicesTitle);
+          // place the add-service button inline with the title
+          btnAddService.className = 'px-3 py-1 text-sm bg-blue-500 text-white rounded';
+          servicesHeader.appendChild(btnAddService);
+          servicesWrapper.appendChild(servicesHeader);
+
+          // container for the service cards (always visible)
+          const servicesList = document.createElement('div');
+          servicesList.className = 'mt-2';
+          servicesList.style.display = 'block';
+          servicesWrapper.appendChild(servicesList);
+
+          // find services from hidden template
+          try {
+            const servicesContainer = document.getElementById('servicesData');
+              if (servicesContainer) {
+              const serviceNodes = servicesContainer.querySelectorAll('.service-data');
+              serviceNodes.forEach(function (sn) {
+                if (String(sn.getAttribute('data-contract-id')) === String(id)) {
+                  const sid = sn.getAttribute('data-id');
+                  const sname = sn.getAttribute('data-name') || '';
+                  const stype = sn.getAttribute('data-type') || '';
+                  const sstart = sn.getAttribute('data-start') || '';
+                  const send = sn.getAttribute('data-end') || '';
+                  const samount = sn.getAttribute('data-amount') || '';
+                  const sstatus = sn.getAttribute('data-status') || '';
+
+                  const sCard = document.createElement('div');
+                  // service cards styled light-grey
+                  sCard.className = 'border rounded p-2 mb-2 bg-gray-100';
+                  const sTop = document.createElement('div');
+                  sTop.className = 'flex justify-between items-center';
+                  const sTitle = document.createElement('div');
+                  sTitle.textContent = sname + ' ( #' + sid + ')';
+                  const sButtons = document.createElement('div');
+                  sButtons.className = 'flex space-x-2';
+
+                  const sEdit = document.createElement('button');
+                  sEdit.type = 'button';
+                  sEdit.className = 'px-2 py-1 text-sm bg-yellow-200 rounded';
+                  sEdit.textContent = 'Edit';
+
+                  const sDelete = document.createElement('button');
+                  sDelete.type = 'button';
+                  sDelete.className = 'px-2 py-1 text-sm bg-red-300 rounded';
+                  sDelete.textContent = 'Slet';
+
+                  sButtons.appendChild(sEdit);
+                  sButtons.appendChild(sDelete);
+                  sTop.appendChild(sTitle);
+                  sTop.appendChild(sButtons);
+                  sCard.appendChild(sTop);
+
+                  const sDetails = document.createElement('div');
+                  sDetails.className = 'text-sm text-gray-700 mt-2';
+                  // Map type and status to human-friendly labels and format dates as dd-mm-yyyy
+                  const typeLabels = {
+                    'Billeter': 'Billeter',
+                    'Kuponer': 'Kuponer',
+                    'Banner': 'Banner',
+                    'LogoTrojler': 'Logo på trøjer',
+                    'LogoBukser': 'Logo på bukser',
+                    'Tickets': 'Tickets',
+                    'Coupons': 'Coupons'
+                  };
+                  const statusLabels = {
+                    'AKTIV': 'Aktiv',
+                    'IGANG': 'Igang',
+                    'UDFORT': 'Udført',
+                    'INAKTIV': 'Inaktiv',
+                    'true': 'Aktiv',
+                    'false': 'Inaktiv'
+                  };
+                  const displayType = typeLabels[stype] || stype || '';
+                  const displayStart = formatDisplayDate(sstart);
+                  const displayEnd = formatDisplayDate(send);
+                  const displayStatus = statusLabels[String(sstatus)] || sstatus || '';
+                  sDetails.innerHTML = `Type: ${escapeHtml(displayType)}<br/>Start: ${escapeHtml(displayStart)}<br/>End: ${escapeHtml(displayEnd)}<br/>Amount/Division: ${escapeHtml(samount)}<br/>Status: ${escapeHtml(displayStatus)}`;
+                  sCard.appendChild(sDetails);
+
+                  // small inline edit block for service
+                  const sEditBlock = document.createElement('div');
+                  sEditBlock.style.display = 'none';
+                  sEditBlock.className = 'mt-2';
+                  // build basic edit form
+                  const sForm = document.createElement('form');
+                  sForm.action = '/update/service';
+                  sForm.method = 'POST';
+                  // hidden id
+                  const sIdInput = document.createElement('input'); sIdInput.type = 'hidden'; sIdInput.name = 'id'; sIdInput.value = sid; sForm.appendChild(sIdInput);
+                  // name
+                  const sNameLab = document.createElement('label'); sNameLab.className = 'block text-sm'; sNameLab.textContent = 'Info/Kommentar'; sForm.appendChild(sNameLab);
+                  const sNameInp = document.createElement('input'); sNameInp.name = 'name'; sNameInp.type = 'text'; sNameInp.value = sname; sNameInp.className='border rounded px-2 py-1 w-full'; sForm.appendChild(sNameInp);
+                  // type 
+                  const sTypeLab = document.createElement('label'); sTypeLab.className='block text-sm'; sTypeLab.textContent='Type'; sForm.appendChild(sTypeLab);
+                  const sTypeSel = document.createElement('select'); sTypeSel.name='type'; sTypeSel.className='border rounded px-2 py-1 w-full';
+                  // copy options from the Add Service modal so labels/values match
+                  const templateType = document.getElementById('addServiceType');
+                  if (templateType) {
+                    const opts = templateType.querySelectorAll('option');
+                    opts.forEach(function(o){ sTypeSel.appendChild(o.cloneNode(true)); });
+                    if (stype) sTypeSel.value = stype;
+                  }
+                  sForm.appendChild(sTypeSel);
+
+                  // amount/division wrapper (we toggle between number input and select for logo types)
+                  const sAmtWrapper = document.createElement('div'); sAmtWrapper.id = 's-amount-wrapper-' + sid; sForm.appendChild(sAmtWrapper);
+                  function updateSAmountWrapper() {
+                    // clear wrapper
+                    sAmtWrapper.innerHTML = '';
+                    const v = sTypeSel.value;
+                    if (v === 'LogoTrojler' || v === 'LogoBukser') {
+                      const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Divisionen'; sAmtWrapper.appendChild(lab);
+                      const divSel = document.createElement('select'); divSel.name='amountOrDivision'; divSel.className='border rounded px-2 py-1 w-full';
+                      // preserve previous numeric value when possible
+                      const prev = parseInt(samount) || 1;
+                      for (let i=1;i<=10;i++) { const o = document.createElement('option'); o.value = String(i); o.textContent = String(i); if(i===prev) o.selected=true; divSel.appendChild(o); }
+                      sAmtWrapper.appendChild(divSel);
+                    } else {
+                      const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Antal'; sAmtWrapper.appendChild(lab);
+                      const inp = document.createElement('input'); inp.name='amountOrDivision'; inp.type='number'; inp.value = (samount || '0'); inp.className='border rounded px-2 py-1 w-full'; sAmtWrapper.appendChild(inp);
+                    }
+                  }
+                  // initialize wrapper based on current type/value
+                  updateSAmountWrapper();
+                  // update when service type changes
+                  sTypeSel.addEventListener('change', updateSAmountWrapper);
+                  // start/end/status
+                  const sStartLab = document.createElement('label'); sStartLab.className='block text-sm'; sStartLab.textContent='Start Dato'; sForm.appendChild(sStartLab);
+                  const sStartInp = document.createElement('input'); sStartInp.name='startDate'; sStartInp.type='date'; sStartInp.value=sstart; sStartInp.className='border rounded px-2 py-1 w-full'; sForm.appendChild(sStartInp);
+                  const sEndLab = document.createElement('label'); sEndLab.className='block text-sm'; sEndLab.textContent='Slut Dato'; sForm.appendChild(sEndLab);
+                  const sEndInp = document.createElement('input'); sEndInp.name='endDate'; sEndInp.type='date'; sEndInp.value=send; sEndInp.className='border rounded px-2 py-1 w-full'; sForm.appendChild(sEndInp);
+                  const sStatusLab = document.createElement('label'); sStatusLab.className='block text-sm'; sStatusLab.textContent='Status'; sForm.appendChild(sStatusLab);
+                  const sStatusSel = document.createElement('select'); sStatusSel.name='status'; sStatusSel.className='border rounded px-2 py-1 w-full';
+                  // Use enum names as values so Spring can bind to Service.ServiceStatus
+                  const statusOptions = [
+                    { value: 'AKTIV', label: 'Aktiv' },
+                    { value: 'IGANG', label: 'Igang' },
+                    { value: 'UDFORT', label: 'Udført' },
+                    { value: 'INAKTIV', label: 'Inaktiv' }
+                  ];
+                  statusOptions.forEach(function(o){ const opt=document.createElement('option'); opt.value=o.value; opt.textContent=o.label; if(o.value===sstatus) opt.selected=true; sStatusSel.appendChild(opt); }); sForm.appendChild(sStatusSel);
+                  const sBtnRow = document.createElement('div'); sBtnRow.className='flex justify-end space-x-2 mt-2';
+                  const sCancel = document.createElement('button'); sCancel.type='button'; sCancel.className='px-3 py-1 bg-gray-200 rounded'; sCancel.textContent='Cancel';
+                  const sSave = document.createElement('button'); sSave.type='submit'; sSave.className='px-3 py-1 bg-green-500 text-white rounded'; sSave.textContent='Save';
+                  sBtnRow.appendChild(sCancel); sBtnRow.appendChild(sSave); sForm.appendChild(sBtnRow);
+                  sEditBlock.appendChild(sForm);
+                  sCard.appendChild(sEditBlock);
+
+                  sEdit.addEventListener('click', function(){ sEditBlock.style.display = sEditBlock.style.display==='none' ? 'block' : 'none'; });
+                  // cancel should hide the inline edit block
+                  sCancel.addEventListener('click', function () { sEditBlock.style.display = 'none'; });
+                  sDelete.addEventListener('click', function(){ if(confirm('Slet denne tjeneste?')) postDeleteService(sid, id); });
+
+                  servicesList.appendChild(sCard);
+                }
+              });
+            }
+          } catch (e) {
+            console.error('populateViewContracts: services render error', e);
+          }
+
+
+          
+          // ----------------------------------------------------------
+          // REDIGERINGS-FORMULAR (skjult indtil "Edit" klikkes)
+          // ----------------------------------------------------------
+          const editBlock = document.createElement('div');
+          editBlock.id = `editform-${idx}`;
+          editBlock.style.display = 'none';
+          editBlock.className = 'mt-2 text-sm text-gray-700 border-t pt-2';
+
+          // sender POST til /sponsors/editContract
+          const form = document.createElement('form');
+          form.action = '/sponsors/editContract';
+          form.method = 'POST';
+          form.className = 'space-y-2';
+
+          // skjulte felter: kontrakt-ID + sponsor-navnet (bruges til redirect)
+          const hiddenId = document.createElement('input');
+          hiddenId.type = 'hidden'; 
+          hiddenId.name = 'contractId'; 
+          hiddenId.value = id;
+          
+          const hiddenSponsorName = document.createElement('input');
+          hiddenSponsorName.type = 'hidden'; 
+          hiddenSponsorName.name = 'sponsorName'; 
+          hiddenSponsorName.value = sponsorDisplayName || '';
+
+          // iføjer så de skulte felter
+          form.appendChild(hiddenId);
+          form.appendChild(hiddenSponsorName);
+
+          
+          // ----------------------------------------------------------
+          // Helperfunktion til at tilføje label + input-felt i ét trin
+          // ----------------------------------------------------------
+          function addLabelAndControl(parent, labelText, control) {
+            const lab = document.createElement('label');
+            lab.className = 'block text-sm';
+            lab.textContent = labelText;
+            parent.appendChild(lab);
+            parent.appendChild(control);
+          }
+
+          // ----------------------------------------------------------
+          // Sponsor dropdown (fyldes senere via cloneNode fra template)
+          // ----------------------------------------------------------
+          const sponsorSelect = document.createElement('select');
+          sponsorSelect.id = `sponsor-select-${idx}`;
+          sponsorSelect.name = 'sponsorId';
+          sponsorSelect.className = 'border rounded px-2 py-1 w-full';
+          addLabelAndControl(form, 'Sponsor', sponsorSelect);
+
+          // Inputfelt: kontrakt-navn
+          const nameInput = document.createElement('input');
+          nameInput.name = 'name'; 
+          nameInput.type = 'text'; 
+          nameInput.value = name; 
+          nameInput.className = 'border rounded px-2 py-1 w-full';
+          addLabelAndControl(form, 'Navn', nameInput);
+
+          // Inputfelt: kontrakt-type
+          const typeInput = document.createElement('input');
+          typeInput.name = 'type'; 
+          typeInput.type = 'text'; 
+          typeInput.value = type; 
+          typeInput.className = 'border rounded px-2 py-1 w-full';
+          addLabelAndControl(form, 'Type', typeInput);
+
+          // Startdato-felt
+          const startInput = document.createElement('input');
+          startInput.name = 'startDate'; 
+          startInput.type = 'date'; 
+          startInput.value = start || '' ; 
+          startInput.className = 'border rounded px-2 py-1 w-full';
+          addLabelAndControl(form, 'Start Dato', startInput);
+
+          // Slutdato-felt
+          const endInput = document.createElement('input');
+          endInput.name = 'endDate'; 
+          endInput.type = 'date'; 
+          endInput.value = end || '' ; 
+          endInput.className = 'border rounded px-2 py-1 w-full';
+          addLabelAndControl(form, 'Slut Dato', endInput);
+
+          // Betaling-felt
+          const paymentInput = document.createElement('input');
+          paymentInput.name = 'payment'; 
+          paymentInput.type = 'number'; 
+          paymentInput.value = payment; 
+          paymentInput.className = 'border rounded px-2 py-1 w-full';
+          addLabelAndControl(form, 'Payment', paymentInput);
+
+          // Status-dropdown (true/false)
+          const statusSelect = document.createElement('select');
+          statusSelect.id = `status-select-${idx}`; 
+          statusSelect.name = 'status'; 
+          statusSelect.className = 'border rounded px-2 py-1 w-full';
+          
+          const optTrue = document.createElement('option'); 
+          optTrue.value = 'true'; 
+          optTrue.textContent = 'True';
+          
+          const optFalse = document.createElement('option'); 
+          optFalse.value = 'false'; 
+          optFalse.textContent = 'False';
+          
+          statusSelect.appendChild(optTrue); statusSelect.appendChild(optFalse);
+          if (String(status) === 'true' || status === true) statusSelect.value = 'true'; else statusSelect.value = 'false';
+          addLabelAndControl(form, 'Aktive', statusSelect);
+
+
+          // ----------------------------------------------------------
+          // Knapper nederst (Save og Cancel)
+          // ----------------------------------------------------------
+          const btnRow = document.createElement('div'); 
+          btnRow.className = 'flex justify-end space-x-2 mt-2';
+          
+          const btnCancel = document.createElement('button'); 
+          btnCancel.type = 'button'; 
+          btnCancel.className = 'px-3 py-1 bg-gray-200 rounded'; 
+          btnCancel.textContent = 'Cancel';
+
+          const btnSave = document.createElement('button'); 
+          btnSave.type = 'submit'; 
+          btnSave.className = 'px-3 py-1 bg-green-500 text-white rounded'; 
+          btnSave.textContent = 'Save';
+          btnRow.appendChild(btnCancel); btnRow.appendChild(btnSave);
+          form.appendChild(btnRow);
+
+          editBlock.appendChild(form);
+
+          // Assemble container
+          container.appendChild(topRow);
+          container.appendChild(details);
+          // services header + list (if any)
+          container.appendChild(servicesWrapper);
+          // services button is inline in the header; no floating button required
+          container.appendChild(editBlock);
+
+          // Details always shown; no toggle handler required
+          // Åbn add-service modal
+          btnAddService.addEventListener('click', function () {
+            try {
+              const modal = document.getElementById('addServiceModal');
+              if (!modal) return;
+              document.getElementById('addServiceContractId').value = id;
+              document.getElementById('addServiceContractName').textContent = name || ('#' + id);
+              // reset inputs
+              const form = modal.querySelector('form');
+              if (form) form.reset();
+              modal.style.display = 'flex';
+            } catch (e) { console.error('openAddService error', e); }
+          });
+          // services always visible; no toggle
+          // Åbn/luk redigeringsformular
+          btnEdit.addEventListener('click', function () {
+            editBlock.style.display = editBlock.style.display === 'none' ? 'block' : 'none';
+          });
+          // Slet kontrakt (kalder back-end via postDeleteContract)
+          btnDelete.addEventListener('click', function () {
+            if (confirm('Slet denne kontrakt? Dette kan ikke fortrydes.')) {
+              postDeleteContract(id, sponsorId);
+            }
+          });
+          // Luk redigeringsformular uden at gemme
+          btnCancel.addEventListener('click', function () { editBlock.style.display = 'none'; });
+
+          // Tilføj containeren til modal-listen
+          listEl.appendChild(container);
+
+          // udfyld sponsor-dropdown og status-dropdown med rigtige værdier
+          // Gør det ved at klone <option>-elementer fra skjult template 
+          try {
+            const template = document.getElementById('sponsorOptionsTemplate');
+            if (template) {
+              const sel = document.getElementById('sponsor-select-' + idx);
+              if (sel) {
+                // clone option nodes from template
+                const opts = template.querySelectorAll('option');
+                opts.forEach(function (o) {
+                  sel.appendChild(o.cloneNode(true));
+                });
+                // Sæt sponsorId som valgt værdi
+                sel.value = n.getAttribute('data-sponsor-id');
+              }
+            }
+            // Sæt korrekt status i status-select
+            const statusSel = document.getElementById('status-select-' + idx);
+            if (statusSel) statusSel.value = String(status) === 'true' || String(status) === 'True' ? 'true' : 'false';
+          } catch (err) {
+            // Hvis noget går galt ved udfyldning, log fejl til konsol men fortsæt
+            console.error('populateViewContracts: cannot populate selects', err);
+          }
+        });
+      }
+      // Sender en POST-anmodning for at slette en kontrakt ved at oprette og indsende en skjult formular.
+      // Kaldes fra den dynamisk genererede kontraktkortets knap 'Slet Kontrakt'.
+      function postDeleteContract(contractId, sponsorId) {
+        try {
+          const f = document.createElement('form');
+          f.method = 'POST';
+          f.action = '/sponsors/deleteContract';
+          f.style.display = 'none';
+          const inId = document.createElement('input');
+          inId.type = 'hidden';
+          inId.name = 'contractId';
+          inId.value = contractId;
+          f.appendChild(inId);
+          const inSponsor = document.createElement('input');
+          inSponsor.type = 'hidden';
+          inSponsor.name = 'sponsorId';
+          inSponsor.value = sponsorId || '';
+          f.appendChild(inSponsor);
+          document.body.appendChild(f);
+          f.submit();
+        } catch (e) {
+          console.error('postDeleteContract error', e);
+          alert('Kunne ikke slette kontrakt — se konsol for detaljer.');
+        }
+      }
+
+      // POST delete service by creating hidden form
+      function postDeleteService(serviceId, contractId) {
+        try {
+          const f = document.createElement('form');
+          f.method = 'POST';
+          f.action = '/sponsors/deleteService';
+          f.style.display = 'none';
+          const inId = document.createElement('input');
+          inId.type = 'hidden';
+          inId.name = 'serviceId';
+          inId.value = serviceId;
+          f.appendChild(inId);
+          document.body.appendChild(f);
+          f.submit();
+        } catch (e) {
+          console.error('postDeleteService error', e);
+          alert('Kunne ikke slette tjeneste — se konsol for detaljer.');
+        }
+      }
+
+      // toggle amount/division input in addService modal
+      (function setupServiceModal() {
+        const sel = document.getElementById('addServiceType');
+        if (!sel) return;
+        const wrapper = document.getElementById('amountOrDivisionWrapper');
+        function updateWrapper() {
+          const v = sel.value;
+          wrapper.innerHTML = '';
+          if (v === 'LogoTrojler' || v === 'LogoBukser') {
+            const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Divisionen'; wrapper.appendChild(lab);
+            const divSel = document.createElement('select'); divSel.name='amountOrDivision'; divSel.className='border rounded px-2 py-1 w-full';
+            for (let i=1;i<=10;i++) { const o = document.createElement('option'); o.value = String(i); o.textContent = String(i); divSel.appendChild(o); }
+            wrapper.appendChild(divSel);
+          } else {
+            const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Antal'; wrapper.appendChild(lab);
+            const inp = document.createElement('input'); inp.name='amountOrDivision'; inp.type='number'; inp.value='0'; inp.className='border rounded px-2 py-1 w-full'; wrapper.appendChild(inp);
+          }
+        }
+        sel.addEventListener('change', updateWrapper);
+        // init
+        updateWrapper();
+      })();
+
+      // basic escaping to avoid injection when rendering attributes
+      function escapeHtml(s) {
+        if (!s && s !== 0) return '';
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      }
     </script>
   </body>
 </html>
