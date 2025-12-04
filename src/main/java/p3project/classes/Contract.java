@@ -27,6 +27,7 @@ public class Contract {
 
     // copy of sponsor name for easy display in views
     private String sponsorName;
+    private String mimeType;
 
     @Lob
     @Column(name = "pdf_data", columnDefinition = "LONGBLOB") /* Longblob to have enough storage for .pdf's */
@@ -70,6 +71,16 @@ public class Contract {
     public String getName() {
         return this.name;
     }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
+
 
     public void setSponsorId(Long sponsorId) {
         this.sponsorId = sponsorId;

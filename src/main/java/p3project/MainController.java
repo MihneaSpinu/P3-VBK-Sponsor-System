@@ -2,12 +2,9 @@ package p3project;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -16,9 +13,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.WebUtils;
 
 import p3project.classes.Changelog;
 import p3project.classes.Contract;
@@ -26,14 +27,18 @@ import p3project.classes.Eventlog;
 import p3project.classes.Service;
 import p3project.classes.Sponsor;
 import p3project.classes.User;
-import p3project.classes.Token;
 import p3project.repositories.ContractRepository;
 import p3project.repositories.LogRepository;
 import p3project.repositories.ServiceRepository;
 import p3project.repositories.SponsorRepository;
 import p3project.repositories.UserRepository;
 
-import org.springframework.http.HttpCookie;
+import java.nio.file.Files;
+
+import org.springframework.web.util.WebUtils;
+
+import p3project.classes.Token;
+
 import org.springframework.http.ResponseCookie;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -259,6 +264,7 @@ public class MainController {
             @RequestParam(required = false, defaultValue = "false") boolean status,
             @RequestParam String type,
             @RequestParam String name,
+            @RequestParam MultipartFile pdffile,
             Model model) {
         // Prøv at parse datoer og oprette kontrakten. Ved fejl vises en fejlbesked
         try {
@@ -270,6 +276,17 @@ public class MainController {
             java.util.Optional<Sponsor> sponsorOpt = sponsorRepository.findById(sponsorId);
             if (sponsorOpt.isPresent())
                 contract.setSponsorName(sponsorOpt.get().getName());
+
+            // Håndter PDF upload
+            try {
+                contract.setPdfData(pdffile.getBytes());
+                String cleanFilename = Paths.get(pdffile.getOriginalFilename()).getFileName().toString(); //Get the name of the file
+                contract.setFileName(cleanFilename); //save the name of the file in contract
+                contract.setMimeType(pdffile.getContentType()); //Save the type of file
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "error"; // 
+            }
             contractRepository.save(contract);
             return "redirect:/sponsors"; // Post/Redirect/Get for at undgå double submit
         } catch (IllegalArgumentException ex) {
@@ -383,6 +400,7 @@ public class MainController {
             @RequestParam(required = false, defaultValue = "false") boolean status,
             @RequestParam String type,
             @RequestParam(required = false) String name,
+            @RequestParam MultipartFile pdffile,
             Model model) {
         java.util.Optional<Contract> contractOpt = contractRepository.findById(contractId);
         // Hent kontrakten, opdater felter og gem. Valider datoer koncentrisk.
@@ -402,6 +420,16 @@ public class MainController {
                 if (name != null) {
                     contract.setName(name);
                 }
+                // Håndter PDF upload
+                try {   
+                    contract.setPdfData(pdffile.getBytes());
+                    String cleanFilename = Paths.get(pdffile.getOriginalFilename()).getFileName().toString(); //Get the name of the file
+                    contract.setFileName(cleanFilename); //save the name of the file in contract
+                    contract.setMimeType(pdffile.getContentType()); //Save the type of file
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return "error"; // 
+                }
                 contractRepository.save(contract);
             } catch (IllegalArgumentException ex) {
                 model.addAttribute("error", ex.getMessage());
@@ -420,19 +448,26 @@ public class MainController {
         return "redirect:/sponsors";
     }
 
-    // fjern requestparam?
-    @GetMapping("/getFile")
-    public ResponseEntity<byte[]> getFile(@RequestParam long contractId) {
-        Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new RuntimeException("/uploadFile, Contract not found"));
-        byte[] pdfData = contract.getPdfData();
 
+    // fjern requestparam?
+    @GetMapping("/getFile/{contractId}")
+    public ResponseEntity<byte[]> getFile(@PathVariable long contractId) {
+        Optional<Contract> contractOpt = contractRepository.findById(contractId);
+        if (contractOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        Contract contract = contractRepository.findById(contractId)
+                .orElseThrow(() -> new RuntimeException("/getFile, Contract not found"));
+        byte[] pdfData = contract.getPdfData();
+        String mime = contract.getMimeType() != null
+            ? contract.getMimeType()
+            : "application/octet-stream";
         return ResponseEntity.ok()
             .header(
                 HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + contract.getFileName() + ".pdf\""
+                "attachment; filename=\"" + contract.getFileName() + "\""
             )
-            .contentType(MediaType.APPLICATION_PDF)
+            .contentType(MediaType.parseMediaType(mime))
             .body(pdfData);
 
     }
@@ -440,6 +475,10 @@ public class MainController {
     // File upload
     @PostMapping("/uploadFile")
     public String uploadFileTo(@RequestParam MultipartFile pdffile, @RequestParam Long contractId) {
+        Optional<Contract> contractOpt = contractRepository.findById(contractId);
+        if (contractOpt.isEmpty()) {
+            return "error"; //
+        }
         Contract contract = contractRepository.findById(contractId)
                 .orElseThrow(() -> new RuntimeException("/uploadFile, Contract not found"));
 
@@ -542,25 +581,6 @@ public class MainController {
         Token token = Token.sign(cookieId);
         return token.verify(cookieHash);
     }
-
-    /* 
-    @PostMapping("/login/confirm")
-    public String confirmLogin(
-            @RequestParam String username,
-            @RequestParam String email,
-            Model model) {
-
-        User user = userRepository.findByName(username);
-
-        if (user == null || !Objects.equals(email, user.getEmail())) {
-            model.addAttribute("error", "Invalid username or email");
-            return "login";
-        }
-
-        model.addAttribute("user", user);
-        return "homepage"; // login success page
-    }
-    */
 
     @GetMapping("/homepage")
     public String showhomepage(Model model, HttpServletRequest request) {

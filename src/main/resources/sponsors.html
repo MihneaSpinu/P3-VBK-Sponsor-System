@@ -146,14 +146,32 @@
             modal-indholdet dynamisk når brugeren ønsker at se en sponsors kontrakter.
           -->
           <div id="contractsData" style="display:none">
-            <div th:each="c : ${contracts}" class="contract-data"
-                 th:attr="data-id=${c.id},data-sponsor-id=${c.sponsorId},data-name=${c.name},data-type=${c.type},data-start=${c.startDate},data-end=${c.endDate},data-payment=${c.payment},data-status=${c.status}">
+              <div th:each="c : ${contracts}" class="contract-data"
+                  th:attr="
+                      data-id=${c.id},
+                      data-sponsor-id=${c.sponsorId},
+                      data-name=${c.name},
+                      data-type=${c.type},
+                      data-start=${c.startDate},
+                      data-end=${c.endDate},
+                      data-payment=${c.payment},
+                      data-status=${c.status},
+                      data-has-pdf=${c.pdfData != null},
+                      data-pdf-filename=${c.fileName}"></div>
+              </div>
             </div>
-          </div>
           <!-- Skjult data-lager for tjenester (services) -->
           <div id="servicesData" style="display:none">
               <div th:each="s : ${services}" class="service-data"
-                th:attr="data-id=${s.id},data-contract-id=${s.contractId},data-name=${s.name},data-type=${s.type},data-start=${s.startDate},data-end=${s.endDate},data-amount=${s.amountOrDivision},data-status=${s.statusEnum}">
+                th:attr="
+                data-id=${s.id},
+                data-contract-id=${s.contractId},
+                data-name=${s.name},data-type=${s.type},
+                data-start=${s.startDate},
+                data-end=${s.endDate},
+                data-amount=${s.amountOrDivision},
+                data-status=${s.statusEnum}"
+                >
             </div>
           </div>
 
@@ -180,7 +198,7 @@
                 <h3 class="font-semibold">Tilføj Kontrakt for <span id="addModalSponsorName"></span></h3>
                 <button type="button" class="text-gray-600" onclick="closeModal('addContractModal')">✕</button>
               </div>
-              <form action="/sponsors/addContract" method="POST" class="space-y-2">
+              <form action="/sponsors/addContract" method="POST" class="space-y-2" enctype="multipart/form-data">
                 <input id="addModalSponsorId" type="hidden" name="sponsorId" />
                 <label class="block text-sm">Kontrakt Navn:</label>
                 <input name="name" type="text" required class="border rounded px-2 py-1 w-full" />
@@ -197,6 +215,7 @@
                   <option value="true">True</option>
                   <option value="false" selected>False</option>
                 </select>
+                <input type="file" accept=".pdf" id="fileyesyes" name = "pdffile">
                 <div class="flex justify-end space-x-2 mt-2">
                   <button type="button" class="px-3 py-1 bg-gray-200 rounded" onclick="closeModal('addContractModal')">Annuller</button>
                   <button type="submit" class="px-3 py-1 bg-green-500 text-white rounded">Opret</button>
@@ -433,6 +452,7 @@
           const formattedEnd = formatDisplayDate(end);
           const payment = n.getAttribute('data-payment') || '';
           const status = n.getAttribute('data-status') || '';
+          const pdfFileName = n.getAttribute('data-pdf-filename') || '';
 
           const item = document.createElement('div');
           item.className = 'border rounded p-2';
@@ -461,9 +481,25 @@
           title.appendChild(nameText);
           title.appendChild(idSpan);
 
-          // gruppe til de tre knapper: Vis/Skjul, Edit, Slet
+          // gruppe til de knapper:  Edit, Slet
           const btnGroup = document.createElement('div');
           btnGroup.className = 'flex space-x-2';
+
+          //knap til download pdf
+            const btnDownload = document.createElement('button');
+            btnDownload.type = 'button';
+            btnDownload.className = 'px-2 py-1 text-sm bg-green-300 rounded';
+            btnDownload.textContent = pdfFileName ?  `Download: ${pdfFileName}` : 'Download PDF';
+
+            btnDownload.onclick = function () {
+                const pdfAvailable = n.getAttribute('data-has-pdf');
+
+                if (pdfAvailable === 'true') {
+                    window.open(`/getFile/${id}`, '_blank');
+                } else {
+                    alert('Ingen PDF tilgængelig for denne kontrakt.');
+                }
+            };
 
 
           // knap: Åbn/luk redigeringsformular
@@ -512,6 +548,8 @@
           details.appendChild(dEnd);
           details.appendChild(dPayment);
           details.appendChild(dStatus);
+          // placeringen på download pdf-filen
+          details.appendChild(btnDownload);
 
           // ----------------------------------------------------------
           // SERVICES-LISTE: vis tjenester som hører til denne kontrakt
@@ -792,7 +830,15 @@
           const optFalse = document.createElement('option'); 
           optFalse.value = 'false'; 
           optFalse.textContent = 'False';
-          
+
+          // PDF upload field
+          const pdfInput = document.createElement('input');
+          pdfInput.type = 'file';
+          pdfInput.name = 'pdffile';
+          pdfInput.accept = 'application/pdf';
+          pdfInput.className = 'border rounded px-2 py-1 w-full';
+          addLabelAndControl(form, 'Upload PDF', pdfInput);
+
           statusSelect.appendChild(optTrue); statusSelect.appendChild(optFalse);
           if (String(status) === 'true' || status === true) statusSelect.value = 'true'; else statusSelect.value = 'false';
           addLabelAndControl(form, 'Aktive', statusSelect);
