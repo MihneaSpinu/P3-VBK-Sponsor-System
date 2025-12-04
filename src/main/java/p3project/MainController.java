@@ -441,7 +441,11 @@ public class MainController {
     @GetMapping("/homepage")
     public String showhomepage(Model model) {
         Iterable<Sponsor> sponsors = sponsorRepository.findAll();
+        Iterable<Contract> contracts = contractRepository.findAll();
+        Iterable<Service> services = serviceRepository.findAll();
         model.addAttribute("sponsors", sponsors);
+        model.addAttribute("contracts", contracts);
+        model.addAttribute("services", services);
         return "homepage";
     }
 
