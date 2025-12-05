@@ -27,8 +27,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.WebUtils;
 
-import com.sun.jdi.VoidType;
-
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -135,7 +133,11 @@ public class MainController {
     public ResponseEntity<String> updateContractFields(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, HttpServletRequest request) { // pdfdata dead on arrival
         Contract storedContract = contractRepository.findById(contract.getId())
         .orElseThrow(() -> new RuntimeException("Unable to retrieve contract with id: " + contract.getId()));
-        parseContract(contract, pdffile);
+        if(contract.getPdfData() == null || contract.getPdfData().length == 0){
+            contract.setPdfData(storedContract.getPdfData());
+        } else {
+            parseContract(contract, pdffile);
+        }
         return handleUpdateRequest(contract, storedContract, request);
     }
 
@@ -390,7 +392,6 @@ public class MainController {
             )
             .contentType(MediaType.parseMediaType(mime))
             .body(pdfData);
-
     }
 
 
@@ -540,12 +541,7 @@ public class MainController {
     }
 
 
-
-
-
-
-
-
+    // Add a test user with preset name and password, for easier testing
     @GetMapping("/testuser")
     public String testUser(HttpServletResponse response) {
         User user = new User();
