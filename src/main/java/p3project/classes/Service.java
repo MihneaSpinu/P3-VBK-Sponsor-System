@@ -66,24 +66,48 @@ public class Service {
         this.amountOrDivision = amountOrDuration;
     }
 
-    public boolean getStatus() { return this.status == ServiceStatus.AKTIV; }
-    public void setStatus(boolean active) { this.status = active ? ServiceStatus.AKTIV : ServiceStatus.INAKTIV; }
+    public boolean getStatus() { 
+        return this.status == ServiceStatus.AKTIV; 
+    }
+    public void setStatus(boolean active) { 
+        this.status = active ? ServiceStatus.AKTIV : ServiceStatus.INAKTIV; 
+    }
 
 
-    public ServiceStatus getStatusEnum() { return status; }
-    public void setStatus(ServiceStatus status) { this.status = status; }
+    public ServiceStatus getStatusEnum() { 
+        return status; 
+    }
+    public void setStatus(ServiceStatus status) { 
+        this.status = status; 
+    }
 
-    public int getAmountOrDuration() { return amountOrDivision; }
-    public void setAmountOrDuration(int amount) { this.amountOrDivision = amount; }
+    public int getAmountOrDuration() { 
+        return amountOrDivision; 
+    }
+    public void setAmountOrDuration(int amount) { 
+        this.amountOrDivision = amount; 
+    }
 
-    public int getAmountOrDivision() { return amountOrDivision; }
-    public void setAmountOrDivision(int amountOrDivision) { this.amountOrDivision = amountOrDivision; }
+    public int getAmountOrDivision() { 
+        return amountOrDivision; 
+    }
+    public void setAmountOrDivision(int amountOrDivision) { 
+        this.amountOrDivision = amountOrDivision; 
+    }
 
-    public LocalDate getStartDate() { return startDate; }
-    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
+    public LocalDate getStartDate() { 
+        return startDate; 
+    }
+    public void setStartDate(LocalDate startDate) { 
+        this.startDate = startDate; 
+    }
 
-    public LocalDate getEndDate() { return endDate; }
-    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
+    public LocalDate getEndDate() { 
+        return endDate; 
+    }
+    public void setEndDate(LocalDate endDate) { 
+        this.endDate = endDate; 
+    }
 
     // Nested enum for service status (AKTIV, IGANG, UDFORT, INAKTIV)
     public static enum ServiceStatus {

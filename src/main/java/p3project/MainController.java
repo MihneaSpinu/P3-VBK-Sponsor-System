@@ -139,14 +139,16 @@ public class MainController {
         return handleUpdateRequest(contract, storedContract, request);
     }
 
+    /* 
     @PostMapping("/update/service")
     public ResponseEntity<String> updateServiceFields(@ModelAttribute Service service, HttpServletRequest request) {
         Service storedService = serviceRepository.findById(service.getId())
         .orElseThrow(() -> new RuntimeException("Unable to retrieve service with id: " + service.getId()));
         return handleUpdateRequest(service, storedService, request);
     }
+    */
 
-    /*
+    
     @PostMapping("/update/service")
     public ResponseEntity<String> updateServiceFields(HttpServletRequest request,
             @RequestParam Long id,
@@ -199,7 +201,7 @@ public class MainController {
 
         return handleUpdateRequest(requestService, storedService, request);
     }
-    */
+    
 
 
     private <T> ResponseEntity<String> handleUpdateRequest(T requestObject, T storedObject, HttpServletRequest request) {
