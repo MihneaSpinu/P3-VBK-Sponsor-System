@@ -9,4 +9,3 @@ public enum ServiceType {
    Tickets,
    Coupons
 }
-

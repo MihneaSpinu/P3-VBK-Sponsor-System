@@ -110,7 +110,7 @@
                   </div>
                 </div>
                 <!-- Hvis ingen sponsorer findes, visses en beseked -->
-                <div th:if="${#lists.isEmpty(sponsors)}">Ingen Sponsorsnu.</div>
+                <div th:if="${#lists.isEmpty(sponsors)}">Ingen Sponsors i nu.</div>
               </section>
 
               <div>
@@ -147,9 +147,9 @@
               Dette bruges af klient-side JavaScript (populateViewContracts) til at bygge
               modal-indholdet dynamisk når brugeren ønsker at se en sponsors kontrakter.
             -->
-            <div id="contractsData" style="display:none">
-              <div th:each="c : ${contracts}" class="contract-data"
-                  th:attr="
+              <div id="contractsData" style="display:none">
+                <div th:each="c : ${contracts}" class="contract-data"
+                    th:attr="
                       data-id=${c.id},
                       data-sponsor-id=${c.sponsorId},
                       data-name=${c.name},
@@ -159,7 +159,8 @@
                       data-payment=${c.payment},
                       data-status=${c.status},
                       data-has-pdf=${c.pdfData != null},
-                      data-pdf-filename=${c.fileName}"></div>
+                      data-pdf-filename=${c.fileName}">
+                </div>
               </div>
             </div>
             <!-- Skjult data-lager for tjenester (services) -->

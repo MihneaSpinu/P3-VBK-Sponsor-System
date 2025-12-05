@@ -113,9 +113,15 @@ public class MainController {
     }
 
     @PostMapping("/update/contract")
-    public ResponseEntity<String> updateContractFields(@ModelAttribute Contract contract) {
+    public ResponseEntity<String> updateContractFields(
+        @ModelAttribute Contract contract,
+        @RequestParam MultipartFile pdfFile)
+        {
         Contract storedContract = contractRepository.findById(contract.getId())
         .orElseThrow(() -> new RuntimeException("Unable to retrieve sponsor with id: " + contract.getId()));
+        if (pdfFile.isEmpty()){
+            contract.setPdfData(storedContract.getPdfData());
+        }
         return handleUpdateRequest(contract, storedContract);
     }
 
@@ -325,15 +331,20 @@ public class MainController {
                 if (name != null) {
                     contract.setName(name);
                 }
-            // Håndter PDF upload
-                try {   
-                    contract.setPdfData(pdffile.getBytes());
-                    String cleanFilename = Paths.get(pdffile.getOriginalFilename()).getFileName().toString(); //Get the name of the file
-                    contract.setFileName(cleanFilename); //save the name of the file in contract
-                    contract.setMimeType(pdffile.getContentType()); //Save the type of file
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return "error"; // 
+                // Håndter PDF upload
+                System.out.println("\n \n PDF DATA:" + contract.getPdfData() + "\n \n");
+                if (!(pdffile.isEmpty())){
+                    try {   
+                        System.out.println("\n \n New Pdf, keeping existing data. \n \n");
+                        System.out.println("\n \n PDF file name: " + pdffile + " \n \n");
+                        contract.setPdfData(pdffile.getBytes());
+                        String cleanFilename = Paths.get(pdffile.getOriginalFilename()).getFileName().toString(); //Get the name of the file
+                        contract.setFileName(cleanFilename); //save the name of the   file in contract
+                        contract.setMimeType(pdffile.getContentType()); //Save the type of file
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return "error"; // 
+                    }
                 }
                 contractRepository.save(contract);
             } catch (IllegalArgumentException ex) {
