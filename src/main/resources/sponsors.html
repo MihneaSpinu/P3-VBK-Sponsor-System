@@ -146,31 +146,31 @@
             modal-indholdet dynamisk når brugeren ønsker at se en sponsors kontrakter.
           -->
           <div id="contractsData" style="display:none">
-              <div th:each="c : ${contracts}" class="contract-data"
+              <div th:each="contract : ${contracts}" class="contract-data"
                   th:attr="
-                      data-id=${c.id},
-                      data-sponsor-id=${c.sponsorId},
-                      data-name=${c.name},
-                      data-type=${c.type},
-                      data-start=${c.startDate},
-                      data-end=${c.endDate},
-                      data-payment=${c.payment},
-                      data-status=${c.status},
-                      data-has-pdf=${c.pdfData != null},
-                      data-pdf-filename=${c.fileName}"></div>
+                      data-id=${contract.id},
+                      data-sponsor-id=${contract.sponsorId},
+                      data-name=${contract.name},
+                      data-type=${contract.type},
+                      data-start=${contract.startDate},
+                      data-end=${contract.endDate},
+                      data-payment=${contract.payment},
+                      data-status=${contract.status},
+                      data-has-pdf=${contract.pdfData != null},
+                      data-pdf-filename=${contract.fileName}"></div>
               </div>
             </div>
           <!-- Skjult data-lager for tjenester (services) -->
           <div id="servicesData" style="display:none">
-              <div th:each="s : ${services}" class="service-data"
+              <div th:each="service : ${services}" class="service-data"
                 th:attr="
-                data-id=${s.id},
-                data-contract-id=${s.contractId},
-                data-name=${s.name},data-type=${s.type},
-                data-start=${s.startDate},
-                data-end=${s.endDate},
-                data-amount=${s.amountOrDivision},
-                data-status=${s.statusEnum}"
+                data-id=${service.id},
+                data-contract-id=${service.contractId},
+                data-name=${service.name},data-type=${service.type},
+                data-start=${service.startDate},
+                data-end=${service.endDate},
+                data-amount=${service.amountOrDivision},
+                data-status=${service.statusEnum}"
                 >
             </div>
           </div>
@@ -183,7 +183,7 @@
             aktuelle sponsor-navne og id.
           -->
           <select id="sponsorOptionsTemplate" style="display:none">
-            <option th:each="s : ${sponsors}" th:value="${s.id}" th:text="${s.name}"></option>
+            <option th:each="sponsor : ${sponsors}" th:value="${sponsor.id}" th:text="${sponsor.name}"></option>
           </select>
 
           <!--
@@ -740,6 +740,7 @@
           form.action = '/update/contract';
           form.method = 'POST';
           form.className = 'space-y-2';
+          form.enctype = 'multipart/form-data';
 
           // skjulte felter: kontrakt-ID + sponsor-navnet (bruges til redirect)
           const hiddenId = document.createElement('input');
@@ -938,7 +939,7 @@
           f.style.display = 'none';
           const inId = document.createElement('input');
           inId.type = 'hidden';
-          inId.name = 'contractId';
+          inId.name = 'id';
           inId.value = contractId;
           f.appendChild(inId);
           const inSponsor = document.createElement('input');

@@ -15,9 +15,9 @@ public class Changelog extends Eventlog {
     public <T> Changelog(User user, T changedObject, Field field, Object before, Object after) {
         super(user, changedObject, "UPDATED");
 
-        this.field = field.getName();
-        this.before = before.toString();
-        this.after = after.toString();
+        this.field = field == null ? "-" : field.getName();
+        this.before = before == null ? "-" : before.toString();
+        this.after = after == null ? "-" : after.toString();
     }
 
     private String field;
