@@ -16,8 +16,8 @@ public class Changelog extends Eventlog {
         super(user, changedObject, "UPDATED");
 
         this.field = field == null ? "-" : field.getName();
-        this.before = before == null ? "-" : before.toString();
-        this.after = after == null ? "-" : after.toString();
+        this.before = before == null || before == "" ? "-" : before.toString();
+        this.after = after == null || after == "" ? "-" : after.toString();
     }
 
     private String field;
