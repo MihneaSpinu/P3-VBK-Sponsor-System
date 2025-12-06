@@ -139,16 +139,19 @@ public class MainController {
         return handleUpdateRequest(contract, storedContract, request);
     }
 
-    /* 
+     
     @PostMapping("/update/service")
     public ResponseEntity<String> updateServiceFields(@ModelAttribute Service service, HttpServletRequest request) {
+        System.out.println("\n\n\nID: " + service.getId() + "\n\n\n");
+        System.out.println("\n\n\nNAME: " + service.getName() + "\n\n\n");
+        System.out.println("\n\n\nCONTRACT ID: " + service.getContractId() + "\n\n\n");
         Service storedService = serviceRepository.findById(service.getId())
         .orElseThrow(() -> new RuntimeException("Unable to retrieve service with id: " + service.getId()));
         return handleUpdateRequest(service, storedService, request);
     }
-    */
-
     
+
+    /*
     @PostMapping("/update/service")
     public ResponseEntity<String> updateServiceFields(HttpServletRequest request,
             @RequestParam Long id,
@@ -201,6 +204,7 @@ public class MainController {
 
         return handleUpdateRequest(requestService, storedService, request);
     }
+    */
     
 
 
@@ -325,14 +329,10 @@ public class MainController {
             @RequestParam(required = false, defaultValue = "0") int amountOrDivision,
             @RequestParam String startDate,
             @RequestParam String endDate,
-            @RequestParam(required = false, defaultValue = "AKTIV") String status,
+            @RequestParam(required = false, defaultValue = "true") boolean archived,
             Model model) {
         try {
-            java.time.LocalDate start = startDate == null || startDate.isEmpty() ? null : java.time.LocalDate.parse(startDate);
-            java.time.LocalDate end = endDate == null || endDate.isEmpty() ? null : java.time.LocalDate.parse(endDate);
-            p3project.classes.ServiceType st = p3project.classes.ServiceType.valueOf(type);
-            Service.ServiceStatus ss = Service.ServiceStatus.valueOf(status);
-            p3project.classes.Service service = new p3project.classes.Service(contractId, name == null ? "" : name, st, ss, amountOrDivision, start, end);
+            Service service = new Service(contractId, name, type, archived, amountOrDivision, LocalDate.parse(startDate), LocalDate.parse(endDate));
             serviceRepository.save(service);
             return "redirect:/sponsors";
         } catch (IllegalArgumentException ex) {
