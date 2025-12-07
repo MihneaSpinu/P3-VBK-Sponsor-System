@@ -81,46 +81,53 @@
     <!-- COLUMN 2 — All services for all this sponsor's contracts -->
     <div class="border-r p-4 flex items-stretch">
         <div class="flex flex-col gap-2 w-full">
-
               <!-- loop contracts for this sponsor -->
               <div th:each="contract : ${contracts}" 
                   th:if="${contract.sponsorId == sponsor.id}">
-                  
                   <!-- loop services for this contract -->
                   <div th:each="svc : ${services}"
                       th:if="${svc.contractId == contract.id}"
                       class="bg-gray-200 rounded px-4 py-3 text-center">
-                      
                       <span th:text="${svc.name}"></span>
                       <span class="text-xs text-gray-500"
                             th:text="' (Contract #' + ${contract.id} + ')'">
                       </span>
-                  </div>
-
-              </div>
-
-          </div>
-      </div>
-
-      <!-- COLUMN 3 — Contract Status for each contract -->
-      <div class="border-r p-4 flex items-stretch">
-        <div class="flex flex-col gap-2 w-full">
-          <div th:each="c : ${contracts}"
-               th:if="${c.sponsorId == sponsor.id}"
-               th:classappend="${c.status} ? 'bg-green-400' : 'bg-red-400'"
-               class="rounded px-4 py-3 text-center"
-               th:text="${c.status ? 'Aktiv' : 'Inaktiv'}">
-          </div>
+                </div>
+            </div>  
         </div>
       </div>
+
+    <!-- COLUMN 3 — Contract Status for each contract -->
+    <div class="border-r p-4 flex items-stretch">
+        <div class="flex flex-col gap-2 w-full">
+            <!-- Loop through contracts for this sponsor -->
+            <div th:each="contract : ${contracts}"
+                th:if="${contract.sponsorId == sponsor.id}">
+
+                <!-- Loop through services for this contract -->
+                <div th:each="svc : ${services}"
+                    th:if="${svc.contractId == contract.id}"
+                    th:classappend="${svc.archived} ? 'bg-red-400' : 'bg-green-400'"
+                    class="rounded px-4 py-3 text-center"
+                    th:text="${!svc.archived ? 'Aktiv' : 'Inaktiv'}">
+                </div>
+
+            </div>
+
+        </div>
+    </div>
 
       <!-- COLUMN 4 — Contract Date Range -->
       <div class="p-4 flex items-stretch">
         <div class="flex flex-col gap-2 w-full">
-          <div class="bg-gray-200 rounded px-4 py-3 text-center"
-               th:each="c : ${contracts}"
-               th:if="${c.sponsorId == sponsor.id}"
-               th:text="${#temporals.format(c.startDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(c.endDate, 'dd/MM/yyyy')}">
+          <!--Loop through contracts-->
+          <div th:each="contract : ${contracts}"
+              th:if="${contract.sponsorId == sponsor.id}">
+                <div class="bg-gray-200 rounded px-4 py-3 text-center"
+                th:each="svc : ${services}"
+                th:if="${svc.contractId == contract.id}"
+                th:text="${#temporals.format(svc.startDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(svc.endDate, 'dd/MM/yyyy')}">
+                </div>
           </div>
         </div>
       </div>
