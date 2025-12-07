@@ -6,15 +6,12 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -117,8 +114,15 @@ public class MainController {
 
         Contract storedContract = contractRepository.findById(contract.getId()).orElse(null);
         if(storedContract == null) return renderSponsorPageWithResponse("Error retrieving contract. Please try again", model);
-        // if(pdffile.isEmpty()) contract.setPdfData(storedContract.getPdfData()); <-- SKAL FIKSES!!!!
-        parseContract(contract, pdffile);
+        //If a file is sent parse the data
+        if(!pdffile.isEmpty()){
+            parseContract(contract, pdffile);
+        }else{
+            //if no pdf sent, get the stored values.
+            contract.setPdfData(storedContract.getPdfData());
+            contract.setFileName(storedContract.getFileName());
+            contract.setMimeType(storedContract.getMimeType());
+        }
         return handleUpdateRequest(contract, storedContract, request, model);
 
     }
@@ -164,7 +168,7 @@ public class MainController {
             try {
                 Object before = field.get(storedObject);
                 Object after = field.get(requestObject);
-                if (!Objects.equals(before, after) && fieldShouldBeEvaluated(field)) {
+                if (!Objects.equals(before, after)) {
                     User user = getUserFromToken(request);
                     Changelog log = new Changelog(user, requestObject, field, before, after);
                     logRepository.save(log);
@@ -301,6 +305,9 @@ public class MainController {
 
 
     private void parseContract(Contract contract, MultipartFile pdffile) throws RuntimeException {
+        if (pdffile.isEmpty()){
+            return;
+        }
         try {   
             contract.setPdfData(pdffile.getBytes());
             String cleanFilename = Paths.get(pdffile.getOriginalFilename()).getFileName().toString(); 
