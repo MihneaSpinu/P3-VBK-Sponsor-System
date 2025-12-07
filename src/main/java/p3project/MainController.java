@@ -124,7 +124,6 @@ public class MainController {
             contract.setMimeType(storedContract.getMimeType());
         }
         return handleUpdateRequest(contract, storedContract, request, model);
-
     }
 
      
@@ -416,7 +415,11 @@ public class MainController {
         if(!userHasValidToken(request)) return "redirect:/login";
 
         Iterable<Sponsor> sponsors = sponsorRepository.findAll();
+        Iterable<Contract> contracts = contractRepository.findAll();
+        Iterable<Service> services = serviceRepository.findAll();
         model.addAttribute("sponsors", sponsors);
+        model.addAttribute("contracts", contracts);
+        model.addAttribute("services", services);
         return "homepage";
     }
 
