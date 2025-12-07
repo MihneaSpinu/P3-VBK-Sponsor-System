@@ -58,22 +58,10 @@ public class MainController {
     // ==========================
     // Web page endpoints (HTML)
     // ==========================
-    @GetMapping("/")
-    public String home() {
-        return "redirect:/login";
-    }
 
 
-    @GetMapping("/sponsors")
-    public String showSponsors(Model model, HttpServletRequest request) {
-        if(!userHasValidToken(request)) return "redirect:/login";
-        if(!userIsAdmin(request))       return "redirect:/homepage";
 
-        model.addAttribute("sponsors", sponsorRepository.findAll());
-        model.addAttribute("contracts", contractRepository.findAll());
-        model.addAttribute("services", serviceRepository.findAll());
-        return "sponsors";
-    }
+
 
     private boolean userIsAdmin(HttpServletRequest request) {
         User user = getUserFromToken(request);
@@ -374,39 +362,7 @@ public class MainController {
         return "redirect:/login";
     }
 
-    private boolean userHasValidToken(HttpServletRequest request) {
-        String cookieId;
-        String cookieHash;
-        try {
-            String[] parsedCookie = parseCookie(request);
-            cookieId = parsedCookie[0];
-            cookieHash = parsedCookie[1];
-        } catch(RuntimeException e) {
-            return false;
-        }
-        Token token = Token.sign(cookieId);
-        return token.verify(cookieHash);
-    }   
-    
 
-    private String[] parseCookie(HttpServletRequest request) throws RuntimeException{ // find anden exception?
-        Cookie cookie = WebUtils.getCookie(request, "token");
-        if (cookie == null) throw new RuntimeException();
-        
-        String decodedToken = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);        
-        String[] splitCookie = decodedToken.split("\\.");
-        if(splitCookie.length != 2) throw new RuntimeException();
-
-        return splitCookie;
-    }
-
-    private User getUserFromToken(HttpServletRequest request) throws RuntimeException {
-        String[] parsedCookie = parseCookie(request);
-        int userId = Integer.parseInt(parsedCookie[0]);
-        User user = userRepository.findById((userId)).orElse(null);
-        if(user == null) throw new RuntimeException("Unable to retrieve username");
-        return user;
-    }
 
 
     
