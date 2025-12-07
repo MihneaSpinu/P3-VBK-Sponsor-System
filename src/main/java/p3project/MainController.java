@@ -66,89 +66,92 @@ public class MainController {
         return "redirect:/login";
     }
 
-  
-    // Displays the sponsors page with lists of sponsors and contracts
+
     @GetMapping("/sponsors")
     public String showSponsors(Model model, HttpServletRequest request) {
-        if(userHasValidToken(request)) {
-            User user = getUserFromToken(request);
-            if(user.getIsAdmin()) {
-                model.addAttribute("sponsors", sponsorRepository.findAll());
-                model.addAttribute("contracts", contractRepository.findAll());
-                model.addAttribute("services", serviceRepository.findAll());
-                return "sponsors";
-            } else {
-                return "redirect:/homepage";
-            }
-        }
-        return "redirect:/login";
+        if(!userHasValidToken(request)) return "redirect:/login";
+        if(!userIsAdmin(request))       return "redirect:/homepage";
+
+        model.addAttribute("sponsors", sponsorRepository.findAll());
+        model.addAttribute("contracts", contractRepository.findAll());
+        model.addAttribute("services", serviceRepository.findAll());
+        return "sponsors";
+    }
+
+    private boolean userIsAdmin(HttpServletRequest request) {
+        User user = getUserFromToken(request);
+        return user.getIsAdmin();
     }
 
     
     // Changelog page
     @GetMapping("/changelog")
     public String changelogPage(Model model, HttpServletRequest request) {
-        if(userHasValidToken(request)) {
-            List<Eventlog> logs = logRepository.findAll();
-            Collections.reverse(logs);
-            model.addAttribute("changelogs", logs);
-            return "changelog";
-        }
-        return "redirect:/login";
+        if(!userHasValidToken(request)) return "redirect:/login";
+        if(!userIsAdmin(request))       return "redirect:/homepage";
+
+        // make newest logs appear first
+        List<Eventlog> logs = logRepository.findAll();
+        Collections.reverse(logs);
+        model.addAttribute("changelogs", logs);
+        return "changelog";
     }
 
     // boilerplate update handlers
     @PostMapping("/update/sponsor")
-    public ResponseEntity<String> updateSponsorFields(@ModelAttribute Sponsor sponsor, HttpServletRequest request) {
-        if(userHasValidToken(request)) {
-            User user = getUserFromToken(request);
-            if(user.getIsAdmin()) {
-                Sponsor storedSponsor = sponsorRepository.findById(sponsor.getId())
-                .orElseThrow(() -> new RuntimeException("Unable to retrieve sponsor with id: " + sponsor.getId()));
-                return handleUpdateRequest(sponsor, storedSponsor, request);
-            }
-        }
-        return new ResponseEntity<>("FEJL!!", HttpStatus.UNAUTHORIZED);
+    public String updateSponsorFields(@ModelAttribute Sponsor sponsor, HttpServletRequest request, Model model) {
+        if(!userHasValidToken(request)) return "redirect:/login";
+        if(!userIsAdmin(request))       return "redirect:/homepage";
+
+        Sponsor storedSponsor = sponsorRepository.findById(sponsor.getId()).orElse(null);
+        if(storedSponsor == null) return renderSponsorPageWithResponse("Error retrieving sponsor. Please try again", model);
+
+        return handleUpdateRequest(sponsor, storedSponsor, request, model);
+
     }
 
     @PostMapping("/update/contract")
-    public ResponseEntity<String> updateContractFields(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, HttpServletRequest request) { // pdfdata dead on arrival
-        if(userHasValidToken(request)) {
-            User user = getUserFromToken(request);
-            if(user.getIsAdmin()) {
-                Contract storedContract = contractRepository.findById(contract.getId())
-                .orElseThrow(() -> new RuntimeException("Unable to retrieve contract with id: " + contract.getId()));
-                // if(pdffile.isEmpty()) contract.setPdfData(storedContract.getPdfData()); <-- SKAL FIKSES!!!!
-                parseContract(contract, pdffile);
-                return handleUpdateRequest(contract, storedContract, request);
-            }
-        }
-        return new ResponseEntity<>("FEJL!!", HttpStatus.UNAUTHORIZED);
+    public String updateContractFields(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, HttpServletRequest request, Model model) {
+        if(!userHasValidToken(request)) return "redirect:/login";
+        if(!userIsAdmin(request))       return "redirect:/homepage";
+
+        Contract storedContract = contractRepository.findById(contract.getId()).orElse(null);
+        if(storedContract == null) return renderSponsorPageWithResponse("Error retrieving contract. Please try again", model);
+        // if(pdffile.isEmpty()) contract.setPdfData(storedContract.getPdfData()); <-- SKAL FIKSES!!!!
+        parseContract(contract, pdffile);
+        return handleUpdateRequest(contract, storedContract, request, model);
+
     }
 
      
     @PostMapping("/update/service")
-    public ResponseEntity<String> updateServiceFields(@ModelAttribute Service service, HttpServletRequest request) {
-        if(userHasValidToken(request)) {
-            User user = getUserFromToken(request);
-            if(user.getIsAdmin()) {
-                Service storedService = serviceRepository.findById(service.getId())
-                .orElseThrow(() -> new RuntimeException("Unable to retrieve service with id: " + service.getId()));
-                return handleUpdateRequest(service, storedService, request);
-            }
-        }
-        return new ResponseEntity<>("FEJL!!", HttpStatus.UNAUTHORIZED);
+    public String updateServiceFields(@ModelAttribute Service service, HttpServletRequest request, Model model) {
+        if(!userHasValidToken(request)) return "redirect:/login";
+        if(!userIsAdmin(request))       return "redirect:/homepage";
+
+        Service storedService = serviceRepository.findById(service.getId()).orElse(null);
+        if(storedService == null) return renderSponsorPageWithResponse("Error retrieving service. Please try again", model);
+        return handleUpdateRequest(service, storedService, request, model);
+
+    }
+
+    private String renderSponsorPageWithResponse(String responseMessage, Model model) { // tilføj flag til respons type?
+        model.addAttribute("sponsors", sponsorRepository.findAll());
+        model.addAttribute("contracts", contractRepository.findAll());
+        model.addAttribute("services", serviceRepository.findAll());
+        model.addAttribute("responseMessage", responseMessage);
+        return "sponsors";
     }
     
 
-    private <T> ResponseEntity<String> handleUpdateRequest(T requestObject, T storedObject, HttpServletRequest request) {
+    private <T> String handleUpdateRequest(T requestObject, T storedObject, HttpServletRequest request, Model model) {
         Integer fieldsChanged;
         try {
             fieldsChanged = compareFields(requestObject, storedObject, request);
+            return renderSponsorPageWithResponse("Updated " + fieldsChanged + " fields", model);
         } catch (ClassNotFoundException error) {
-            return new ResponseEntity<>("Internal server error: " + error, HttpStatus.INTERNAL_SERVER_ERROR);
+            return renderSponsorPageWithResponse("Internal server error. Please try again", model);
         }
-        return new ResponseEntity<>(fieldsChanged.toString(), HttpStatus.OK);
     }
 
 
@@ -181,7 +184,7 @@ public class MainController {
         return fieldsChanged;
     }
 
-    private boolean fieldShouldBeEvaluated(Field field) {
+    private boolean fieldShouldBeEvaluated(Field field) { // jank
         String fieldName = field.getName();
         switch(fieldName) {
             case "pdfData":
@@ -192,135 +195,107 @@ public class MainController {
         }
     }
 
-    // Handles adding a new sponsor from the web form
     @PostMapping("/sponsors/add")
     public String addSponsorFromWeb(@ModelAttribute Sponsor sponsor, Model model, HttpServletRequest request) {
-        // Valider telefonnummer: kun cifre er tilladt
-        if(userHasValidToken(request)) {
-            User user = getUserFromToken(request);
-            if(user.getIsAdmin()) {
-                Eventlog log = new Eventlog(user, sponsor, "CREATED");
-                logRepository.save(log);
-                sponsorRepository.save(sponsor);
-                return "redirect:/sponsors";
-            }
-            return "redirect:/homepage";
-        }
-        return "redirect:/login";
+        if(!userHasValidToken(request)) return "redirect:/login";
+        if(!userIsAdmin(request))       return "redirect:/homepage";
+
+        User user = getUserFromToken(request);
+        Eventlog log = new Eventlog(user, sponsor, "CREATED");
+        logRepository.save(log);
+        sponsorRepository.save(sponsor);
+        return "redirect:/sponsors";
     }
+
 
     // Handles creating a new contract for a sponsor
     @PostMapping("/sponsors/addContract")
     public String addContractForSponsor(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, Model model, HttpServletRequest request) {
-        if(userHasValidToken(request)) {
-            User user = getUserFromToken(request);
-            if(user.getIsAdmin()) {
-                try {
-                    parseContract(contract, pdffile);
-                    contractRepository.save(contract);
-                    return "redirect:/sponsors"; // Post/Redirect/Get for at undgå double submit
-                } catch (IllegalArgumentException ex) {
-                // Håndterer fejl og viser siden igen med fejlbesked
-                    model.addAttribute("error", ex.getMessage());
-                    model.addAttribute("sponsors", sponsorRepository.findAll());
-                    model.addAttribute("contracts", contractRepository.findAll());
-                    return "sponsors"; // Geninlæs siden og vis sponsors-siden med fejlbesked
-                }
-            }
-            return "redirect:/homepage";
-        }
-        return "redirect:/login";
+        if(!userHasValidToken(request)) return "redirect:/login";
+        if(!userIsAdmin(request))       return "redirect:/homepage";
 
+        try {
+            parseContract(contract, pdffile);
+            contractRepository.save(contract);
+            return "redirect:/sponsors";
+        } catch (IllegalArgumentException ex) {
+            return renderSponsorPageWithResponse("FEJL!!!", model);
+        }
     }
 
     // Handles creating a new service for a contract
     @PostMapping("/sponsors/addService")
     public String addServiceForContract(@ModelAttribute Service service, Model model, HttpServletRequest request) {
-        if(userHasValidToken(request)) {
-            User user = getUserFromToken(request);
-            if(user.getIsAdmin()) {
-                try {
-                    serviceRepository.save(service);
-                    return "redirect:/sponsors";
-                } catch (IllegalArgumentException ex) {
-                    model.addAttribute("error", "Invalid data for service: " + ex.getMessage());
-                    model.addAttribute("sponsors", sponsorRepository.findAll());
-                    model.addAttribute("contracts", contractRepository.findAll());
-                    model.addAttribute("services", serviceRepository.findAll());
-                    return "sponsors";
-                }
-            }
-            return "redirect:/homepage";
+        if(!userHasValidToken(request)) return "redirect:/login";
+        if(!userIsAdmin(request))       return "redirect:/homepage";
+
+        try {
+            serviceRepository.save(service);
+            return "redirect:/sponsors";
+        } catch (IllegalArgumentException ex) {
+            return renderSponsorPageWithResponse("FEJL!!!", model);
         }
-        return "redirect:/login";
+
     }
 
     // Deletes a service by ID
     @PostMapping("/sponsors/deleteService")
     public String deleteService(@RequestParam Long serviceId, HttpServletRequest request) {
-        if(userHasValidToken(request)) {
-            User user = getUserFromToken(request);
-            if(user.getIsAdmin()) {
-                serviceRepository.deleteById(serviceId);
-                return "redirect:/sponsors";
-            }
-            return "redirect:/homepage";
-        }
-        return "redirect:/login";
+        if(!userHasValidToken(request)) return "redirect:/login";
+        if(!userIsAdmin(request))       return "redirect:/homepage";
+
+        serviceRepository.deleteById(serviceId);
+        return "redirect:/sponsors";
+
     }
 
 
     // Deletes a sponsor and all contracts linked to that sponsor
     @PostMapping("/sponsors/delete")
     public String deleteSponsor(@RequestParam Long sponsorId, HttpServletRequest request) {
-        if(userHasValidToken(request)) {
-            User user = getUserFromToken(request);
-            if(user.getIsAdmin()) {
-                sponsorRepository.deleteById(sponsorId);
-                Iterable<Contract> contracts = contractRepository.findAll();
-                for (Contract contract : contracts) {
-                    if (sponsorId.equals(contract.getSponsorId())) {
-                        contractRepository.deleteById(contract.getId());
-                    }
-                }
-                return "redirect:/sponsors";
+        if(!userHasValidToken(request)) return "redirect:/login";
+        if(!userIsAdmin(request))       return "redirect:/homepage";
+
+        sponsorRepository.deleteById(sponsorId);
+        Iterable<Contract> contracts = contractRepository.findAll();
+        for (Contract contract : contracts) {
+            if (sponsorId.equals(contract.getSponsorId())) {
+                contractRepository.deleteById(contract.getId());
             }
-            return "redirect:/homepage";
         }
-        return "redirect:/login";
+        return "redirect:/sponsors";
     }
 
 
     // Deletes a contract by ID
     @PostMapping("/sponsors/deleteContract")
     public String deleteContract(@RequestParam Long contractId, HttpServletRequest request) {
-        if(userHasValidToken(request)) {
-            User user = getUserFromToken(request);
-            if(user.getIsAdmin()) {
-                contractRepository.deleteById(contractId);
-                return "redirect:/sponsors";
-            }
-            return "redirect:/homepage";
-        }
-        return "redirect:/login";
+        if(!userHasValidToken(request)) return "redirect:/login";
+        if(!userIsAdmin(request))       return "redirect:/homepage";
+        
+        contractRepository.deleteById(contractId);
+        return "redirect:/sponsors";
     }
 
 
     @GetMapping("/getFile/{contractId}")
     public ResponseEntity<byte[]> getFile(@PathVariable long contractId) {
-        Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new RuntimeException("/getFile, Contract not found"));
+
+        Contract contract = contractRepository.findById(contractId).orElse(null);
+        if(contract == null) throw new RuntimeException("/getFile, Contract not found");
+
         byte[] pdfData = contract.getPdfData();
         String mime = contract.getMimeType() != null
-            ? contract.getMimeType()
-            : "application/octet-stream";
-        return ResponseEntity.ok()
-            .header(
-                HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + contract.getFileName() + "\""
-            )
-            .contentType(MediaType.parseMediaType(mime))
-            .body(pdfData);
+                    ? contract.getMimeType()
+                    : "application/octet-stream";
+        return ResponseEntity
+                .ok()
+                .header(
+                    HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=\"" + contract.getFileName() + "\""
+                )
+                .contentType(MediaType.parseMediaType(mime))
+                .body(pdfData);
 
     }
 
@@ -340,23 +315,17 @@ public class MainController {
 
     @GetMapping("/archive")
     public String showArchivePage(Model model, HttpServletRequest request) {
-        if (userHasValidToken(request)) {
-            return "archive";
-        }
-        return "redirect:/login";
+        if(!userHasValidToken(request)) return "redirect:/login";
+        return "archive";
     }
 
 
     @GetMapping("/AdminPanel")
     public String showAdminPanelPage(Model model, HttpServletRequest request) {
-        if (userHasValidToken(request)) {
-            User user = getUserFromToken(request);
-            if(user.getIsAdmin()) {
-                return "AdminPanel";
-            }
-            return "redirect:/homepage";
-        }
-        return "redirect:/login";
+        if(!userHasValidToken(request)) return "redirect:/login";
+        if(!userIsAdmin(request))       return "redirect:/homepage";
+        
+        return "AdminPanel";
     }
 
     @GetMapping("/login")
@@ -370,6 +339,8 @@ public class MainController {
 
     @PostMapping("/login/confirm")
     public String confirmLogin(@RequestParam String username, @RequestParam String hashedPassword, @RequestParam boolean rememberMe, Model model, HttpServletResponse response) {
+        // String hashedPassword = bcrypt.hash(password);
+        // if(bcrypt.compare(hashedpassword, user.getPassword());
         User user = userRepository.findByName(username);
         if(hashedPassword.equals(user.getPassword())) {
             String id = user.getId().toString();
@@ -378,9 +349,9 @@ public class MainController {
             String encodedToken = URLEncoder.encode(formattedToken, StandardCharsets.UTF_8);
             int time = rememberMe ? (60 * 60 * 24 * 365) : (60 * 60 * 24); // 1 år vs 1 dag
             ResponseCookie cookie = ResponseCookie.from("token", encodedToken)
-            .httpOnly(true)  // javascript kan ikke røre den B-)
+            .httpOnly(true)  // noget med javascript
             .secure(false)    // HTTPS only
-            .path("/")       // Bruges til alle sider
+            .path("/")       // Bruges til alle sider i domænet
             .maxAge(time)
             .build();
             response.addHeader("Set-Cookie", cookie.toString());
@@ -391,7 +362,7 @@ public class MainController {
     }
 
     @GetMapping("/logout") 
-    public String logout(HttpServletRequest request) {
+    public String logout(HttpServletRequest request) { // ikke implementeret på frontend endnu
         Cookie cookie = WebUtils.getCookie(request, "token");
         if(cookie != null) cookie.setMaxAge(0);
         return "redirect:/login";
@@ -412,7 +383,7 @@ public class MainController {
     }   
     
 
-    private String[] parseCookie(HttpServletRequest request) throws RuntimeException{
+    private String[] parseCookie(HttpServletRequest request) throws RuntimeException{ // find anden exception?
         Cookie cookie = WebUtils.getCookie(request, "token");
         if (cookie == null) throw new RuntimeException();
         
@@ -420,15 +391,14 @@ public class MainController {
         String[] splitCookie = decodedToken.split("\\.");
         if(splitCookie.length != 2) throw new RuntimeException();
 
-
         return splitCookie;
     }
 
     private User getUserFromToken(HttpServletRequest request) throws RuntimeException {
         String[] parsedCookie = parseCookie(request);
-        Integer userId = Integer.valueOf(parsedCookie[0]);
-        User user = userRepository.findById((userId))
-        .orElseThrow(() -> new RuntimeException("Unable to retrieve username"));
+        int userId = Integer.parseInt(parsedCookie[0]);
+        User user = userRepository.findById((userId)).orElse(null);
+        if(user == null) throw new RuntimeException("Unable to retrieve username");
         return user;
     }
 
@@ -436,18 +406,18 @@ public class MainController {
     
     @GetMapping("/homepage")
     public String showhomepage(Model model, HttpServletRequest request) {
-        if(userHasValidToken(request)) {
-            Iterable<Sponsor> sponsors = sponsorRepository.findAll();
-            model.addAttribute("sponsors", sponsors);
-            return "homepage";
-        } else {
-            return "redirect:/login";
-        }
+        if(!userHasValidToken(request)) return "redirect:/login";
+
+        Iterable<Sponsor> sponsors = sponsorRepository.findAll();
+        model.addAttribute("sponsors", sponsors);
+        return "homepage";
     }
 
     // Add user with demo sponsor & contract
     @PostMapping("/users/add")
     public String addUserFromWeb(@RequestParam String name, @RequestParam String password) {
+        // String hashedPassword = bcrypt.hash(password)
+        // user.setPassword(hashedPassword);
         User user = new User();
         user.setName(name);
         user.setPassword(password);
