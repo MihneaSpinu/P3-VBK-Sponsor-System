@@ -80,14 +80,6 @@ public class Service {
         return this.archived;
     }
 
-
-    public int getAmountOrDuration() { 
-        return amountOrDivision; 
-    }
-    public void setAmountOrDuration(int amount) { 
-        this.amountOrDivision = amount; 
-    }
-
     public int getAmountOrDivision() { 
         return amountOrDivision; 
     }
