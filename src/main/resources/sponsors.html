@@ -146,31 +146,31 @@
             modal-indholdet dynamisk når brugeren ønsker at se en sponsors kontrakter.
           -->
           <div id="contractsData" style="display:none">
-              <div th:each="c : ${contracts}" class="contract-data"
+              <div th:each="contract : ${contracts}" class="contract-data"
                   th:attr="
-                      data-id=${c.id},
-                      data-sponsor-id=${c.sponsorId},
-                      data-name=${c.name},
-                      data-type=${c.type},
-                      data-start=${c.startDate},
-                      data-end=${c.endDate},
-                      data-payment=${c.payment},
-                      data-status=${c.status},
-                      data-has-pdf=${c.pdfData != null},
-                      data-pdf-filename=${c.fileName}"></div>
+                      data-id=${contract.id},
+                      data-sponsor-id=${contract.sponsorId},
+                      data-name=${contract.name},
+                      data-type=${contract.type},
+                      data-start=${contract.startDate},
+                      data-end=${contract.endDate},
+                      data-payment=${contract.payment},
+                      data-status=${contract.status},
+                      data-has-pdf=${contract.pdfData != null},
+                      data-pdf-filename=${contract.fileName}"></div>
               </div>
             </div>
           <!-- Skjult data-lager for tjenester (services) -->
           <div id="servicesData" style="display:none">
-              <div th:each="s : ${services}" class="service-data"
+              <div th:each="service : ${services}" class="service-data"
                 th:attr="
-                data-id=${s.id},
-                data-contract-id=${s.contractId},
-                data-name=${s.name},data-type=${s.type},
-                data-start=${s.startDate},
-                data-end=${s.endDate},
-                data-amount=${s.amountOrDivision},
-                data-status=${s.statusEnum}"
+                data-id=${service.id},
+                data-contract-id=${service.contractId},
+                data-name=${service.name},data-type=${service.type},
+                data-start=${service.startDate},
+                data-end=${service.endDate},
+                data-amount=${service.amountOrDivision},
+                data-archived=${service.archived}"
                 >
             </div>
           </div>
@@ -183,7 +183,7 @@
             aktuelle sponsor-navne og id.
           -->
           <select id="sponsorOptionsTemplate" style="display:none">
-            <option th:each="s : ${sponsors}" th:value="${s.id}" th:text="${s.name}"></option>
+            <option th:each="sponsor : ${sponsors}" th:value="${sponsor.id}" th:text="${sponsor.name}"></option>
           </select>
 
           <!--
@@ -242,7 +242,7 @@
               </div>
               <form action="/sponsors/addService" method="POST" class="space-y-2">
                 <input id="addServiceContractId" type="hidden" name="contractId" />
-                <label class="block text-sm">Info/Kommentar</label>
+                <label class="block text-sm">Kommentar</label>
                 <input name="name" type="text" class="border rounded px-2 py-1 w-full" />
                 <label class="block text-sm">Type</label>
                 <select id="addServiceType" name="type" class="border rounded px-2 py-1 w-full">
@@ -260,12 +260,10 @@
                 <input name="startDate" type="date" class="border rounded px-2 py-1 w-full" />
                 <label class="block text-sm">Slut Dato</label>
                 <input name="endDate" type="date" class="border rounded px-2 py-1 w-full" />
-                <label class="block text-sm">Status</label>
-                <select name="status" class="border rounded px-2 py-1 w-full">
-                  <option value="AKTIV">Aktiv</option>
-                  <option value="IGANG">Igang</option>
-                  <option value="UDFORT">Udført</option>
-                  <option value="INAKTIV">Inaktiv</option>
+                <label class="block text-sm">Arkiveret</label>
+                <select name="archived" class="border rounded px-2 py-1 w-full">
+                  <option value="true">True</option>
+                  <option value="false" selected>False</option>
                 </select>
                 <div class="flex justify-end space-x-2 mt-2">
                   <button type="button" class="px-3 py-1 bg-gray-200 rounded" onclick="closeModal('addServiceModal')">Annuller</button>
@@ -588,7 +586,7 @@
                   const sstart = sn.getAttribute('data-start') || '';
                   const send = sn.getAttribute('data-end') || '';
                   const samount = sn.getAttribute('data-amount') || '';
-                  const sstatus = sn.getAttribute('data-status') || '';
+                  const sarchived = sn.getAttribute('data-archived') || '';
 
                   const sCard = document.createElement('div');
                   // service cards styled light-grey
@@ -633,13 +631,13 @@
                     'IGANG': 'Igang',
                     'UDFORT': 'Udført',
                     'INAKTIV': 'Inaktiv',
-                    'true': 'Aktiv',
-                    'false': 'Inaktiv'
+                    'true': 'Arkiveret',
+                    'false': 'Aktiv'
                   };
                   const displayType = typeLabels[stype] || stype || '';
                   const displayStart = formatDisplayDate(sstart);
                   const displayEnd = formatDisplayDate(send);
-                  const displayStatus = statusLabels[String(sstatus)] || sstatus || '';
+                  const displayStatus = statusLabels[String(sarchived)] || sarchived || '';
                   sDetails.innerHTML = `Type: ${escapeHtml(displayType)}<br/>Start: ${escapeHtml(displayStart)}<br/>End: ${escapeHtml(displayEnd)}<br/>Amount/Division: ${escapeHtml(samount)}<br/>Status: ${escapeHtml(displayStatus)}`;
                   sCard.appendChild(sDetails);
 
@@ -653,6 +651,8 @@
                   sForm.method = 'POST';
                   // hidden id
                   const sIdInput = document.createElement('input'); sIdInput.type = 'hidden'; sIdInput.name = 'id'; sIdInput.value = sid; sForm.appendChild(sIdInput);
+                  const serviceContractId = document.createElement("input"); 
+                  serviceContractId.type = "hidden"; serviceContractId.name = "contractId"; serviceContractId.value = sn.getAttribute("data-contract-id"); sForm.appendChild(serviceContractId);
                   // name
                   const sNameLab = document.createElement('label'); sNameLab.className = 'block text-sm'; sNameLab.textContent = 'Info/Kommentar'; sForm.appendChild(sNameLab);
                   const sNameInp = document.createElement('input'); sNameInp.name = 'name'; sNameInp.type = 'text'; sNameInp.value = sname; sNameInp.className='border rounded px-2 py-1 w-full'; sForm.appendChild(sNameInp);
@@ -695,16 +695,13 @@
                   const sStartInp = document.createElement('input'); sStartInp.name='startDate'; sStartInp.type='date'; sStartInp.value=sstart; sStartInp.className='border rounded px-2 py-1 w-full'; sForm.appendChild(sStartInp);
                   const sEndLab = document.createElement('label'); sEndLab.className='block text-sm'; sEndLab.textContent='Slut Dato'; sForm.appendChild(sEndLab);
                   const sEndInp = document.createElement('input'); sEndInp.name='endDate'; sEndInp.type='date'; sEndInp.value=send; sEndInp.className='border rounded px-2 py-1 w-full'; sForm.appendChild(sEndInp);
-                  const sStatusLab = document.createElement('label'); sStatusLab.className='block text-sm'; sStatusLab.textContent='Status'; sForm.appendChild(sStatusLab);
-                  const sStatusSel = document.createElement('select'); sStatusSel.name='status'; sStatusSel.className='border rounded px-2 py-1 w-full';
-                  // Use enum names as values so Spring can bind to Service.ServiceStatus
-                  const statusOptions = [
-                    { value: 'AKTIV', label: 'Aktiv' },
-                    { value: 'IGANG', label: 'Igang' },
-                    { value: 'UDFORT', label: 'Udført' },
-                    { value: 'INAKTIV', label: 'Inaktiv' }
-                  ];
-                  statusOptions.forEach(function(o){ const opt=document.createElement('option'); opt.value=o.value; opt.textContent=o.label; if(o.value===sstatus) opt.selected=true; sStatusSel.appendChild(opt); }); sForm.appendChild(sStatusSel);
+                  const sStatusLab = document.createElement('label'); sStatusLab.className='block text-sm'; sStatusLab.textContent='Arkiveret'; sForm.appendChild(sStatusLab);
+                  const sStatusSel = document.createElement('select'); sStatusSel.name='archived'; sStatusSel.className='border rounded px-2 py-1 w-full';
+                  const sOptTrue = document.createElement('option'); sOptTrue.value = 'true'; sOptTrue.textContent = 'True';
+                  const sOptFalse = document.createElement('option'); sOptFalse.value = 'false'; sOptFalse.textContent = 'False';
+                  sStatusSel.appendChild(sOptTrue); sStatusSel.appendChild(sOptFalse);
+                  if (String(sarchived) === 'true') sStatusSel.value = 'true'; else sStatusSel.value = 'false';
+                  sForm.appendChild(sStatusSel);
                   const sBtnRow = document.createElement('div'); sBtnRow.className='flex justify-end space-x-2 mt-2';
                   const sCancel = document.createElement('button'); sCancel.type='button'; sCancel.className='px-3 py-1 bg-gray-200 rounded'; sCancel.textContent='Cancel';
                   const sSave = document.createElement('button'); sSave.type='submit'; sSave.className='px-3 py-1 bg-green-500 text-white rounded'; sSave.textContent='Save';
@@ -740,6 +737,7 @@
           form.action = '/update/contract';
           form.method = 'POST';
           form.className = 'space-y-2';
+          form.enctype = 'multipart/form-data';
 
           // skjulte felter: kontrakt-ID + sponsor-navnet (bruges til redirect)
           const hiddenId = document.createElement('input');
@@ -938,7 +936,7 @@
           f.style.display = 'none';
           const inId = document.createElement('input');
           inId.type = 'hidden';
-          inId.name = 'contractId';
+          inId.name = 'id';
           inId.value = contractId;
           f.appendChild(inId);
           const inSponsor = document.createElement('input');
