@@ -433,9 +433,12 @@ public class MainController {
     }
 
     @GetMapping("/logout") 
-    public String logout(HttpServletRequest request) { // ikke implementeret på frontend endnu
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
         Cookie cookie = WebUtils.getCookie(request, "token");
-        if(cookie != null) cookie.setMaxAge(0);
+        if(cookie != null) {
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
+        }
         return "redirect:/login";
     }
 
