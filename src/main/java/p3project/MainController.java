@@ -176,9 +176,9 @@ public class MainController {
                         User user = getUserFromToken(request);
                         Changelog log = new Changelog(user, requestObject, field, before, after);
                         logRepository.save(log);
+                        fieldsChanged++;
                     }
                     field.set(storedObject, after);
-                    fieldsChanged++;
                 }
             } catch (IllegalAccessException error) {
                 throw new RuntimeException(error);
@@ -337,9 +337,11 @@ public class MainController {
         logRepository.save(log);
 
         sponsorRepository.deleteById(sponsorId);
+        
         Iterable<Contract> contracts = contractRepository.findAll();
         for (Contract contract : contracts) {
             if (sponsorId.equals(contract.getSponsorId())) {
+                // SLET OGSÅ TILHØRENDE SERVICES TIL KONTRAKTERNE, SÆT I FUNKTION MÅSKE
                 contractRepository.deleteById(contract.getId());
             }
         }
@@ -362,6 +364,13 @@ public class MainController {
         User user = getUserFromToken(request);
         Eventlog log = new Eventlog(user, contract, "DELETED");
         logRepository.save(log);
+
+        Iterable<Service> services = serviceRepository.findAll();
+        for (Service service : services) {
+            if (contractId.equals(service.getContractId())) {
+                serviceRepository.deleteById(service.getId());
+            }
+        }
         
         contractRepository.deleteById(contractId);
         return "redirect:/sponsors";
@@ -492,6 +501,24 @@ public class MainController {
         if(user == null) throw new RuntimeException("Unable to retrieve username");
         return user;
     }
+
+
+    /* 
+    private boolean isSponsorActive(Sponsor sponsor) {
+
+
+    }
+
+    private boolean isContractActive(Contract contract) {
+        Iterable<Service> services = serviceRepository.findAll();
+        if()
+
+    }
+
+    private boolean isServiceActive(Service service) {
+        return service.getArchived() || LocalDate.now().isAfter(service.getEndDate());
+    }
+    */
 
     
     @GetMapping("/homepage")
