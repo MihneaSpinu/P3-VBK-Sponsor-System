@@ -6,11 +6,12 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.time.LocalDate;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -29,9 +30,6 @@ import org.springframework.web.util.WebUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import org.mindrot.jbcrypt.BCrypt;
-
 import p3project.classes.Changelog;
 import p3project.classes.Contract;
 import p3project.classes.Eventlog;
@@ -124,7 +122,6 @@ public class MainController {
             //if no pdf sent, get the stored values.
             contract.setPdfData(storedContract.getPdfData());
             contract.setFileName(storedContract.getFileName());
-            contract.setMimeType(storedContract.getMimeType());
         }
         return handleUpdateRequest(contract, storedContract, request, model);
     }
@@ -196,7 +193,6 @@ public class MainController {
         String fieldName = field.getName();
         switch(fieldName) {
             case "pdfData":
-            case "mimeType":
                 return false;
             default:
                 return true;
@@ -361,16 +357,13 @@ public class MainController {
         if(contract == null) throw new RuntimeException("/getFile, Contract not found");
 
         byte[] pdfData = contract.getPdfData();
-        String mime = contract.getMimeType() != null
-                    ? contract.getMimeType()
-                    : "application/octet-stream";
         return ResponseEntity
                 .ok()
                 .header(
                     HttpHeaders.CONTENT_DISPOSITION,
                     "attachment; filename=\"" + contract.getFileName() + "\""
                 )
-                .contentType(MediaType.parseMediaType(mime))
+                .contentType(MediaType.APPLICATION_PDF)
                 .body(pdfData);
 
     }
@@ -384,7 +377,6 @@ public class MainController {
             contract.setPdfData(pdffile.getBytes());
             String cleanFilename = Paths.get(pdffile.getOriginalFilename()).getFileName().toString(); 
             contract.setFileName(cleanFilename);
-            contract.setMimeType(pdffile.getContentType());
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Kunne ikke uploade kontrakt. Prøv venligst igen :)");
@@ -419,6 +411,10 @@ public class MainController {
     @PostMapping("/login/confirm")
     public String confirmLogin(@RequestParam String username, @RequestParam String password, @RequestParam boolean rememberMe, Model model, HttpServletResponse response) {
         User user = userRepository.findByName(username);
+        System.out.println("\n\nNAVN: " + username);
+        System.out.println("\n\nKODE: " + password);
+        System.out.println("\n\nREMG: " + rememberMe);
+
         if(BCrypt.checkpw(user.getPassword(), password)) {
             String id = user.getId().toString();
             Token token = Token.sign(id);
@@ -432,9 +428,9 @@ public class MainController {
                 .maxAge(time)
                 .build();
             response.addHeader("Set-Cookie", cookie.toString());
-            return "redirect:/homepage";
+            return "login";
         } else {
-            return "redirect:/login";
+            return "login";
         }
     }
 
