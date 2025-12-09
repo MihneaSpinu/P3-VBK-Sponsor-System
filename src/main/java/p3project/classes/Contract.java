@@ -22,10 +22,6 @@ public class Contract {
     private String type;
     private boolean status;
     private String name;
-    // Link contract to sponsor by sponsorName
-    // sponsor id (generated) to link to Sponsor
-
-    private String mimeType;
 
     @Lob
     @Column(columnDefinition = "LONGBLOB") /* Longblob to have enough storage for .pdf's */
@@ -70,15 +66,6 @@ public class Contract {
     public String getName() {
         return this.name;
     }
-
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
-    }
-
 
 
     public void setSponsorId(Long sponsorId) {
