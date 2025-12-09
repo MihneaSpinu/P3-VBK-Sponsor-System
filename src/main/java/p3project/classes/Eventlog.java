@@ -54,6 +54,10 @@ public class Eventlog {
     }
 
     // Getters used exclusively for dynamic Thymeleaf view generation
+    public Long getId() {
+        return this.id;
+    }
+
     public String getUsername() {
         return this.username;
     }
