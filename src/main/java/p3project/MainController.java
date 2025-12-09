@@ -358,14 +358,13 @@ public class MainController {
 
         byte[] pdfData = contract.getPdfData();
         return ResponseEntity
-                .ok()
-                .header(
-                    HttpHeaders.CONTENT_DISPOSITION,
-                    "attachment; filename=\"" + contract.getFileName() + "\""
-                )
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(pdfData);
-
+                    .ok()
+                    .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + contract.getFileName() + "\""
+                    )
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(pdfData);
     }
 
 
@@ -411,11 +410,9 @@ public class MainController {
     @PostMapping("/login/confirm")
     public String confirmLogin(@RequestParam String username, @RequestParam String password, @RequestParam boolean rememberMe, Model model, HttpServletResponse response) {
         User user = userRepository.findByName(username);
-        System.out.println("\n\nNAVN: " + username);
-        System.out.println("\n\nKODE: " + password);
-        System.out.println("\n\nREMG: " + rememberMe);
+        if(user == null) return "redirect:/login";
 
-        if(BCrypt.checkpw(user.getPassword(), password)) {
+        if(BCrypt.checkpw(password, user.getPassword())) {
             String id = user.getId().toString();
             Token token = Token.sign(id);
             String formattedToken = id + "." + token.getHash();
@@ -428,9 +425,9 @@ public class MainController {
                 .maxAge(time)
                 .build();
             response.addHeader("Set-Cookie", cookie.toString());
-            return "login";
+            return "redirect:/homepage";
         } else {
-            return "login";
+            return "redirect:/login";
         }
     }
 
@@ -489,7 +486,7 @@ public class MainController {
         return "homepage";
     }
 
-    // Add user with demo sponsor & contract
+
     @PostMapping("/users/add")
     public String addUserFromWeb(@RequestParam String name, @RequestParam String password, boolean isAdmin, Model model) {
         List<User> users = userRepository.findAll();
@@ -499,7 +496,8 @@ public class MainController {
                 return "AdminPanel";
             }
         }
-        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+   
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt(8));
         User user = new User();
         user.setName(name);
         user.setPassword(hashedPassword);
@@ -514,73 +512,13 @@ public class MainController {
     public String testUser(HttpServletResponse response) {
         User user = new User();
         user.setName("søren");
-        String hashedPassword = "test123";
+
+        String password = "test123";
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt(8));
+
         user.setPassword(hashedPassword);
         userRepository.save(user);
-        ResponseCookie cookie = ResponseCookie.from("token", user.getId() + ".fihuayr78108hfnhfnhubr801gh89")
-        .httpOnly(true)  // javascript kan ikke røre den B-)
-        .secure(false)    // HTTPS only
-        .path("/")       // Bruges til alle sider
-        .maxAge(3600)
-        .build();
-        response.addHeader("Set-Cookie", cookie.toString());
 
         return "redirect:/login";
     }
-
-
-    /*
-    @PostMapping("/update/service")
-    public ResponseEntity<String> updateServiceFields(HttpServletRequest request,
-            @RequestParam Long id,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) Integer amountOrDivision,
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate) {
-
-        Service storedService = serviceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Unable to retrieve service with id: " + id));
-
-        // Build a request Service object using stored values as defaults
-        p3project.classes.Service requestService;
-        try {
-            p3project.classes.ServiceType st = null;
-            p3project.classes.Service.ServiceStatus ss = null;
-            java.time.LocalDate sd = null;
-            java.time.LocalDate ed = null;
-
-            if (type != null && !type.isEmpty()) {
-                try { st = p3project.classes.ServiceType.valueOf(type); } catch (Exception e) { st = storedService.getType(); }
-            } else {
-                st = storedService.getType();
-            }
-
-            if (status != null && !status.isEmpty()) {
-                try { ss = p3project.classes.Service.ServiceStatus.valueOf(status); } catch (Exception e) { ss = storedService.getStatusEnum(); }
-            } else {
-                ss = storedService.getStatusEnum();
-            }
-
-            if (startDate != null && !startDate.isEmpty()) sd = java.time.LocalDate.parse(startDate); else sd = storedService.getStartDate();
-            if (endDate != null && !endDate.isEmpty()) ed = java.time.LocalDate.parse(endDate); else ed = storedService.getEndDate();
-
-            int amt = amountOrDivision == null ? storedService.getAmountOrDivision() : amountOrDivision;
-            String nm = name == null ? storedService.getName() : name;
-
-            requestService = new p3project.classes.Service(storedService.getContractId(), nm, st, ss, amt, sd, ed);
-
-            // set private id field via reflection so compareFields can inspect it
-            java.lang.reflect.Field idField = requestService.getClass().getDeclaredField("id");
-            idField.setAccessible(true);
-            idField.set(requestService, id);
-
-        } catch (Exception e) {
-            return new ResponseEntity<>("Bad request: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-
-        return handleUpdateRequest(requestService, storedService, request);
-    }
-    */
 }

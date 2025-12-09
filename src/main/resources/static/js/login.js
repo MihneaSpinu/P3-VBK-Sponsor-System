@@ -19,7 +19,7 @@ document.getElementById("loginForm").addEventListener("submit", event => {
         body: formData
     })
     .then(() => {
-        //window.location.href = "/homepage";
+        window.location.href = "/homepage";
     })
     .catch(() => {
         errorMessage.textContent = "Wrong username or password";
