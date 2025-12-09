@@ -2,7 +2,6 @@ package p3project.classes;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -19,12 +18,12 @@ public class UserTest {
         // Act - Set properties
         user.setName("John Doe");
         //user.setEmail("john@example.com");
-        user.setId(1);
+        user.setId(1L);
         
         // Assert - Check that properties were set correctly
         assertEquals("John Doe", user.getName());
         //assertEquals("john@example.com", user.getEmail());
-        assertEquals(1, user.getId());
+        assertEquals(1L, user.getId());
     }
     
     @Test
