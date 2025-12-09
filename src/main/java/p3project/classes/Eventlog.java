@@ -35,12 +35,12 @@ public class Eventlog {
 
     protected Eventlog() {};
 
-    public <T> Eventlog(User user, T changedObject, String action) {
+    public <T> Eventlog(User user, T targetObject, String action) {
         this.username = user.getName(); 
-        this.objectType = changedObject.getClass().getSimpleName(); // oversæt til dansk på frontend xd
+        this.objectType = targetObject.getClass().getSimpleName(); // oversæt til dansk på frontend xd
         try {
-            Method getName = changedObject.getClass().getMethod("getName"); // jank
-            this.objectName = getName.invoke(changedObject).toString();
+            Method getName = targetObject.getClass().getMethod("getName"); // jank
+            this.objectName = getName.invoke(targetObject).toString();
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException error) {
             this.objectName = "-";
         }
@@ -72,26 +72,4 @@ public class Eventlog {
         return this.action;
     }
 
-    // NO SETTERS !!!!
-
-    /*
-    // legacy kode
-    public static <T> Eventlog create(User user, T changedObject, String action) {
-        Eventlog log = new Eventlog();
-        log.username = "testUsername";
-        
-        //log.objectType = changedObject.getClass().getSimpleName(); // oversæt til dansk på frontend xd
-        try {
-            Method getName = changedObject.getClass().getMethod("getName"); // jank
-            log.objectName = getName.invoke(changedObject).toString();
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException error) {
-            log.objectName = "-";
-            throw new RuntimeException("Error getting name of target object: ", error);
-        }
-        
-        log.timestamp = LocalDateTime.now(); // skal formateres ordentligt
-        log.action = action;
-        return log;
-    }
-    */
 }

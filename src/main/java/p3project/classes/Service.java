@@ -16,8 +16,8 @@ public class Service {
     private Long id;
     private Long contractId;
     private String name;
-    private ServiceType type;
-    private ServiceStatus status;
+    private String type;
+    private boolean archived;
     private int amountOrDivision;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -26,11 +26,11 @@ public class Service {
     protected Service() {}
 
     // Constructor
-    public Service(Long contractId, String name, ServiceType type, ServiceStatus status, int amountOrDivision, LocalDate startDate, LocalDate endDate) {
+    public Service(Long contractId, String name, String type, boolean archived, int amountOrDivision, LocalDate startDate, LocalDate endDate) {
         this.contractId = contractId;
         this.name = name;
         this.type = type;
-        this.status = status;
+        this.archived = archived;
         this.amountOrDivision = amountOrDivision;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -39,6 +39,10 @@ public class Service {
 
     public Long getId() { 
         return id; 
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getContractId() {
@@ -55,41 +59,47 @@ public class Service {
         this.name = name; 
     }
 
-    public ServiceType getType() { 
+    public String getType() { 
         return type; 
     }
-    public void setType(ServiceType type) { this.type = type; }
+    public void setType(String type) { 
+        this.type = type; 
+    }
 
-    public Service(ServiceType type, boolean status, int amountOrDuration) {
+    public Service(String type, boolean archived, int amountOrDuration) {
         this.type = type;
-        this.setStatus(status);
+        this.archived = archived;
         this.amountOrDivision = amountOrDuration;
     }
 
-    public boolean getStatus() { return this.status == ServiceStatus.AKTIV; }
-    public void setStatus(boolean active) { this.status = active ? ServiceStatus.AKTIV : ServiceStatus.INAKTIV; }
-
-
-    public ServiceStatus getStatusEnum() { return status; }
-    public void setStatus(ServiceStatus status) { this.status = status; }
-
-    public int getAmountOrDuration() { return amountOrDivision; }
-    public void setAmountOrDuration(int amount) { this.amountOrDivision = amount; }
-
-    public int getAmountOrDivision() { return amountOrDivision; }
-    public void setAmountOrDivision(int amountOrDivision) { this.amountOrDivision = amountOrDivision; }
-
-    public LocalDate getStartDate() { return startDate; }
-    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
-
-    public LocalDate getEndDate() { return endDate; }
-    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
-
-    // Nested enum for service status (AKTIV, IGANG, UDFORT, INAKTIV)
-    public static enum ServiceStatus {
-        AKTIV,
-        IGANG,
-        UDFORT,
-        INAKTIV
+    public void setArchived(boolean archived) {
+        this.archived = archived;
     }
+
+    public boolean getArchived() {
+        return this.archived;
+    }
+
+    public int getAmountOrDivision() { 
+        return amountOrDivision; 
+    }
+    public void setAmountOrDivision(int amountOrDivision) { 
+        this.amountOrDivision = amountOrDivision; 
+    }
+
+    public LocalDate getStartDate() { 
+        return startDate; 
+    }
+    public void setStartDate(LocalDate startDate) { 
+        this.startDate = startDate; 
+    }
+
+    public LocalDate getEndDate() { 
+        return endDate; 
+    }
+    public void setEndDate(LocalDate endDate) { 
+        this.endDate = endDate; 
+    }
+
+
 }

@@ -22,15 +22,9 @@ public class Contract {
     private String type;
     private boolean status;
     private String name;
-    // Link contract to sponsor by sponsorName
-    // sponsor id (generated) to link to Sponsor
-
-    // copy of sponsor name for easy display in views
-    private String sponsorName;
-    private String mimeType;
 
     @Lob
-    @Column(name = "pdf_data", columnDefinition = "LONGBLOB") /* Longblob to have enough storage for .pdf's */
+    @Column(columnDefinition = "LONGBLOB") /* Longblob to have enough storage for .pdf's */
     private byte[] pdfData;
     private String fileName;
 
@@ -64,6 +58,7 @@ public class Contract {
         return sponsorId;
     }
 
+
     public void setName(String name) {
         this.name = name;
     }
@@ -71,15 +66,6 @@ public class Contract {
     public String getName() {
         return this.name;
     }
-
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
-    }
-
 
 
     public void setSponsorId(Long sponsorId) {
@@ -157,15 +143,6 @@ public class Contract {
         this.type = type;
     }
 
-    // Returns the name of the sponsor
-    public String getSponsorName() {
-        return sponsorName;
-    }
-
-    // Sets the name of the sponsor
-    public void setSponsorName(String sponsorName) {
-        this.sponsorName = sponsorName;
-    }
 
     public void setFileName(String fileName){
         this.fileName = fileName;

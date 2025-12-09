@@ -6,8 +6,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Entity // This tells Hibernate to make a table out of this class
-@Table(name = "users") // Avoid 'user' as it's a reserved keyword in H2
+@Entity
+@Table(name = "users")
 public class User {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -16,6 +16,8 @@ public class User {
 	private String name;
 
 	private String password;
+
+	private boolean isAdmin = true;
 
 	public Integer getId() {
 		return id;
@@ -39,5 +41,13 @@ public class User {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public boolean getIsAdmin() {
+		return this.isAdmin;
+	}
+
+	public void setIsAdmin(boolean isAdmin) {
+		this.isAdmin = isAdmin;
 	}
 }

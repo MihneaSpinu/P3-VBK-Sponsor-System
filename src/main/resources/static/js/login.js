@@ -6,13 +6,12 @@ document.getElementById("loginForm").addEventListener("submit", event => {
     let rememberMe = document.getElementById("rememberMe").checked;
     let errorMessage = document.getElementById("errorMessage");
 
-    // let hashedPassword = bcrypt.hashSync(password, 8);
-    // console.log(hashedPassword);
+
 
     let formData = new FormData();
 
     formData.append("username", username);
-    formData.append("hashedPassword", password);
+    formData.append("password", password);
     formData.append("rememberMe", rememberMe);
 
     fetch("/login/confirm", {
