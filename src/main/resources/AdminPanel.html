@@ -167,51 +167,50 @@
 </style>
 
 <body class="bg-gray-100 text-gray-900">
-
-        <!-- User Modal-->
-        <div id="Umodal">
-            <div class="ModalBox">
-                <a class="CloseModal" href="#">X</a>
-
-                <div class="ModalRow">
-                    <div class="ModalTag">
-                        <h3 class="title">Brugernavn:</h3>
-                        <div class="UserField">
-                            <p id="UsernameDisplay">Bruger1</p>
-                            <input id="UsernameInput" class="rounded" type="text" placeholder="Nyt brugernavn">
-                            <button class="tag" onclick="">Ændre brugernavn</button>
-                        </div>
-                    </div>
-                    <div class="ModalTag">
-                        <h3 class="title">Adgangskode:</h3>
-                        <div class="UserField">
-                            <p id="PasswordDisplay">Kode1234</p>
-                            <input id="PasswordInput" class="rounded" type="password" placeholder="Ny adgangskode">
-                            <button class="tag" onclick="">Ændre adgangskode</button>
-                        </div>
-                    </div>
-
-                    <div class="ModalRow">
-                        <div class="ModalActionsRow">
-                            <button onclick="location.hash='Dmodal'" style="background:#f87171;color:#fff;">Slet bruger</button>
-                        </div>
+    <!-- User Modal-->
+    <div id="Umodal">
+        <div class="ModalBox">
+            <a class="CloseModal" href="#">X</a>
+            
+            <div class="ModalRow">
+                <div class="ModalTag">
+                    <h3 class="title">Brugernavn:</h3>
+                    <div class="UserField">
+                        <p id="UsernameDisplay">Bruger1</p>
+                        <input id="UsernameInput" class="rounded" type="text" placeholder="Nyt brugernavn">
+                        <button class="tag" onclick="">Ændre brugernavn</button>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Delete User Modal -->
-        <div id="Dmodal">
-            <div class="ModalBox">
-                <p>Er du sikker på at du vil slette <strong id="DeleteUsername">Bruger1</strong>?</p>
+                <div class="ModalTag">
+                    <h3 class="title">Adgangskode:</h3>
+                    <div class="UserField">
+                        <p id="PasswordDisplay">Kode1234</p>
+                        <input id="PasswordInput" class="rounded" type="password" placeholder="Ny adgangskode">
+                        <button class="tag" onclick="">Ændre adgangskode</button>
+                    </div>
+                </div>
+                
                 <div class="ModalRow">
                     <div class="ModalActionsRow">
-                        <button onclick="location.hash='Umodal'">Annuller</button>
-                        <button onclick=" location.hash='#';DeleteFunction()" style="background:#f87171;color:#fff;">Slet Bruger</button>
+                        <button onclick="location.hash='Dmodal'" style="background:#f87171;color:#fff;">Slet bruger</button>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+    
+    <!-- Delete User Modal -->
+    <div id="Dmodal">
+        <div class="ModalBox">
+            <p>Er du sikker på at du vil slette <strong id="DeleteUsername">Bruger1</strong>?</p>
+            <div class="ModalRow">
+                <div class="ModalActionsRow">
+                    <button onclick="location.hash='Umodal'">Annuller</button>
+                    <button onclick=" location.hash='#';DeleteFunction()" style="background:#f87171;color:#fff;">Slet Bruger</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <div class="flex min-h-screen">
         
@@ -219,7 +218,7 @@
         <aside class="sidebar">
             <div>
                 <div class="logo">VBK Sponsor System</div>
-
+                
                 <div class="menu">
                     <button class="menu-btn" onclick="location.href='/homepage'">Forside</button>
                     <button class="menu-btn" onclick="location.href='/sponsors'">Sponsors</button>
@@ -228,13 +227,16 @@
                     <button class="menu-btn" onclick="location.href='/AdminPanel'">Admin panel</button>
                 </div>
             </div>
-
+            
             <button class="logout-btn" onclick="location.href='/login'">Log ud</button>
         </aside>
-
-    <!-- Main Content -->
-    <main class="flex-1 p-6">
-       <div>
+        
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <div th:if="${responseMessage}" class="mb-4 px-4 py-2 bg-yellow-100 text-yellow-800 border-l-4 border-yellow-500 rounded">
+                <p th:text="${responseMessage}"></p>
+            </div>
+        <div>
             <div class="bg-gray-200 rounded-t-lg text-sm font-semibold">
                 <div class="grid grid-cols-2">
                     <div class="px-6 py-3 border-r">
@@ -248,13 +250,28 @@
 
             <div class="grid grid-cols-2 gap-3 items-start">
 
+
                 <!-- User list -->
                 <section class="bg-white rounded shadow p-4">
                     <table class="min-w-full text-sm">
                         <tbody>
-                            <tr>
-                                <td class="px-6 py-4">
-                                    <button class="py-2 m-2 bg-gray-200 w-full px-3 text-center hover:bg-gray-300 rounded" onclick="location.hash='Umodal'">Bruger #1</button>
+                            <tr th:each="user : ${users}" class="hover:bg-gray-50">
+                                <td class="px-6 py-4 flex items-center justify-between">
+                                    <!-- Username on the left -->
+                                    <span th:text="${user.name}" class="font-medium text-gray-800"></span>
+
+                                    <!-- Admin status centered -->
+                                    <span th:text="${user.isAdmin ? 'Admin' : 'Ikke admin'}"
+                                        th:classappend="${user.isAdmin} ? 'text-green-600 font-semibold' : 'text-gray-600'"
+                                        class="mx-auto">
+                                    </span>
+
+                                    <!-- Delete button on the right -->
+                                    <form th:action="@{/users/delete/{id}(id=${user.id})}" method="post">
+                                        <button type="submit" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">
+                                            Delete
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         </tbody>
@@ -263,15 +280,22 @@
 
                 <!-- Add user -->
                 <section class="bg-white rounded shadow p-4">
-                    <form th:action="@{/users/add}" action="/users/add" method="post" class="space-y-4">
+                    <form th:action="@{/users/add}" method="post" class="space-y-4">
+                        <!--Username-->
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Brugernavn</label>
-                            <input name="username" type="text" required class="mt-1 block w-full border-gray-300 rounded px-3 py-2" placeholder="Brugernavn">
+                            <input name="name" type="text" required class="mt-1 block w-full border-gray-300 rounded px-3 py-2" placeholder="Brugernavn">
                         </div>
-
+                        <!--Password-->
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Adgangskode</label>
                             <input name="password" type="password" required class="mt-1 block w-full border-gray-300 rounded px-3 py-2" placeholder="Adgangskode">
+                        </div>
+                        <!--Checkbox for if admin-->
+                        <div class="flex items-center space-x-2">
+                            <input id="isAdmin" name="isAdmin" type="checkbox"
+                                class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="isAdmin" class="text-gray-700 font-medium">Er de administratore?</label>
                         </div>
 
                         <div>

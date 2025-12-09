@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.WebUtils;
 
 import jakarta.servlet.http.Cookie;
@@ -394,7 +395,7 @@ public class MainController {
     public String showAdminPanelPage(Model model, HttpServletRequest request) {
         if(!userHasValidToken(request)) return "redirect:/login";
         if(!userIsAdmin(request))       return "redirect:/homepage";
-        
+        model.addAttribute("users", userRepository.findAll());
         return "AdminPanel";
     }
 
@@ -466,7 +467,7 @@ public class MainController {
 
     private User getUserFromToken(HttpServletRequest request) throws RuntimeException {
         String[] parsedCookie = parseCookie(request);
-        int userId = Integer.parseInt(parsedCookie[0]);
+        Long userId = Long.valueOf(parsedCookie[0]);
         User user = userRepository.findById((userId)).orElse(null);
         if(user == null) throw new RuntimeException("Unable to retrieve username");
         return user;
@@ -486,14 +487,25 @@ public class MainController {
         return "homepage";
     }
 
+    @PostMapping("/users/delete/{id}")
+    public String deleteUserById(@PathVariable Long id){
+        userRepository.deleteById(id);
+        return "redirect:/AdminPanel";
+
+    }
 
     @PostMapping("/users/add")
-    public String addUserFromWeb(@RequestParam String name, @RequestParam String password, boolean isAdmin, Model model) {
+    public String addUserFromWeb(
+        @RequestParam String name, 
+        @RequestParam String password, 
+        boolean isAdmin, Model model,
+        RedirectAttributes redirectAttributes) {
         List<User> users = userRepository.findAll();
         for(User user : users) {
             if(name.equals(user.getName())) {
-                model.addAttribute("responseMessage", "Username already exists. Please choose another.");
-                return "AdminPanel";
+                //model.addAttribute("responseMessage", "Username already exists. Please choose another.");
+                redirectAttributes.addFlashAttribute("responseMessage", "Brugernavn allerede i brug, vælg et andet");
+                return "redirect:/AdminPanel";
             }
         }
    
@@ -504,7 +516,7 @@ public class MainController {
         user.setIsAdmin(isAdmin);
         userRepository.save(user);
 
-        return "redirect:/users";
+        return "redirect:/AdminPanel";
     }
 
 
