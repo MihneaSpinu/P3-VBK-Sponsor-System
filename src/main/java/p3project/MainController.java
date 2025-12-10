@@ -99,23 +99,29 @@ public class MainController {
 
     // boilerplate update handlers
     @PostMapping("/update/sponsor")
-    public String updateSponsorFields(@ModelAttribute Sponsor sponsor, HttpServletRequest request, Model model) {
+    public String updateSponsorFields(@ModelAttribute Sponsor sponsor, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(!userHasValidToken(request)) return "redirect:/login";
         if(!userIsAdmin(request))       return "redirect:/homepage";
 
         Sponsor storedSponsor = sponsorRepository.findById(sponsor.getId()).orElse(null);
-        if(storedSponsor == null) return renderSponsorPageWithResponse("Error retrieving sponsor. Please try again", model);
+        if(storedSponsor == null) {
+            redirectAttributes.addAttribute("responseMessage", "FEJL!! PRØV IGEN");
+            return "redirect:/sponsors";
+        }
 
-        return handleUpdateRequest(sponsor, storedSponsor, request, model);
+        return handleUpdateRequest(sponsor, storedSponsor, request, redirectAttributes);
     }
 
     @PostMapping("/update/contract")
-    public String updateContractFields(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, HttpServletRequest request, Model model) {
+    public String updateContractFields(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(!userHasValidToken(request)) return "redirect:/login";
         if(!userIsAdmin(request))       return "redirect:/homepage";
 
         Contract storedContract = contractRepository.findById(contract.getId()).orElse(null);
-        if(storedContract == null) return renderSponsorPageWithResponse("Error retrieving contract. Please try again", model);
+        if(storedContract == null) {
+            redirectAttributes.addAttribute("responseMessage", "FEJL!! PRØV IGEN");
+            return "redirect:/sponsors";
+        }
         //If a file is sent parse the data
         if(!pdffile.isEmpty()){
             parseContract(contract, pdffile);
@@ -124,37 +130,34 @@ public class MainController {
             contract.setPdfData(storedContract.getPdfData());
             contract.setFileName(storedContract.getFileName());
         }
-        return handleUpdateRequest(contract, storedContract, request, model);
+        return handleUpdateRequest(contract, storedContract, request, redirectAttributes);
     }
 
      
     @PostMapping("/update/service")
-    public String updateServiceFields(@ModelAttribute Service service, HttpServletRequest request, Model model) {
+    public String updateServiceFields(@ModelAttribute Service service, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(!userHasValidToken(request)) return "redirect:/login";
         if(!userIsAdmin(request))       return "redirect:/homepage";
 
         Service storedService = serviceRepository.findById(service.getId()).orElse(null);
-        if(storedService == null) return renderSponsorPageWithResponse("Error retrieving service. Please try again", model);
-        return handleUpdateRequest(service, storedService, request, model);
+        if(storedService == null) {
+            redirectAttributes.addAttribute("responseMessage", "FEJL!! PRØV IGEN");
+            return "redirect:/sponsors";
+        }
+        return handleUpdateRequest(service, storedService, request, redirectAttributes);
 
     }
 
-    private String renderSponsorPageWithResponse(String responseMessage, Model model) { // tilføj flag til respons type?
-        model.addAttribute("sponsors", sponsorRepository.findAll());
-        model.addAttribute("contracts", contractRepository.findAll());
-        model.addAttribute("services", serviceRepository.findAll());
-        model.addAttribute("responseMessage", responseMessage);
-        return "sponsors";
-    }
-    
 
-    private <T> String handleUpdateRequest(T requestObject, T storedObject, HttpServletRequest request, Model model) {
+    private <T> String handleUpdateRequest(T requestObject, T storedObject, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         Integer fieldsChanged;
         try {
             fieldsChanged = compareFields(requestObject, storedObject, request);
-            return renderSponsorPageWithResponse("Updated " + fieldsChanged + " fields", model);
+            redirectAttributes.addAttribute("repsonseMessage", "Opdateret " + fieldsChanged + " felter");
+            return "redirect:/sponsors";
         } catch (ClassNotFoundException error) {
-            return renderSponsorPageWithResponse("Internal server error. Please try again", model);
+            redirectAttributes.addAttribute("responseMessage","FEJL!! PRØ GEN");
+            return "redirect:/sponsors";
         }
     }
 
@@ -173,9 +176,9 @@ public class MainController {
                         User user = getUserFromToken(request);
                         Changelog log = new Changelog(user, requestObject, field, before, after);
                         logRepository.save(log);
+                        fieldsChanged++;
                     }
                     field.set(storedObject, after);
-                    fieldsChanged++;
                 }
             } catch (IllegalAccessException error) {
                 throw new RuntimeException(error);
@@ -201,7 +204,7 @@ public class MainController {
     }
 
     @PostMapping("/sponsors/add")
-    public String addSponsorFromWeb(@ModelAttribute Sponsor sponsor, Model model, HttpServletRequest request) {
+    public String addSponsorFromWeb(@ModelAttribute Sponsor sponsor, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(!userHasValidToken(request)) return "redirect:/login";
         if(!userIsAdmin(request))       return "redirect:/homepage";
 
@@ -211,13 +214,14 @@ public class MainController {
 
         sponsorRepository.save(sponsor);
 
+        redirectAttributes.addAttribute("responseMessage", "tilføjet sponsor:");
         return "redirect:/sponsors";
     }
 
 
     // Handles creating a new contract for a sponsor
     @PostMapping("/sponsors/addContract")
-    public String addContractForSponsor(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, Model model, HttpServletRequest request) {
+    public String addContractForSponsor(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(!userHasValidToken(request)) return "redirect:/login";
         if(!userIsAdmin(request))       return "redirect:/homepage";
 
@@ -228,15 +232,17 @@ public class MainController {
         try {
             parseContract(contract, pdffile);
             contractRepository.save(contract);
+            redirectAttributes.addAttribute("responseMessage", "Tilføejt klntrakt:");
             return "redirect:/sponsors";
         } catch (IllegalArgumentException ex) {
-            return renderSponsorPageWithResponse("FEJL!!!", model);
+            redirectAttributes.addAttribute("responseMessage","FEJL!! PRØV IOGEN");
+            return "redirect:/sponsors";
         }
     }
 
     // Handles creating a new service for a contract
     @PostMapping("/sponsors/addService")
-    public String addServiceForContract(@ModelAttribute Service service, Model model, HttpServletRequest request) {
+    public String addServiceForContract(@ModelAttribute Service service, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(!userHasValidToken(request)) return "redirect:/login";
         if(!userIsAdmin(request))       return "redirect:/homepage";
 
@@ -246,9 +252,11 @@ public class MainController {
 
         try {
             serviceRepository.save(service);
+            redirectAttributes.addAttribute("responseMessage", "tilføjet service: [navn]");
             return "redirect:/sponsors";
         } catch (IllegalArgumentException ex) {
-            return renderSponsorPageWithResponse("FEJL!!!", model);
+            redirectAttributes.addAttribute("responseMessage", "FEJL");
+            return "redirect:/sponsors";
         }
     }
 
@@ -292,12 +300,15 @@ public class MainController {
 
     // Deletes a service by ID
     @PostMapping("/sponsors/deleteService")
-    public String deleteService(@RequestParam Long serviceId, HttpServletRequest request, Model model) {
+    public String deleteService(@RequestParam Long serviceId, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(!userHasValidToken(request)) return "redirect:/login";
         if(!userIsAdmin(request))       return "redirect:/homepage";
 
         Service service = serviceRepository.findById(serviceId).orElse(null);
-        if(service == null) return renderSponsorPageWithResponse("Invalid id", model);
+        if(service == null) {
+            redirectAttributes.addFlashAttribute("responseMessage", "FEJL PRØV IGEN");
+            return "redirect:/sponsors";
+        }
 
         User user = getUserFromToken(request);
         Eventlog log = new Eventlog(user, service, "DELETED");
@@ -311,21 +322,26 @@ public class MainController {
 
     // Deletes a sponsor and all contracts linked to that sponsor
     @PostMapping("/sponsors/delete")
-    public String deleteSponsor(@RequestParam Long sponsorId, HttpServletRequest request, Model model) {
+    public String deleteSponsor(@RequestParam Long sponsorId, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(!userHasValidToken(request)) return "redirect:/login";
         if(!userIsAdmin(request))       return "redirect:/homepage";
 
         Sponsor sponsor = sponsorRepository.findById(sponsorId).orElse(null);
-        if(sponsor == null) return renderSponsorPageWithResponse("Invalid id", model);
+        if(sponsor == null) {
+            redirectAttributes.addFlashAttribute("responseMessage", "FEJL PRØV IGEN");
+            return "redirect:/sponsors";
+        }
 
         User user = getUserFromToken(request);
         Eventlog log = new Eventlog(user, sponsor, "DELETED");
         logRepository.save(log);
 
         sponsorRepository.deleteById(sponsorId);
+        
         Iterable<Contract> contracts = contractRepository.findAll();
         for (Contract contract : contracts) {
             if (sponsorId.equals(contract.getSponsorId())) {
+                // SLET OGSÅ TILHØRENDE SERVICES TIL KONTRAKTERNE, SÆT I FUNKTION MÅSKE
                 contractRepository.deleteById(contract.getId());
             }
         }
@@ -335,16 +351,26 @@ public class MainController {
 
     // Deletes a contract by ID
     @PostMapping("/sponsors/deleteContract")
-    public String deleteContract(@RequestParam Long contractId, HttpServletRequest request, Model model) {
+    public String deleteContract(@RequestParam Long contractId, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(!userHasValidToken(request)) return "redirect:/login";
         if(!userIsAdmin(request))       return "redirect:/homepage";
 
         Contract contract = contractRepository.findById(contractId).orElse(null);
-        if(contract == null) return renderSponsorPageWithResponse("Invalid id", model);
+        if(contract == null) {
+            redirectAttributes.addFlashAttribute("responseMessage", "FEJL PRØV IGEN");
+            return "redirect:/sponsors";
+        }
 
         User user = getUserFromToken(request);
         Eventlog log = new Eventlog(user, contract, "DELETED");
         logRepository.save(log);
+
+        Iterable<Service> services = serviceRepository.findAll();
+        for (Service service : services) {
+            if (contractId.equals(service.getContractId())) {
+                serviceRepository.deleteById(service.getId());
+            }
+        }
         
         contractRepository.deleteById(contractId);
         return "redirect:/sponsors";
@@ -402,7 +428,7 @@ public class MainController {
     @GetMapping("/login")
     public String loginPage(Model model, HttpServletRequest request) {
         if (userHasValidToken(request)) {
-            return "redirect:/homepage"; // må ikke logge ind igen
+            return "redirect:/homepage";
         }        
         return "login";
     }
@@ -433,9 +459,12 @@ public class MainController {
     }
 
     @GetMapping("/logout") 
-    public String logout(HttpServletRequest request) { // ikke implementeret på frontend endnu
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
         Cookie cookie = WebUtils.getCookie(request, "token");
-        if(cookie != null) cookie.setMaxAge(0);
+        if(cookie != null) {
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
+        }
         return "redirect:/login";
     }
 
@@ -473,6 +502,24 @@ public class MainController {
         return user;
     }
 
+
+    /* 
+    private boolean isSponsorActive(Sponsor sponsor) {
+
+
+    }
+
+    private boolean isContractActive(Contract contract) {
+        Iterable<Service> services = serviceRepository.findAll();
+        if()
+
+    }
+
+    private boolean isServiceActive(Service service) {
+        return service.getArchived() || LocalDate.now().isAfter(service.getEndDate());
+    }
+    */
+
     
     @GetMapping("/homepage")
     public String showhomepage(Model model, HttpServletRequest request) {
@@ -495,15 +542,10 @@ public class MainController {
     }
 
     @PostMapping("/users/add")
-    public String addUserFromWeb(
-        @RequestParam String name, 
-        @RequestParam String password, 
-        boolean isAdmin, Model model,
-        RedirectAttributes redirectAttributes) {
+    public String addUserFromWeb(@RequestParam String name, @RequestParam String password, boolean isAdmin, Model model, RedirectAttributes redirectAttributes) {
         List<User> users = userRepository.findAll();
         for(User user : users) {
             if(name.equals(user.getName())) {
-                //model.addAttribute("responseMessage", "Username already exists. Please choose another.");
                 redirectAttributes.addFlashAttribute("responseMessage", "Brugernavn allerede i brug, vælg et andet");
                 return "redirect:/AdminPanel";
             }
