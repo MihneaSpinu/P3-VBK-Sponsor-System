@@ -421,11 +421,18 @@ public class MainController {
         boolean userIsAdmin = userIsAdmin(request);
         model.addAttribute("userIsAdmin", userIsAdmin);
 
-        List<Sponsor> arcvhiedSponsors = getArchivedSponsors();
+        List<Sponsor> sponsors = sponsorRepository.findAll();
+        List<Sponsor> archivedSponsors = new ArrayList<>();
+        for(Sponsor sponsor : sponsors) {
+            if(!sponsorIsActive(sponsor)) {
+                archivedSponsors.add(sponsor);
+            }
+        }
+
         Iterable<Contract> contracts = contractRepository.findAll();
         Iterable<Service> services = serviceRepository.findAll();
 
-        model.addAttribute("sponsors", arcvhiedSponsors);
+        model.addAttribute("sponsors", archivedSponsors);
         model.addAttribute("contracts", contracts);
         model.addAttribute("services", services);
         
@@ -519,60 +526,54 @@ public class MainController {
         return user;
     }
 
-    public boolean isServiceActive(Service service){
-        if((service.getType().equals("Banner")     || 
-                service.getType().equals("LogoTrojer")  || 
-                service.getType().equals("LogoBukser")) &&
-                LocalDate.now().isAfter(service.getEndDate()))
-            {
-            service.setArchived(true);
-            return true;
+    public boolean serviceIsActive(Service service) {
+        if((service.getType().equals("Banner")      || 
+            service.getType().equals("LogoTrojer")  || 
+            service.getType().equals("LogoBukser")) &&
+            LocalDate.now().isAfter(service.getEndDate())) {
+
+            service.setActive(false);
         }
-        return service.getArchived();
+        return service.getActive();
     }
 
-    public boolean isContractActive(Contract contract) {
+    // del op i 2 funktioner
+    public boolean contractIsActive(Contract contract) {  
         List<Service> services = serviceRepository.findAll();
         for(Service service : services) {
-            if(contract.getId().equals(service.getContractId()) && isServiceActive(service)){
-                contract.setArchived(false);
-                return true;
-            } 
+            if(contract.getId().equals(service.getContractId())) {
+
+                if(LocalDate.now().isAfter(contract.getEndDate())) {
+                    service.setActive(false);
+                    continue;
+                }
+
+                if(serviceIsActive(service)) {
+                    contract.setActive(true);
+                    return true;
+                }
+
+            }
         }
-        return false;
+        contract.setActive(false);
+        return contract.getActive();
     }
 
-    private boolean isSponsorActive(Sponsor sponsor) {
+
+
+    private boolean sponsorIsActive(Sponsor sponsor) {
         List<Contract> contracts = contractRepository.findAll();
         for(Contract contract : contracts) {
-            if(sponsor.getId().equals(contract.getSponsorId()) && isContractActive(contract)){
-                sponsor.setArchived(false);
+            if(sponsor.getId().equals(contract.getSponsorId()) && contractIsActive(contract)){
+                sponsor.setActive(true);
                 return true;
             }
         }
+        sponsor.setActive(false);
         return false;
     }
 
-
-    private List<Sponsor> getActiveSponsors(){
-        List<Sponsor> sponsors = sponsorRepository.findAll();
-        List<Sponsor> activeSponsors = new ArrayList<>();
-        for(Sponsor sponsor : sponsors) {
-            if(isSponsorActive(sponsor)) activeSponsors.add(sponsor);
-        }
-        return activeSponsors;
-    }
-
-    private List<Sponsor> getArchivedSponsors(){
-        List<Sponsor> sponsors = sponsorRepository.findAll();
-        List<Sponsor> activeSponsors = new ArrayList<>();
-        for(Sponsor sponsor : sponsors) {
-            if(!isSponsorActive(sponsor)) activeSponsors.add(sponsor);
-        }
-        return activeSponsors;
-    }
-    
-    
+        
     @GetMapping("/homepage")
     public String showhomepage(Model model, HttpServletRequest request) {
         if(!userHasValidToken(request)) return "redirect:/login";
@@ -581,8 +582,13 @@ public class MainController {
         Iterable<Contract> contracts = contractRepository.findAll();
         Iterable<Service> services = serviceRepository.findAll();
         boolean userIsAdmin = userIsAdmin(request);
+        List<Sponsor> activeSponsors = new ArrayList<>();
+        for(Sponsor sponsor : sponsors) {
+            if(sponsorIsActive(sponsor)) {
+                activeSponsors.add(sponsor);
+            }
+        }
         
-        List<Sponsor> activeSponsors = getActiveSponsors();
 
         model.addAttribute("sponsors", activeSponsors);
         model.addAttribute("contracts", contracts);
@@ -596,16 +602,6 @@ public class MainController {
         userRepository.deleteById(id);
         return "redirect:/AdminPanel";
 
-    }
-
-    private List<Service> getActiveServices(){
-        List<Service> activeServices = new ArrayList<>();
-        for (Service service : serviceRepository.findAll()){
-            if (isServiceActive(service)){
-                activeServices.add(service);
-            }
-        }
-        return activeServices;
     }
 
     @PostMapping("/users/add")
@@ -638,6 +634,7 @@ public class MainController {
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt(8));
 
         user.setPassword(hashedPassword);
+        user.setIsAdmin(true);
         userRepository.save(user);
 
         return "redirect:/login";

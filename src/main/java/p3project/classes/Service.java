@@ -18,7 +18,7 @@ public class Service {
     private Long contractId;
     private String name;
     private String type;
-    private boolean archived;
+    private boolean active;
     private int amountOrDivision;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -27,11 +27,11 @@ public class Service {
     protected Service() {}
 
     // Constructor
-    public Service(Long contractId, String name, String type, boolean archived, int amountOrDivision, LocalDate startDate, LocalDate endDate) {
+    public Service(Long contractId, String name, String type, boolean active, int amountOrDivision, LocalDate startDate, LocalDate endDate) {
         this.contractId = contractId;
         this.name = name;
         this.type = type;
-        this.archived = archived;
+        this.active = active;
         this.amountOrDivision = amountOrDivision;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -67,18 +67,18 @@ public class Service {
         this.type = type; 
     }
 
-    public Service(String type, boolean archived, int amountOrDuration) {
+    public Service(String type, boolean active, int amountOrDuration) {
         this.type = type;
-        this.archived = archived;
+        this.active = active;
         this.amountOrDivision = amountOrDuration;
     }
 
-    public void setArchived(boolean archived) {
-        this.archived = archived;
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
-    public boolean getArchived() {
-        return this.archived;
+    public boolean getActive() {
+        return this.active;
     }
 
     public int getAmountOrDivision() { 

@@ -41,7 +41,7 @@ class SponsorRepositoryTest {
         assertThat(savedSponsor.getName()).isEqualTo("Tech Corp");
         assertThat(savedSponsor.getContactPerson()).isEqualTo("John Smith");
         assertThat(savedSponsor.getEmail()).isEqualTo("john@techcorp.com");
-        assertThat(savedSponsor.getArchived()).isTrue();
+        assertThat(savedSponsor.getActive()).isTrue();
     }
 
     @Test
@@ -65,7 +65,7 @@ class SponsorRepositoryTest {
         assertThat(foundSponsor).isPresent();
         assertThat(foundSponsor.get().getName()).isEqualTo("Sports Inc");
         assertThat(foundSponsor.get().getContactPerson()).isEqualTo("Jane Doe");
-        assertThat(foundSponsor.get().getArchived()).isFalse();
+        assertThat(foundSponsor.get().getActive()).isFalse();
     }
 
     @Test
@@ -93,14 +93,14 @@ class SponsorRepositoryTest {
         // When
         savedSponsor.setName("Updated Corp");
         savedSponsor.setContactPerson("Updated Contact");
-        savedSponsor.setArchived(false);
+        savedSponsor.setActive(false);
         Sponsor updatedSponsor = sponsorRepository.save(savedSponsor);
 
         // Then
         assertThat(updatedSponsor.getId()).isEqualTo(savedSponsor.getId());
         assertThat(updatedSponsor.getName()).isEqualTo("Updated Corp");
         assertThat(updatedSponsor.getContactPerson()).isEqualTo("Updated Contact");
-        assertThat(updatedSponsor.getArchived()).isFalse();
+        assertThat(updatedSponsor.getActive()).isFalse();
     }
 
     @Test
@@ -144,7 +144,7 @@ class SponsorRepositoryTest {
         sponsor.setEmail("empty@corp.com");
         sponsor.setPhoneNumber("55555555");
         sponsor.setCvrNumber("CVREMP");
-        sponsor.setArchived(true);
+        sponsor.setActive(true);
         sponsor.setComments("Created with empty constructor");
 
         // When

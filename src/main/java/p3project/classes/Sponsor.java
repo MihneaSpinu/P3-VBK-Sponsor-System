@@ -16,18 +16,18 @@ public class Sponsor {
     private String email;
     private String phoneNumber;
     private String cvrNumber;
-    private boolean archived;
+    private boolean active;
     private String comments;
 
     // Constructor
     public Sponsor(String name, String contactPerson, String email,
-                    String phoneNumber, String cvrNumber, boolean archived, String comments) {
+                    String phoneNumber, String cvrNumber, boolean active, String comments) {
         this.name = name;
         this.contactPerson = contactPerson;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.cvrNumber = cvrNumber;
-        this.archived = archived;
+        this.active = active;
         this.comments = comments;
     }
 
@@ -83,12 +83,12 @@ public class Sponsor {
         this.cvrNumber = cvrNumber;
     }
 
-    public void setArchived(boolean archived) {
-        this.archived = archived;
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
-    public boolean getArchived(){
-        return archived;
+    public boolean getActive(){
+        return active;
     }
 
     public String getComments() {

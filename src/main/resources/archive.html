@@ -106,12 +106,12 @@
             <div th:each="contract : ${contracts}"
                 th:if="${contract.sponsorId == sponsor.id}">
 
-                <!-- Loop through services for this contract -->
+                <!-- Loop through services for this contract. behøver ikke tjekke om servicen er aktiv eller ej -->
                 <div th:each="svc : ${services}"
                     th:if="${svc.contractId == contract.id}"
-                    th:classappend="${svc.archived} ? 'bg-red-400' : 'bg-green-400'"
+                    th:classappend="${svc.active} ? 'bg-green-400' : 'bg-red-400'"
                     class="rounded px-4 py-3 text-center"
-                    th:text="${!svc.archived ? 'Aktiv' : 'Inaktiv'}">
+                    th:text="${!svc.active ? 'Udført' : 'Igangværende'}">
                 </div>
 
             </div>
