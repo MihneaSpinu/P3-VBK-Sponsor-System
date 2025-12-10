@@ -30,7 +30,7 @@ function postDeleteService(serviceId, contractId) {
 (function setupServiceModal() {
 	function updateWrapper(sel, wrapper) {
 		const v = sel.value;
-		wrapper.innerHTML = '';
+		wrapper.textContent = '';
 		if (v === 'LogoTrojler' || v === 'LogoBukser') {
 			const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Divisionen'; wrapper.appendChild(lab);
 			const divSel = document.createElement('select'); divSel.name='amountOrDivision'; divSel.className='border rounded px-2 py-1 w-full';

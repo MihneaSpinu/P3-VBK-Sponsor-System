@@ -2,7 +2,7 @@
 function populateViewContracts(sponsorId) {
 	const listEl = document.getElementById('viewContractsList');
 	if (!listEl) return;
-	listEl.innerHTML = '';
+	listEl.textContent = '';
 	const container = document.getElementById('contractsData');
 	if (!container) return;
 	const nodes = container.querySelectorAll('.contract-data');
@@ -13,7 +13,10 @@ function populateViewContracts(sponsorId) {
 		}
 	});
 	if (matches.length === 0) {
-		listEl.innerHTML = '<div class="text-sm text-gray-600">Ingen kontrakter for denne sponsor.</div>';
+		const emptyDiv = document.createElement('div');
+		emptyDiv.className = 'text-sm text-gray-600';
+		emptyDiv.textContent = 'Ingen kontrakter for denne sponsor.';
+		listEl.appendChild(emptyDiv);
 		return;
 	}
 
@@ -192,7 +195,13 @@ function populateViewContracts(sponsorId) {
 						const displayStart = formatDisplayDate(sstart);
 						const displayEnd = formatDisplayDate(send);
 						const displayStatus = statusLabels[String(sarchived)] || sarchived || '';
-						sDetails.innerHTML = `Type: ${escapeHtml(displayType)}<br/>Start: ${escapeHtml(displayStart)}<br/>End: ${escapeHtml(displayEnd)}<br/>Amount/Division: ${escapeHtml(samount)}<br/>Status: ${escapeHtml(displayStatus)}`;
+						sDetails.textContent = '';
+						const sLine = function (label, value) { const d = document.createElement('div'); d.textContent = label + ' ' + (value || ''); return d; };
+						sDetails.appendChild(sLine('Type:', displayType));
+						sDetails.appendChild(sLine('Start:', displayStart));
+						sDetails.appendChild(sLine('End:', displayEnd));
+						sDetails.appendChild(sLine('Amount/Division:', samount));
+						sDetails.appendChild(sLine('Status:', displayStatus));
 						sCard.appendChild(sDetails);
 
 						const sEditBlock = document.createElement('div');
@@ -218,7 +227,7 @@ function populateViewContracts(sponsorId) {
 
 						const sAmtWrapper = document.createElement('div'); sAmtWrapper.id = 's-amount-wrapper-' + sid; sForm.appendChild(sAmtWrapper);
 						function updateSAmountWrapper() {
-							sAmtWrapper.innerHTML = '';
+							sAmtWrapper.textContent = '';
 							const v = sTypeSel.value;
 							if (v === 'LogoTrojler' || v === 'LogoBukser') {
 								const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Divisionen'; sAmtWrapper.appendChild(lab);
@@ -357,7 +366,7 @@ function postDeleteContract(contractId, sponsorId) {
 		f.method = 'POST';
 		f.action = '/sponsors/deleteContract';
 		f.style.display = 'none';
-		const inId = document.createElement('input'); inId.type = 'hidden'; inId.name = 'id'; inId.value = contractId; f.appendChild(inId);
+		const inId = document.createElement('input'); inId.type = 'hidden'; inId.name = 'contractId'; inId.value = contractId; f.appendChild(inId);
 		const inSponsor = document.createElement('input'); inSponsor.type = 'hidden'; inSponsor.name = 'sponsorId'; inSponsor.value = sponsorId || ''; f.appendChild(inSponsor);
 		document.body.appendChild(f);
 		f.submit();
