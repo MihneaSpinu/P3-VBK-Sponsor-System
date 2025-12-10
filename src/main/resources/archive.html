@@ -4,10 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Archive</title>
+  <title>Forside</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script th:src="@{/js/filter.js}"></script>
   <link rel="stylesheet" th:href="@{/css/Sidebar.css}" href="static/css/Sidebar.css">
+  <link rel="stylesheet" th:href="@{/css/Modal.css}" href="static/css/Modal.css">
+  <link rel="stylesheet" th:href="@{/css/Table.css}" href="static/css/Table.css">
+  <link rel="stylesheet" th:href="@{/css/homepage.css}" href="static/css/homepage.css">
 
 </head>
 
@@ -22,10 +25,10 @@
 
         <div class="menu">
           <button class="menu-btn" onclick="location.href='/homepage'">Forside</button>
-          <button class="menu-btn" onclick="location.href='/sponsors'">Sponsors</button>
-          <button class="menu-btn" onclick="location.href='/changelog'">Change log</button>
           <button class="menu-btn" onclick="location.href='/archive'">Arkiv</button>
-          <button class="menu-btn" onclick="location.href='/AdminPanel'">Admin panel</button>
+          <button th:if="${userIsAdmin}" class="menu-btn" onclick="location.href='/sponsors'">Sponsors</button>
+          <button th:if="${userIsAdmin}" class="menu-btn" onclick="location.href='/changelog'">Hændelses log</button>
+          <button th:if="${userIsAdmin}" class="menu-btn" onclick="location.href='/AdminPanel'">Tilføj bruger</button>
         </div>
       </div>
 
@@ -34,21 +37,22 @@
 
     <!-- Main Content -->
     <main class="flex-1 p-6">
-
+      <!--Warning message-->
       <div class="relative">
-
+        <div th:if="${responseMessage}" class="mb-4 px-4 py-2 bg-yellow-100 text-yellow-800 border-l-4 border-yellow-500 rounded">
+          <p th:text="${responseMessage}"></p>
+        </div>
         <!-- Column headers -->
         <div class="bg-gray-200 rounded-t-lg shadow-md text-sm font-semibold grid grid-cols-4">
           <div class="px-6 py-3 border-r flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <span>Sponsor name</span>
+              <span>Sponsor navn</span>
               <label for="sortSelect" class="sr-only">Sort</label>
               <select id="sortSelect" class="bg-white border text-xs rounded px-2 py-1">
                 <option value="">Sort</option>
-                <option value="name-asc">Name A→Z</option>
-                <option value="name-desc">Name Z→A</option>
-                <option value="payment-desc">Max payment ↓</option>
-                <option value="date-asc">Earliest start ↑</option>
+                <option value="name-asc">Navn A→Z</option>
+                <option value="name-desc">Navn Z→A</option>
+                <option value="date-asc">Tidligste start ↑</option>
               </select>
             </div>
             <div class="flex items-center">
@@ -56,93 +60,84 @@
                 class="ml-4 bg-white border px-2 py-1 text-xs rounded hover:bg-gray-100">Filter</button>
             </div>
           </div>
-          <div class="px-6 py-3 border-r">Description</div>
-          <div class="px-6 py-3 border-r">Payment</div>
-          <div class="px-6 py-3">Active periods</div>
+          <div class="px-6 py-3 border-r">Tjenste</div>
+          <div class="px-6 py-3 border-r">Status</div>
+          <div class="px-6 py-3">Aktive periode</div>
         </div>
 
-        <!-- Sponsor cards -->
-        <div class="space-y-4 mt-0">
+<div class="space-y-4 mt-0">
 
-          <!-- Card 1 -->
-          <div class="bg-white shadow-md rounded-b-lg overflow-hidden">
-            <div class="grid grid-cols-4 text-sm">
+  <!-- LOOP THROUGH SPONSORS -->
+  <div th:each="sponsor : ${sponsors}" class="bg-white shadow-md rounded-lg overflow-hidden">
 
-              <div class="border-r p-4 flex items-stretch">
-                <div class="bg-gray-200 rounded px-4 py-6 w-full text-center">
-                  Spar Nord
-                </div>
-              </div>
+    <div class="grid grid-cols-4 text-sm">
 
-              <div class="border-r p-4 flex items-stretch">
-                <div class="bg-gray-200 rounded px-4 py-6 w-full leading-snug">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras gravida dictum diam.
-                  Suspendisse bibendum purus eros, sed cursus arcu venenatis non.
-                </div>
-              </div>
-
-              <div class="border-r p-4 flex items-stretch">
-                <div class="flex flex-col gap-2 w-full">
-                  <div class="bg-gray-200 rounded px-4 py-3 text-center">25.000 kr.</div>
-                  <div class="bg-gray-200 rounded px-4 py-3 text-center">15.000 kr.</div>
-                  <div class="bg-gray-200 rounded px-4 py-3 text-center">35.000 kr.</div>
-                </div>
-              </div>
-
-              <div class="p-4 flex items-stretch">
-                <div class="flex flex-col gap-2 w-full">
-                  <div class="bg-gray-200 rounded px-4 py-3 text-center">
-                    15/09/2025 - 02/02/2026
-                  </div>
-                  <div class="bg-gray-200 rounded px-4 py-3 text-center">
-                    15/09/2025 - 02/02/2026
-                  </div>
-                  <div class="bg-gray-200 rounded px-4 py-3 text-center">
-                    15/09/2025 - 02/02/2026
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- Card 2 -->
-          <div class="bg-white shadow-md rounded-lg overflow-hidden">
-            <div class="grid grid-cols-4 text-sm">
-
-              <div class="border-r p-4 flex items-stretch">
-                <div class="bg-gray-200 rounded px-4 py-6 w-full text-center">
-                  Spar Syd
-                </div>
-              </div>
-
-              <div class="border-r p-4 flex items-stretch">
-                <div class="bg-gray-200 rounded px-4 py-6 w-full leading-snug">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse luctus sem
-                  quis velit aliquam, non porta neque cursus.
-                </div>
-              </div>
-
-              <div class="border-r p-4 flex items-stretch">
-                <div class="bg-gray-200 rounded px-4 py-6 w-full text-center">
-                  50.000 kr.
-                </div>
-              </div>
-
-              <div class="p-4 flex items-stretch">
-                <div class="bg-gray-200 rounded px-4 py-6 w-full text-center">
-                  29/11/2025 - 11/05/2026
-                </div>
-              </div>
-
-            </div>
-          </div>
-
+      <!-- COLUMN 1 — Sponsor Name -->
+      <div class="border-r p-4 flex items-stretch">
+        <div onclick="location.hash='Smodal'"
+             class="bg-gray-200 rounded px-4 py-3 w-full text-center hover:bg-gray-300"
+             th:text="${sponsor.name}">
         </div>
-
       </div>
-    </main>
+
+    <!-- COLUMN 2 — All services for all this sponsor's contracts -->
+    <div class="border-r p-4 flex items-stretch">
+        <div class="flex flex-col gap-2 w-full">
+              <!-- loop contracts for this sponsor -->
+              <div th:each="contract : ${contracts}" 
+                  th:if="${contract.sponsorId == sponsor.id}">
+                  <!-- loop services for this contract -->
+                  <div th:each="svc : ${services}"
+                      th:if="${svc.contractId == contract.id}"
+                      class="bg-gray-200 rounded px-4 py-3 text-center">
+                      <span th:text="${svc.name}"></span>
+                      <span class="text-xs text-gray-500"
+                            th:text="(${contract.name})">
+                      </span>
+                </div>
+            </div>  
+        </div>
+      </div>
+
+    <!-- COLUMN 3 — Contract Status for each contract -->
+    <div class="border-r p-4 flex items-stretch">
+        <div class="flex flex-col gap-2 w-full">
+            <!-- Loop through contracts for this sponsor -->
+            <div th:each="contract : ${contracts}"
+                th:if="${contract.sponsorId == sponsor.id}">
+
+                <!-- Loop through services for this contract -->
+                <div th:each="svc : ${services}"
+                    th:if="${svc.contractId == contract.id}"
+                    th:classappend="${svc.archived} ? 'bg-red-400' : 'bg-green-400'"
+                    class="rounded px-4 py-3 text-center"
+                    th:text="${!svc.archived ? 'Aktiv' : 'Inaktiv'}">
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+      <!-- COLUMN 4 — Contract Date Range -->
+      <div class="p-4 flex items-stretch">
+        <div class="flex flex-col gap-2 w-full">
+          <!--Loop through contracts-->
+          <div th:each="contract : ${contracts}"
+              th:if="${contract.sponsorId == sponsor.id}">
+                <div class="bg-gray-200 rounded px-4 py-3 text-center"
+                th:each="svc : ${services}"
+                th:if="${svc.contractId == contract.id}"
+                th:text="${#temporals.format(svc.startDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(svc.endDate, 'dd/MM/yyyy')}">
+                </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
+
+</div>
 
 </body>
 <!-- Filter Modal -->
@@ -161,24 +156,6 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700">Description contains</label>
-        <input id="filterDescription" type="text" class="mt-1 block w-full rounded border-gray-300 shadow-sm"
-          placeholder="e.g. ipsum">
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Min payment (kr)</label>
-        <input id="filterMinPayment" type="number" min="0" class="mt-1 block w-full rounded border-gray-300 shadow-sm"
-          placeholder="0">
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Max payment (kr)</label>
-        <input id="filterMaxPayment" type="number" min="0" class="mt-1 block w-full rounded border-gray-300 shadow-sm"
-          placeholder="e.g. 50000">
-      </div>
-
-      <div>
         <label class="block text-sm font-medium text-gray-700">Active start (from)</label>
         <input id="filterDateFrom" type="date" class="mt-1 block w-full rounded border-gray-300 shadow-sm">
       </div>
@@ -187,6 +164,11 @@
         <label class="block text-sm font-medium text-gray-700">Active end (to)</label>
         <input id="filterDateTo" type="date" class="mt-1 block w-full rounded border-gray-300 shadow-sm">
       </div>
+
+      <!-- Hidden so filter.js still works -->
+      <input type="hidden" id="filterDescription" name="filterDescription" value="">
+      <input type="hidden" id="filterMinPayment" name="filterMinPayment" value="">
+      <input type="hidden" id="filterMaxPayment" name="filterMaxPayment" value="">
 
       <div class="col-span-2 flex justify-between mt-4">
         <div>
@@ -201,6 +183,87 @@
         </div>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- Sponsor Modal-->
+<div id="Smodal">
+  <div class="ModalBox">
+    <h1 class="ModalTitle">Indsæt sponsor navn</h1>
+    <a class="CloseModal" href="#">X</a>
+    <div class="SponsorModal">
+    </div>
+    <div class="ModalRow">
+      <div class="SponsorContract">
+        <h2 class="title">Kontrakter</h2>
+        <a class="ModalTag contract-clickable" href="#Cmodal">Kontrakt #1</a>
+        <a class="ModalTag contract-clickable" href="#Cmodal">Kontrakt #2</a>
+        <a class="ModalTag contract-clickable" href="#Cmodal">Kontrakt #3</a>
+      </div>
+      <div class="SponsorContactInfo">
+        <h2 class="title">Kontakt information</h2>
+        <p><span id="SponsorCity" class="ModalTag">By og postnummer</span></p>
+        <p><span id="SponsorAdress" class="ModalTag">Adresse</span></p>
+        <p><span id="SponsorCVR" class="ModalTag">CVR nummer</span></p>
+        <p><span id="SponsorContactPerson" class="ModalTag">Kontaktperson</span></p>
+        <p><span id="SponsorEmail" class="ModalTag">Email</span></p>
+        <p><span id="SponsorPhoneNumber" class="ModalTag">Telefonnummer</span></p>
+        <button class="ModalTag">Opdater info</button>
+
+      </div>
+      <div class="SponsorStatus">
+        <h2 class="title">Status</h2>
+        <div class="ModalTagRed">Inaktiv</div>
+        <div class="ModalTagYellow">Igang</div>
+        <div class="ModalTagGreen">Aktiv</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Contract Modal-->
+<div id="Cmodal">
+  <div class="ModalBox">
+    <h1 class="ModalTitle">Indsæt sponsor navn</h1>
+    <a class="CloseModal" href="#Smodal">X</a>
+    <div class="ContractModal">
+    </div>
+    <div class="ModalRow">
+      <div class="ContractInfo">
+        <h3 class="title">Kontrakt type</h3>
+        <div class="ModalTag">Guld kontrakt</div>
+      </div>
+      <div class="ContractStatus">
+        <h3 class="title">Status</h3>
+        <div class="ModalTagRed">Inaktiv</div>
+      </div>
+      <div class="ContractInfo">
+        <h3 class="title">Dato</h3>
+        <div class="ModalTag">02/02/2025 - 02/02/2026</div>
+      </div>
+      <div class="ContractInfo">
+        <h3 class="title">Ydelser</h3>
+        <div class="ModalTag">Logo på hold trøje</div>
+        <div class="ModalTag">Logo på bande</div>
+        <div class="ModalTag">10 gratis billeter per sæson</div>
+        <div class="ModalTag">Logo i klubhus</div>
+        <div class="ModalTag">3 gratis hotdog per kamp</div>
+      </div>
+      <div class="ContractInfo">
+        <h3 class="title">Betaling</h3>
+        <div class="ModalTag">25.000 kr</div>
+      </div>
+    </div>
+    <div class="ModalRow">
+      <div>
+        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank"><button class="ModalTag">Åben
+            PDF</button></a>
+      </div>
+      <label class="ModalTag" style="cursor:pointer;">
+        Vedhæft PDF
+        <input type="file" accept="application/pdf" style="display:none;">
+      </label>
+    </div>
   </div>
 </div>
 

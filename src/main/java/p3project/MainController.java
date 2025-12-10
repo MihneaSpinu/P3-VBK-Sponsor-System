@@ -7,6 +7,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -105,7 +106,7 @@ public class MainController {
 
         Sponsor storedSponsor = sponsorRepository.findById(sponsor.getId()).orElse(null);
         if(storedSponsor == null) {
-            redirectAttributes.addAttribute("responseMessage", "FEJL!! PRØV IGEN");
+            redirectAttributes.addFlashAttribute("responseMessage", "FEJL!! PRØV IGEN");
             return "redirect:/sponsors";
         }
 
@@ -119,7 +120,7 @@ public class MainController {
 
         Contract storedContract = contractRepository.findById(contract.getId()).orElse(null);
         if(storedContract == null) {
-            redirectAttributes.addAttribute("responseMessage", "FEJL!! PRØV IGEN");
+            redirectAttributes.addFlashAttribute("responseMessage", "FEJL!! PRØV IGEN");
             return "redirect:/sponsors";
         }
         //If a file is sent parse the data
@@ -141,7 +142,7 @@ public class MainController {
 
         Service storedService = serviceRepository.findById(service.getId()).orElse(null);
         if(storedService == null) {
-            redirectAttributes.addAttribute("responseMessage", "FEJL!! PRØV IGEN");
+            redirectAttributes.addFlashAttribute("responseMessage", "FEJL!! PRØV IGEN");
             return "redirect:/sponsors";
         }
         return handleUpdateRequest(service, storedService, request, redirectAttributes);
@@ -153,10 +154,10 @@ public class MainController {
         Integer fieldsChanged;
         try {
             fieldsChanged = compareFields(requestObject, storedObject, request);
-            redirectAttributes.addAttribute("repsonseMessage", "Opdateret " + fieldsChanged + " felter");
+            redirectAttributes.addFlashAttribute("responseMessage", "Opdateret " + fieldsChanged + " felter");
             return "redirect:/sponsors";
         } catch (ClassNotFoundException error) {
-            redirectAttributes.addAttribute("responseMessage","FEJL!! PRØ GEN");
+            redirectAttributes.addFlashAttribute("responseMessage","FEJL!! PRØ GEN");
             return "redirect:/sponsors";
         }
     }
@@ -209,12 +210,12 @@ public class MainController {
         if(!userIsAdmin(request))       return "redirect:/homepage";
 
         User user = getUserFromToken(request);
-        Eventlog log = new Eventlog(user, sponsor, "CREATED");
+        Eventlog log = new Eventlog(user, sponsor, "Oprettede");
         logRepository.save(log);
 
         sponsorRepository.save(sponsor);
 
-        redirectAttributes.addAttribute("responseMessage", "tilføjet sponsor:");
+        redirectAttributes.addFlashAttribute("responseMessage", "tilføjet sponsor:");
         return "redirect:/sponsors";
     }
 
@@ -226,16 +227,16 @@ public class MainController {
         if(!userIsAdmin(request))       return "redirect:/homepage";
 
         User user = getUserFromToken(request);
-        Eventlog log = new Eventlog(user, contract, "CREATED");
+        Eventlog log = new Eventlog(user, contract, "Oprettede");
         logRepository.save(log);
 
         try {
             parseContract(contract, pdffile);
             contractRepository.save(contract);
-            redirectAttributes.addAttribute("responseMessage", "Tilføejt klntrakt:");
+            redirectAttributes.addFlashAttribute("responseMessage", "Tilføjet Kontract: " + contract.getName());
             return "redirect:/sponsors";
         } catch (IllegalArgumentException ex) {
-            redirectAttributes.addAttribute("responseMessage","FEJL!! PRØV IOGEN");
+            redirectAttributes.addFlashAttribute("responseMessage","FEJL!! PRØV IOGEN");
             return "redirect:/sponsors";
         }
     }
@@ -247,15 +248,15 @@ public class MainController {
         if(!userIsAdmin(request))       return "redirect:/homepage";
 
         User user = getUserFromToken(request);
-        Eventlog log = new Eventlog(user, service, "CREATED");
+        Eventlog log = new Eventlog(user, service, "Oprettede");
         logRepository.save(log);
 
         try {
             serviceRepository.save(service);
-            redirectAttributes.addAttribute("responseMessage", "tilføjet service: [navn]");
+            redirectAttributes.addFlashAttribute("responseMessage", "tilføjet service: [navn]");
             return "redirect:/sponsors";
         } catch (IllegalArgumentException ex) {
-            redirectAttributes.addAttribute("responseMessage", "FEJL");
+            redirectAttributes.addFlashAttribute("responseMessage", "FEJL");
             return "redirect:/sponsors";
         }
     }
@@ -311,7 +312,7 @@ public class MainController {
         }
 
         User user = getUserFromToken(request);
-        Eventlog log = new Eventlog(user, service, "DELETED");
+        Eventlog log = new Eventlog(user, service, "Slettede");
         logRepository.save(log);
 
         serviceRepository.deleteById(serviceId);
@@ -333,7 +334,7 @@ public class MainController {
         }
 
         User user = getUserFromToken(request);
-        Eventlog log = new Eventlog(user, sponsor, "DELETED");
+        Eventlog log = new Eventlog(user, sponsor, "Slettede");
         logRepository.save(log);
 
         sponsorRepository.deleteById(sponsorId);
@@ -341,6 +342,7 @@ public class MainController {
         Iterable<Contract> contracts = contractRepository.findAll();
         for (Contract contract : contracts) {
             if (sponsorId.equals(contract.getSponsorId())) {
+                deleteContractServicesByContractId(contract.getId());
                 // SLET OGSÅ TILHØRENDE SERVICES TIL KONTRAKTERNE, SÆT I FUNKTION MÅSKE
                 contractRepository.deleteById(contract.getId());
             }
@@ -362,18 +364,21 @@ public class MainController {
         }
 
         User user = getUserFromToken(request);
-        Eventlog log = new Eventlog(user, contract, "DELETED");
+        Eventlog log = new Eventlog(user, contract, "Slettede");
         logRepository.save(log);
 
+        deleteContractServicesByContractId(contractId);
+        contractRepository.deleteById(contractId);
+        return "redirect:/sponsors";
+    }
+
+    private void deleteContractServicesByContractId(Long contractId){
         Iterable<Service> services = serviceRepository.findAll();
         for (Service service : services) {
             if (contractId.equals(service.getContractId())) {
                 serviceRepository.deleteById(service.getId());
             }
         }
-        
-        contractRepository.deleteById(contractId);
-        return "redirect:/sponsors";
     }
 
 
@@ -413,6 +418,17 @@ public class MainController {
     @GetMapping("/archive")
     public String showArchivePage(Model model, HttpServletRequest request) {
         if(!userHasValidToken(request)) return "redirect:/login";
+        boolean userIsAdmin = userIsAdmin(request);
+        model.addAttribute("userIsAdmin", userIsAdmin);
+
+        List<Sponsor> arcvhiedSponsors = getArchivedSponsors();
+        Iterable<Contract> contracts = contractRepository.findAll();
+        Iterable<Service> services = serviceRepository.findAll();
+
+        model.addAttribute("sponsors", arcvhiedSponsors);
+        model.addAttribute("contracts", contracts);
+        model.addAttribute("services", services);
+        
         return "archive";
     }
 
@@ -422,6 +438,7 @@ public class MainController {
         if(!userHasValidToken(request)) return "redirect:/login";
         if(!userIsAdmin(request))       return "redirect:/homepage";
         model.addAttribute("users", userRepository.findAll());
+    
         return "AdminPanel";
     }
 
@@ -438,7 +455,7 @@ public class MainController {
     public String confirmLogin(@RequestParam String username, @RequestParam String password, @RequestParam boolean rememberMe, Model model, HttpServletResponse response) {
         User user = userRepository.findByName(username);
         if(user == null) return "redirect:/login";
-
+        
         if(BCrypt.checkpw(password, user.getPassword())) {
             String id = user.getId().toString();
             Token token = Token.sign(id);
@@ -502,24 +519,59 @@ public class MainController {
         return user;
     }
 
+    public boolean isServiceActive(Service service){
+        if((service.getType().equals("Banner")     || 
+                service.getType().equals("LogoTrojer")  || 
+                service.getType().equals("LogoBukser")) &&
+                LocalDate.now().isAfter(service.getEndDate()))
+            {
+            service.setArchived(true);
+            return true;
+        }
+        return service.getArchived();
+    }
 
-    /* 
+    public boolean isContractActive(Contract contract) {
+        List<Service> services = serviceRepository.findAll();
+        for(Service service : services) {
+            if(contract.getId().equals(service.getContractId()) && isServiceActive(service)){
+                contract.setArchived(false);
+                return true;
+            } 
+        }
+        return false;
+    }
+
     private boolean isSponsorActive(Sponsor sponsor) {
-
-
+        List<Contract> contracts = contractRepository.findAll();
+        for(Contract contract : contracts) {
+            if(sponsor.getId().equals(contract.getSponsorId()) && isContractActive(contract)){
+                sponsor.setArchived(false);
+                return true;
+            }
+        }
+        return false;
     }
 
-    private boolean isContractActive(Contract contract) {
-        Iterable<Service> services = serviceRepository.findAll();
-        if()
 
+    private List<Sponsor> getActiveSponsors(){
+        List<Sponsor> sponsors = sponsorRepository.findAll();
+        List<Sponsor> activeSponsors = new ArrayList<>();
+        for(Sponsor sponsor : sponsors) {
+            if(isSponsorActive(sponsor)) activeSponsors.add(sponsor);
+        }
+        return activeSponsors;
     }
 
-    private boolean isServiceActive(Service service) {
-        return service.getArchived() || LocalDate.now().isAfter(service.getEndDate());
+    private List<Sponsor> getArchivedSponsors(){
+        List<Sponsor> sponsors = sponsorRepository.findAll();
+        List<Sponsor> activeSponsors = new ArrayList<>();
+        for(Sponsor sponsor : sponsors) {
+            if(!isSponsorActive(sponsor)) activeSponsors.add(sponsor);
+        }
+        return activeSponsors;
     }
-    */
-
+    
     
     @GetMapping("/homepage")
     public String showhomepage(Model model, HttpServletRequest request) {
@@ -528,9 +580,14 @@ public class MainController {
         Iterable<Sponsor> sponsors = sponsorRepository.findAll();
         Iterable<Contract> contracts = contractRepository.findAll();
         Iterable<Service> services = serviceRepository.findAll();
-        model.addAttribute("sponsors", sponsors);
+        boolean userIsAdmin = userIsAdmin(request);
+        
+        List<Sponsor> activeSponsors = getActiveSponsors();
+
+        model.addAttribute("sponsors", activeSponsors);
         model.addAttribute("contracts", contracts);
         model.addAttribute("services", services);
+        model.addAttribute("userIsAdmin", userIsAdmin);
         return "homepage";
     }
 
@@ -539,6 +596,16 @@ public class MainController {
         userRepository.deleteById(id);
         return "redirect:/AdminPanel";
 
+    }
+
+    private List<Service> getActiveServices(){
+        List<Service> activeServices = new ArrayList<>();
+        for (Service service : serviceRepository.findAll()){
+            if (isServiceActive(service)){
+                activeServices.add(service);
+            }
+        }
+        return activeServices;
     }
 
     @PostMapping("/users/add")

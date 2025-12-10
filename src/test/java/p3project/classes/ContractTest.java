@@ -26,7 +26,7 @@ public class ContractTest {
         contract.setStartDate(startDate);
         contract.setEndDate(endDate);
         contract.setPayment(payment);
-        contract.setStatus(status);
+        contract.setArchived(status);
 
 
         //assert

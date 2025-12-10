@@ -1,16 +1,15 @@
 package p3project.repositories;
 
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import p3project.classes.Sponsor;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class SponsorRepositoryTest {
@@ -42,7 +41,7 @@ class SponsorRepositoryTest {
         assertThat(savedSponsor.getName()).isEqualTo("Tech Corp");
         assertThat(savedSponsor.getContactPerson()).isEqualTo("John Smith");
         assertThat(savedSponsor.getEmail()).isEqualTo("john@techcorp.com");
-        assertThat(savedSponsor.isStatus()).isTrue();
+        assertThat(savedSponsor.getArchived()).isTrue();
     }
 
     @Test
@@ -66,7 +65,7 @@ class SponsorRepositoryTest {
         assertThat(foundSponsor).isPresent();
         assertThat(foundSponsor.get().getName()).isEqualTo("Sports Inc");
         assertThat(foundSponsor.get().getContactPerson()).isEqualTo("Jane Doe");
-        assertThat(foundSponsor.get().isStatus()).isFalse();
+        assertThat(foundSponsor.get().getArchived()).isFalse();
     }
 
     @Test
@@ -94,14 +93,14 @@ class SponsorRepositoryTest {
         // When
         savedSponsor.setName("Updated Corp");
         savedSponsor.setContactPerson("Updated Contact");
-        savedSponsor.setStatus(false);
+        savedSponsor.setArchived(false);
         Sponsor updatedSponsor = sponsorRepository.save(savedSponsor);
 
         // Then
         assertThat(updatedSponsor.getId()).isEqualTo(savedSponsor.getId());
         assertThat(updatedSponsor.getName()).isEqualTo("Updated Corp");
         assertThat(updatedSponsor.getContactPerson()).isEqualTo("Updated Contact");
-        assertThat(updatedSponsor.isStatus()).isFalse();
+        assertThat(updatedSponsor.getArchived()).isFalse();
     }
 
     @Test
@@ -145,7 +144,7 @@ class SponsorRepositoryTest {
         sponsor.setEmail("empty@corp.com");
         sponsor.setPhoneNumber("55555555");
         sponsor.setCvrNumber("CVREMP");
-        sponsor.setStatus(true);
+        sponsor.setArchived(true);
         sponsor.setComments("Created with empty constructor");
 
         // When

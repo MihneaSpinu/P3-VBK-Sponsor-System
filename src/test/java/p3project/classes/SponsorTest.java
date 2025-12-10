@@ -24,7 +24,7 @@ public class SponsorTest{
         sponsor.setEmail(email);
         sponsor.setPhoneNumber(phoneNumber);
         sponsor.setCvrNumber(cvrNumber);
-        sponsor.setStatus(status);
+        sponsor.setArchived(status);
         sponsor.setComments(comments);
 
         //check the variables
@@ -33,7 +33,7 @@ public class SponsorTest{
         assertEquals(email, sponsor.getEmail());
         assertEquals(phoneNumber, sponsor.getPhoneNumber());
         assertEquals(cvrNumber, sponsor.getCvrNumber());
-        assertEquals(status, sponsor.getStatus());
+        assertEquals(status, sponsor.getArchived());
         assertEquals(comments, sponsor.getComments());
     }
 
@@ -50,7 +50,7 @@ public class SponsorTest{
         assertNull(sponsor.getEmail());
         assertNull(sponsor.getPhoneNumber());
         assertNull(sponsor.getCvrNumber());
-        assertFalse(sponsor.getStatus()); //Default for a boolean is false
+        assertFalse(sponsor.getArchived()); //Default for a boolean is false
         assertNull(sponsor.getComments());
     }
 

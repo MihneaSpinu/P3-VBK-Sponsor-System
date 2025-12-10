@@ -19,11 +19,11 @@
           <div class="logo">VBK Sponsor System</div>
 
           <div class="menu">
-            <button class="menu-btn" onclick="location.href='/homepage'">Forside</button>
-            <button class="menu-btn" onclick="location.href='/sponsors'">Sponsors</button>
-            <button class="menu-btn" onclick="location.href='/changelog'">Change log</button>
-            <button class="menu-btn" onclick="location.href='/archive'">Arkiv</button>
-            <button class="menu-btn" onclick="location.href='/AdminPanel'">Admin panel</button>
+          <button class="menu-btn" onclick="location.href='/homepage'">Forside</button>
+          <button class="menu-btn" onclick="location.href='/archive'">Arkiv</button>
+          <button class="menu-btn" onclick="location.href='/sponsors'">Sponsors</button>
+          <button class="menu-btn" onclick="location.href='/changelog'">Hændelses log</button>
+          <button class="menu-btn" onclick="location.href='/AdminPanel'">Tilføj bruger</button>
           </div>
         </div>
 
@@ -32,18 +32,11 @@
 
       <!-- Main Content -->
       <main class="flex-1 p-6">
+        <div th:if="${responseMessage}" class="mb-4 px-4 py-2 bg-yellow-100 text-yellow-800 border-l-4 border-yellow-500 rounded">
+          <p th:text="${responseMessage}"></p>
+        </div>
         <div class="container bg-white rounded shadow p-6">
           <h1 class="text-2xl font-semibold mb-4">Sponsors</h1>
-
-          <!-- Error besked area (Vis validation eller errors) -->
-          <div
-            th:if="${error}"
-            class="mb-4 rounded p-3"
-            style="background:#ffe6e6;border:1px solid #ff8080;color:#600"
-          >
-            <strong class="text-red-700">Error:</strong>
-            <span th:text="${error}" class="ml-2"></span>
-          </div>
 
           <div class="grid md:grid-cols-2 gap-6">
             <section class="list">
@@ -52,15 +45,15 @@
                     <h2 class="text-lg font-medium mr-3 m-0">Viser:</h2>
                     <div class="text-sm">
                       <select id="sponsorFilter" class="border rounded px-2 py-1 text-sm" onchange="applySponsorFilter()" style="min-width:6rem">
-                        <option value="active" selected>Aktive Sponsor</option>
-                        <option value="inactive">Ikke-aktive Sponsor</option>
-                        <option value="all">Alle Sponsor</option>
+                        <option value="all" selected>Alle Sponsorer</option>
+                        <option value="active">Aktive Sponsorer</option>
+                        <option value="inactive">Ikke-aktive Sponsorer</option>
                       </select>
                     </div>
                   </div>
               <!-- Liste over sponsorer (gentages via Thymeleaf th:each) -->
               <div th:if="${not #lists.isEmpty(sponsors)}">
-                <div th:each="sponsor, stat : ${sponsors}" th:attr="data-status=${sponsor.status}" class="item sponsor-item relative mb-4 p-3 rounded bg-gray-50">
+                <div th:each="sponsor, stat : ${sponsors}" th:attr="data-archived=${sponsor.archived}" class="item sponsor-item relative mb-4 p-3 rounded bg-gray-50">
                   <div class="absolute right-3 top-3 flex space-x-2">
                     <button type="button" class="px-2 py-1 text-sm bg-blue-500 text-white rounded" th:attr="data-sponsor-id=${sponsor.id},data-sponsor-name=${sponsor.name}" onclick="openAddModal(this)">Tilføj Kontrakt</button>
                     <button type="button" class="px-2 py-1 text-sm bg-gray-200 rounded" th:attr="data-sponsor-id=${sponsor.id},data-sponsor-name=${sponsor.name}" onclick="openViewModal(this)">Se Kontrakterne</button>
@@ -70,7 +63,7 @@
                   <div class="text-sm">Email: <span th:text="${sponsor.email}">email</span></div>
                   <div class="text-sm">Telefon: <span th:text="${sponsor.phoneNumber}">Telefon</span></div>
                   <div class="text-sm">CVR: <span th:text="${sponsor.cvrNumber}">cvr</span></div>
-                  <div class="text-sm">Status: <span th:text="${sponsor.status}">status</span></div>
+                  <div class="text-sm">archived: <span th:text="${sponsor.archived}">archived</span></div>
                   <div class="text-sm">Kommentar: <span th:text="${sponsor.comments}">kommentar</span></div>
                   <!-- Kontroller for sponsor: edit og delete -->
                   <div class="mt-2">
@@ -94,9 +87,9 @@
                     <label class="block text-sm mt-2">CVR</label>
                     <input name="cvrNumber" th:value="${sponsor.cvrNumber}" class="border rounded px-2 py-1 w-full" />
                     <label class="block text-sm mt-2">Aktiv</label>
-                    <select name="status" class="border rounded px-2 py-1 w-full">
-                      <option value="true" th:selected="${sponsor.status}">True</option>
-                      <option value="false" th:selected="${!sponsor.status}">False</option>
+                    <select name="archived" class="border rounded px-2 py-1 w-full">
+                      <option value="true" th:selected="${sponsor.archived}">True</option>
+                      <option value="false" th:selected="${!sponsor.archived}">False</option>
                     </select>
                     <label class="block text-sm mt-2">Kommentar</label>
                     <input name="comments" th:value="${sponsor.comments}" class="border rounded px-2 py-1 w-full" />
@@ -108,7 +101,7 @@
                 </div>
               </div>
               <!-- Hvis ingen sponsorer findes, visses en beseked -->
-              <div th:if="${#lists.isEmpty(sponsors)}">Ingen Sponsors Inu.</div>
+              <div th:if="${#lists.isEmpty(sponsors)}">Ingen sponsors endnu.</div>
             </section>
 
             <div>
@@ -126,7 +119,7 @@
                   <label class="block text-sm">CVR</label>
                   <input id="cvrNumber" name="cvrNumber" class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm">Aktive</label>
-                  <select id="status" name="status" class="border rounded px-2 py-1 w-full">
+                  <select id="archived" name="archived" class="border rounded px-2 py-1 w-full">
                     <option value="true">True</option>
                     <option value="false" selected>False</option>
                   </select>
@@ -155,7 +148,7 @@
                       data-start=${contract.startDate},
                       data-end=${contract.endDate},
                       data-payment=${contract.payment},
-                      data-status=${contract.status},
+                      data-archived=${contract.archived},
                       data-has-pdf=${contract.pdfData != null},
                       data-pdf-filename=${contract.fileName}"></div>
               </div>
@@ -211,7 +204,7 @@
                 <label class="block text-sm">Type</label>
                 <input name="type" value="Standard" class="border rounded px-2 py-1 w-full" />
                 <label class="block text-sm">Aktive</label>
-                <select name="status" class="border rounded px-2 py-1 w-full">
+                <select name="archived" class="border rounded px-2 py-1 w-full">
                   <option value="true">True</option>
                   <option value="false" selected>False</option>
                 </select>
@@ -246,7 +239,7 @@
                 <input name="name" type="text" class="border rounded px-2 py-1 w-full" />
                 <label class="block text-sm">Type</label>
                 <select id="addServiceType" name="type" class="border rounded px-2 py-1 w-full">
-                  <option value="Billeter">Billeter</option>
+                  <option value="Billetter">Billetter</option>
                   <option value="Kuponer">Kuponer</option>
                   <option value="Banner">Banner</option>
                   <option value="LogoTrojler">Logo på trøjer</option>
@@ -332,21 +325,21 @@
         document.querySelectorAll('input[name="phoneNumber"]').forEach(attachPhoneHandlers);
 
         // applySponsorFilter: filtreer sponsors baseret på værdien af dropdownen
-        // - 'active' viser kun sponsorer med status true
-        // - 'inactive' viser kun sponsorer med status false
+        // - 'active' viser kun sponsorer med archived true
+        // - 'inactive' viser kun sponsorer med archived false
         // - 'all' viser alle sponsorer
         function applySponsorFilter() {
           const sel = document.getElementById('sponsorFilter');
           if (!sel) return;
           const v = sel.value;
           document.querySelectorAll('.sponsor-item').forEach(function (el) {
-            const status = el.getAttribute('data-status');
+            const archived = el.getAttribute('data-archived');
             if (v === 'all') {
               el.style.display = '';
             } else if (v === 'active') {
-              el.style.display = status === 'true' || status === 'True' ? '' : 'none';
+              el.style.display = archived === 'true' || archived === 'True' ? '' : 'none';
             } else if (v === 'inactive') {
-              el.style.display = status === 'false' || status === 'False' ? '' : 'none';
+              el.style.display = archived === 'false' || archived === 'False' ? '' : 'none';
             }
           });
         }
@@ -403,7 +396,7 @@
 
       // populateViewContracts: bygger og indsætter HTML for hver kontrakt
       // - Læser data fra #contractsData (server-renderet skjult DOM)
-      // - Bygger en kort visning (Type, Start, End, Payment, Status)
+      // - Bygger en kort visning (Type, Start, End, Payment, archived)
       // - Tilføjer en 'Edit' knap som viser en indlejret form til at gemme ændringer
       // Param: sponsorId (String/Number) - id på den sponsor vi skal vise kontrakter for
       function populateViewContracts(sponsorId) {
@@ -449,7 +442,7 @@
           const formattedStart = formatDisplayDate(start);
           const formattedEnd = formatDisplayDate(end);
           const payment = n.getAttribute('data-payment') || '';
-          const status = n.getAttribute('data-status') || '';
+          const archived = n.getAttribute('data-archived') || '';
           const pdfFileName = n.getAttribute('data-pdf-filename') || '';
 
           const item = document.createElement('div');
@@ -528,7 +521,7 @@
 
 
           // ----------------------------------------------------------
-          // DETALJE-OMRÅDE (Type, datoer, betaling, status)
+          // DETALJE-OMRÅDE (Type, datoer, betaling, archived)
           // ----------------------------------------------------------
           const details = document.createElement('div');
           details.id = `details-${idx}`;
@@ -539,13 +532,13 @@
           const dStart = document.createElement('div'); dStart.textContent = `Start: ${formattedStart}`;
           const dEnd = document.createElement('div'); dEnd.textContent = `End: ${formattedEnd}`;
           const dPayment = document.createElement('div'); dPayment.textContent = `Payment: ${payment}`;
-          const dStatus = document.createElement('div'); dStatus.textContent = `Status: ${status}`;
+          const darchived = document.createElement('div'); darchived.textContent = `archived: ${archived}`;
           // Saml detailfelter
           details.appendChild(dType);
           details.appendChild(dStart);
           details.appendChild(dEnd);
           details.appendChild(dPayment);
-          details.appendChild(dStatus);
+          details.appendChild(darchived);
           // placeringen på download pdf-filen
           details.appendChild(btnDownload);
 
@@ -616,17 +609,15 @@
 
                   const sDetails = document.createElement('div');
                   sDetails.className = 'text-sm text-gray-700 mt-2';
-                  // Map type and status to human-friendly labels and format dates as dd-mm-yyyy
+                  // Map type and archived to human-friendly labels and format dates as dd-mm-yyyy
                   const typeLabels = {
-                    'Billeter': 'Billeter',
+                    'Billetter': 'Billetter',
                     'Kuponer': 'Kuponer',
                     'Banner': 'Banner',
-                    'LogoTrojler': 'Logo på trøjer',
+                    'LogoTrojer': 'Logo på trøjer',
                     'LogoBukser': 'Logo på bukser',
-                    'Tickets': 'Tickets',
-                    'Coupons': 'Coupons'
                   };
-                  const statusLabels = {
+                  const archivedLabels = {
                     'AKTIV': 'Aktiv',
                     'IGANG': 'Igang',
                     'UDFORT': 'Udført',
@@ -637,8 +628,8 @@
                   const displayType = typeLabels[stype] || stype || '';
                   const displayStart = formatDisplayDate(sstart);
                   const displayEnd = formatDisplayDate(send);
-                  const displayStatus = statusLabels[String(sarchived)] || sarchived || '';
-                  sDetails.innerHTML = `Type: ${escapeHtml(displayType)}<br/>Start: ${escapeHtml(displayStart)}<br/>End: ${escapeHtml(displayEnd)}<br/>Amount/Division: ${escapeHtml(samount)}<br/>Status: ${escapeHtml(displayStatus)}`;
+                  const displayarchived = archivedLabels[String(sarchived)] || sarchived || '';
+                  sDetails.innerHTML = `Type: ${escapeHtml(displayType)}<br/>Start: ${escapeHtml(displayStart)}<br/>End: ${escapeHtml(displayEnd)}<br/>Amount/Division: ${escapeHtml(samount)}<br/>archived: ${escapeHtml(displayarchived)}`;
                   sCard.appendChild(sDetails);
 
                   // small inline edit block for service
@@ -690,18 +681,18 @@
                   updateSAmountWrapper();
                   // update when service type changes
                   sTypeSel.addEventListener('change', updateSAmountWrapper);
-                  // start/end/status
+                  // start/end/archived
                   const sStartLab = document.createElement('label'); sStartLab.className='block text-sm'; sStartLab.textContent='Start Dato'; sForm.appendChild(sStartLab);
                   const sStartInp = document.createElement('input'); sStartInp.name='startDate'; sStartInp.type='date'; sStartInp.value=sstart; sStartInp.className='border rounded px-2 py-1 w-full'; sForm.appendChild(sStartInp);
                   const sEndLab = document.createElement('label'); sEndLab.className='block text-sm'; sEndLab.textContent='Slut Dato'; sForm.appendChild(sEndLab);
                   const sEndInp = document.createElement('input'); sEndInp.name='endDate'; sEndInp.type='date'; sEndInp.value=send; sEndInp.className='border rounded px-2 py-1 w-full'; sForm.appendChild(sEndInp);
-                  const sStatusLab = document.createElement('label'); sStatusLab.className='block text-sm'; sStatusLab.textContent='Arkiveret'; sForm.appendChild(sStatusLab);
-                  const sStatusSel = document.createElement('select'); sStatusSel.name='archived'; sStatusSel.className='border rounded px-2 py-1 w-full';
+                  const sarchivedLab = document.createElement('label'); sarchivedLab.className='block text-sm'; sarchivedLab.textContent='Arkiveret'; sForm.appendChild(sarchivedLab);
+                  const sarchivedSel = document.createElement('select'); sarchivedSel.name='archived'; sarchivedSel.className='border rounded px-2 py-1 w-full';
                   const sOptTrue = document.createElement('option'); sOptTrue.value = 'true'; sOptTrue.textContent = 'True';
                   const sOptFalse = document.createElement('option'); sOptFalse.value = 'false'; sOptFalse.textContent = 'False';
-                  sStatusSel.appendChild(sOptTrue); sStatusSel.appendChild(sOptFalse);
-                  if (String(sarchived) === 'true') sStatusSel.value = 'true'; else sStatusSel.value = 'false';
-                  sForm.appendChild(sStatusSel);
+                  sarchivedSel.appendChild(sOptTrue); sarchivedSel.appendChild(sOptFalse);
+                  if (String(sarchived) === 'true') sarchivedSel.value = 'true'; else sarchivedSel.value = 'false';
+                  sForm.appendChild(sarchivedSel);
                   const sBtnRow = document.createElement('div'); sBtnRow.className='flex justify-end space-x-2 mt-2';
                   const sCancel = document.createElement('button'); sCancel.type='button'; sCancel.className='px-3 py-1 bg-gray-200 rounded'; sCancel.textContent='Cancel';
                   const sSave = document.createElement('button'); sSave.type='submit'; sSave.className='px-3 py-1 bg-green-500 text-white rounded'; sSave.textContent='Save';
@@ -815,11 +806,11 @@
           paymentInput.className = 'border rounded px-2 py-1 w-full';
           addLabelAndControl(form, 'Payment', paymentInput);
 
-          // Status-dropdown (true/false)
-          const statusSelect = document.createElement('select');
-          statusSelect.id = `status-select-${idx}`; 
-          statusSelect.name = 'status'; 
-          statusSelect.className = 'border rounded px-2 py-1 w-full';
+          // archived-dropdown (true/false)
+          const archivedSelect = document.createElement('select');
+          archivedSelect.id = `archived-select-${idx}`; 
+          archivedSelect.name = 'archived'; 
+          archivedSelect.className = 'border rounded px-2 py-1 w-full';
           
           const optTrue = document.createElement('option'); 
           optTrue.value = 'true'; 
@@ -837,9 +828,9 @@
           pdfInput.className = 'border rounded px-2 py-1 w-full';
           addLabelAndControl(form, 'Upload PDF', pdfInput);
 
-          statusSelect.appendChild(optTrue); statusSelect.appendChild(optFalse);
-          if (String(status) === 'true' || status === true) statusSelect.value = 'true'; else statusSelect.value = 'false';
-          addLabelAndControl(form, 'Aktive', statusSelect);
+          archivedSelect.appendChild(optTrue); archivedSelect.appendChild(optFalse);
+          if (String(archived) === 'true' || archived === true) archivedSelect.value = 'true'; else archivedSelect.value = 'false';
+          addLabelAndControl(form, 'Aktive', archivedSelect);
 
 
           // ----------------------------------------------------------
@@ -901,7 +892,7 @@
           // Tilføj containeren til modal-listen
           listEl.appendChild(container);
 
-          // udfyld sponsor-dropdown og status-dropdown med rigtige værdier
+          // udfyld sponsor-dropdown og archived-dropdown med rigtige værdier
           // Gør det ved at klone <option>-elementer fra skjult template 
           try {
             const template = document.getElementById('sponsorOptionsTemplate');
@@ -917,9 +908,9 @@
                 sel.value = n.getAttribute('data-sponsor-id');
               }
             }
-            // Sæt korrekt status i status-select
-            const statusSel = document.getElementById('status-select-' + idx);
-            if (statusSel) statusSel.value = String(status) === 'true' || String(status) === 'True' ? 'true' : 'false';
+            // Sæt korrekt archived i archived-select
+            const archivedSel = document.getElementById('archived-select-' + idx);
+            if (archivedSel) archivedSel.value = String(archived) === 'true' || String(archived) === 'True' ? 'true' : 'false';
           } catch (err) {
             // Hvis noget går galt ved udfyldning, log fejl til konsol men fortsæt
             console.error('populateViewContracts: cannot populate selects', err);
@@ -936,7 +927,7 @@
           f.style.display = 'none';
           const inId = document.createElement('input');
           inId.type = 'hidden';
-          inId.name = 'id';
+          inId.name = 'contractId';
           inId.value = contractId;
           f.appendChild(inId);
           const inSponsor = document.createElement('input');

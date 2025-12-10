@@ -1,13 +1,12 @@
 package p3project.classes;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date; // date, localdate, time?
 
-import jakarta.persistence.DiscriminatorColumn; // static for ikke at skrive Action.CREATE etc...
-import jakarta.persistence.DiscriminatorType;
+import jakarta.persistence.DiscriminatorColumn; // date, localdate, time?
+import jakarta.persistence.DiscriminatorType; // static for ikke at skrive Action.CREATE etc...
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

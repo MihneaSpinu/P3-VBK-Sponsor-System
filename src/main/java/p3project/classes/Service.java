@@ -1,6 +1,7 @@
 package p3project.classes;
 
 import java.time.LocalDate;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -100,6 +101,5 @@ public class Service {
     public void setEndDate(LocalDate endDate) { 
         this.endDate = endDate; 
     }
-
 
 }

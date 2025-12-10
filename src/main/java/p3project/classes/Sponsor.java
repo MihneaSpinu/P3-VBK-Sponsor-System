@@ -1,9 +1,9 @@
 package p3project.classes;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity
 public class Sponsor {
@@ -16,18 +16,18 @@ public class Sponsor {
     private String email;
     private String phoneNumber;
     private String cvrNumber;
-    private boolean status;
+    private boolean archived;
     private String comments;
 
     // Constructor
     public Sponsor(String name, String contactPerson, String email,
-                    String phoneNumber, String cvrNumber, boolean status, String comments) {
+                    String phoneNumber, String cvrNumber, boolean archived, String comments) {
         this.name = name;
         this.contactPerson = contactPerson;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.cvrNumber = cvrNumber;
-        this.status = status;
+        this.archived = archived;
         this.comments = comments;
     }
 
@@ -83,16 +83,12 @@ public class Sponsor {
         this.cvrNumber = cvrNumber;
     }
 
-    public boolean isStatus() {
-        return status;
+    public void setArchived(boolean archived) {
+        this.archived = archived;
     }
 
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
-    public boolean getStatus(){
-        return status;
+    public boolean getArchived(){
+        return archived;
     }
 
     public String getComments() {
