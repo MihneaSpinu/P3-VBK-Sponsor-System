@@ -1,3 +1,37 @@
+// Sponsors modal behavior (extracted from homepage inline script)
+document.addEventListener('DOMContentLoaded', function () {
+  try {
+    const modal = document.getElementById('Smodal');
+    if (!modal) return;
+    const modalContent = modal.querySelector('.SponsorModal');
+    const closeBtns = modal.querySelectorAll('.CloseModal');
+
+    document.querySelectorAll('.sponsor-open-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const sponsorId = btn.getAttribute('data-sponsor-id');
+        const template = document.getElementById('sponsor-modal-' + sponsorId);
+        if (!template) return;
+
+        // Clear existing content safely and clone template children
+        if (modalContent) modalContent.textContent = '';
+        Array.from(template.children).forEach(function (c) { if (modalContent) modalContent.appendChild(c.cloneNode(true)); });
+
+        // Try to ensure modal is visible (some styles use display:flex)
+        try { modal.style.display = 'flex'; } catch (err) { /* ignore */ }
+      });
+    });
+
+    closeBtns.forEach(function (cb) {
+      cb.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (modalContent) modalContent.textContent = '';
+        try { modal.style.display = 'none'; } catch (err) { /* ignore */ }
+      });
+    });
+  } catch (e) {
+    console.error('sponsors.js initialization error', e);
+  }
+});
 // Common sponsor-page helpers: filters, modals, input validation
 function toggleSponsorEdit(i) {
 	const id = 'sponsorEditForm-' + i;
