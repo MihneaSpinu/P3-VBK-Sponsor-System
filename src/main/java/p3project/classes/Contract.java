@@ -20,7 +20,7 @@ public class Contract {
     private LocalDate endDate;
     private String payment;
     private String type;
-    private boolean status;
+    private boolean active;
     private String name;
 
     @Lob
@@ -29,7 +29,7 @@ public class Contract {
     private String fileName;
 
     // Constructor
-    public Contract(LocalDate startDate, LocalDate endDate, String payment, boolean status, String typeName) {
+    public Contract(LocalDate startDate, LocalDate endDate, String payment, boolean active, String typeName) {
         // valider datoer: startDate må ikke være efter endDate
         if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
             throw new IllegalArgumentException("Contract start date cannot be after end date");
@@ -37,7 +37,7 @@ public class Contract {
         this.startDate = startDate;
         this.endDate = endDate;
         this.payment = payment;
-        this.status = status;
+        this.active = active;
         this.type = typeName;
     }
 
@@ -127,12 +127,12 @@ public class Contract {
         this.payment = String.valueOf(payment);
     }
 
-    public boolean isStatus() {
-        return status;
+    public boolean getActive() {
+        return active;
     }
 
-    public void setStatus(boolean status) {
-        this.status = status;
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public String getType() {
@@ -151,4 +151,5 @@ public class Contract {
     public String getFileName(){
         return this.fileName;
     }
+
 }

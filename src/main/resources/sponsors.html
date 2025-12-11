@@ -19,11 +19,11 @@
           <div class="logo">VBK Sponsor System</div>
 
           <div class="menu">
-            <button class="menu-btn" onclick="location.href='/homepage'">Forside</button>
-            <button class="menu-btn" onclick="location.href='/sponsors'">Sponsors</button>
-            <button class="menu-btn" onclick="location.href='/changelog'">Change log</button>
-            <button class="menu-btn" onclick="location.href='/archive'">Arkiv</button>
-            <button class="menu-btn" onclick="location.href='/AdminPanel'">Admin panel</button>
+          <button class="menu-btn" onclick="location.href='/homepage'">Forside</button>
+          <button class="menu-btn" onclick="location.href='/archive'">Arkiv</button>
+          <button class="menu-btn" onclick="location.href='/sponsors'">Sponsors</button>
+          <button class="menu-btn" onclick="location.href='/changelog'">Hændelses log</button>
+          <button class="menu-btn" onclick="location.href='/AdminPanel'">Tilføj bruger</button>
           </div>
         </div>
 
@@ -32,18 +32,11 @@
 
       <!-- Main Content -->
       <main class="flex-1 p-6">
+        <div th:if="${responseMessage}" class="mb-4 px-4 py-2 bg-yellow-100 text-yellow-800 border-l-4 border-yellow-500 rounded">
+          <p th:text="${responseMessage}"></p>
+        </div>
         <div class="container bg-white rounded shadow p-6">
           <h1 class="text-2xl font-semibold mb-4">Sponsors</h1>
-
-          <!-- Error besked area (Vis validation eller errors) -->
-          <div
-            th:if="${error}"
-            class="mb-4 rounded p-3"
-            style="background:#ffe6e6;border:1px solid #ff8080;color:#600"
-          >
-            <strong class="text-red-700">Error:</strong>
-            <span th:text="${error}" class="ml-2"></span>
-          </div>
 
           <div class="grid md:grid-cols-2 gap-6">
             <section class="list">
@@ -52,15 +45,15 @@
                     <h2 class="text-lg font-medium mr-3 m-0">Viser:</h2>
                     <div class="text-sm">
                       <select id="sponsorFilter" class="border rounded px-2 py-1 text-sm" onchange="applySponsorFilter()" style="min-width:6rem">
-                        <option value="active" selected>Aktive Sponsor</option>
-                        <option value="inactive">Ikke-aktive Sponsor</option>
-                        <option value="all">Alle Sponsor</option>
+                        <option value="all" selected>Alle Sponsorer</option>
+                        <option value="active">Aktive Sponsorer</option>
+                        <option value="inactive">Ikke-aktive Sponsorer</option>
                       </select>
                     </div>
                   </div>
               <!-- Liste over sponsorer (gentages via Thymeleaf th:each) -->
               <div th:if="${not #lists.isEmpty(sponsors)}">
-                <div th:each="sponsor, stat : ${sponsors}" th:attr="data-status=${sponsor.status}" class="item sponsor-item relative mb-4 p-3 rounded bg-gray-50">
+                <div th:each="sponsor, stat : ${sponsors}" th:attr="data-active=${sponsor.active}" class="item sponsor-item relative mb-4 p-3 rounded bg-gray-50">
                   <div class="absolute right-3 top-3 flex space-x-2">
                     <button type="button" class="px-2 py-1 text-sm bg-blue-500 text-white rounded" th:attr="data-sponsor-id=${sponsor.id},data-sponsor-name=${sponsor.name}" onclick="openAddModal(this)">Tilføj Kontrakt</button>
                     <button type="button" class="px-2 py-1 text-sm bg-gray-200 rounded" th:attr="data-sponsor-id=${sponsor.id},data-sponsor-name=${sponsor.name}" onclick="openViewModal(this)">Se Kontrakterne</button>
@@ -70,7 +63,10 @@
                   <div class="text-sm">Email: <span th:text="${sponsor.email}">email</span></div>
                   <div class="text-sm">Telefon: <span th:text="${sponsor.phoneNumber}">Telefon</span></div>
                   <div class="text-sm">CVR: <span th:text="${sponsor.cvrNumber}">cvr</span></div>
-                  <div class="text-sm">Status: <span th:text="${sponsor.status}">status</span></div>
+
+                  <div class="text-sm">
+                      Status: <span th:text="${sponsor.active} ? 'Aktiv' : 'Inaktiv'"></span>
+                  </div>
                   <div class="text-sm">Kommentar: <span th:text="${sponsor.comments}">kommentar</span></div>
                   <!-- Kontroller for sponsor: edit og delete -->
                   <div class="mt-2">
@@ -93,11 +89,7 @@
                     <input name="phoneNumber" type="tel" inputmode="numeric" pattern="^[0-9]+$" title="Digits only" th:value="${sponsor.phoneNumber}" class="border rounded px-2 py-1 w-full" />
                     <label class="block text-sm mt-2">CVR</label>
                     <input name="cvrNumber" th:value="${sponsor.cvrNumber}" class="border rounded px-2 py-1 w-full" />
-                    <label class="block text-sm mt-2">Aktiv</label>
-                    <select name="status" class="border rounded px-2 py-1 w-full">
-                      <option value="true" th:selected="${sponsor.status}">True</option>
-                      <option value="false" th:selected="${!sponsor.status}">False</option>
-                    </select>
+
                     <label class="block text-sm mt-2">Kommentar</label>
                     <input name="comments" th:value="${sponsor.comments}" class="border rounded px-2 py-1 w-full" />
                     <div class="mt-2">
@@ -108,7 +100,7 @@
                 </div>
               </div>
               <!-- Hvis ingen sponsorer findes, visses en beseked -->
-              <div th:if="${#lists.isEmpty(sponsors)}">Ingen Sponsors Inu.</div>
+              <div th:if="${#lists.isEmpty(sponsors)}">Ingen sponsors endnu.</div>
             </section>
 
             <div>
@@ -125,11 +117,7 @@
                   <input id="phoneNumber" name="phoneNumber" type="tel" inputmode="numeric" pattern="^[0-9]+$" title="Digits only" class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm">CVR</label>
                   <input id="cvrNumber" name="cvrNumber" class="border rounded px-2 py-1 w-full" />
-                  <label class="block text-sm">Aktive</label>
-                  <select id="status" name="status" class="border rounded px-2 py-1 w-full">
-                    <option value="true">True</option>
-                    <option value="false" selected>False</option>
-                  </select>
+
                   <label class="block text-sm">Kommentar</label>
                   <input id="comments" name="comments" class="border rounded px-2 py-1 w-full" />
                   <button type="submit" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded">Add Sponsor</button>
@@ -155,7 +143,7 @@
                       data-start=${contract.startDate},
                       data-end=${contract.endDate},
                       data-payment=${contract.payment},
-                      data-status=${contract.status},
+                      data-active=${contract.active},
                       data-has-pdf=${contract.pdfData != null},
                       data-pdf-filename=${contract.fileName}"></div>
               </div>
@@ -170,7 +158,7 @@
                 data-start=${service.startDate},
                 data-end=${service.endDate},
                 data-amount=${service.amountOrDivision},
-                data-archived=${service.archived}"
+                data-active=${service.active}"
                 >
             </div>
           </div>
@@ -206,15 +194,11 @@
                 <input name="startDate" type="date" required class="border rounded px-2 py-1 w-full" />
                 <label class="block text-sm">Slut Dato</label>
                 <input name="endDate" type="date" required class="border rounded px-2 py-1 w-full" />
-                <label class="block text-sm">Payment (integer)</label>
+                <label class="block text-sm">Beløb</label>
                 <input name="payment" type="number" value="0" required class="border rounded px-2 py-1 w-full" />
                 <label class="block text-sm">Type</label>
                 <input name="type" value="Standard" class="border rounded px-2 py-1 w-full" />
-                <label class="block text-sm">Aktive</label>
-                <select name="status" class="border rounded px-2 py-1 w-full">
-                  <option value="true">True</option>
-                  <option value="false" selected>False</option>
-                </select>
+
                 <input type="file" accept=".pdf" id="fileyesyes" name = "pdffile">
                 <div class="flex justify-end space-x-2 mt-2">
                   <button type="button" class="px-3 py-1 bg-gray-200 rounded" onclick="closeModal('addContractModal')">Annuller</button>
@@ -246,7 +230,7 @@
                 <input name="name" type="text" class="border rounded px-2 py-1 w-full" />
                 <label class="block text-sm">Type</label>
                 <select id="addServiceType" name="type" class="border rounded px-2 py-1 w-full">
-                  <option value="Billeter">Billeter</option>
+                  <option value="Billetter">Billetter</option>
                   <option value="Kuponer">Kuponer</option>
                   <option value="Banner">Banner</option>
                   <option value="LogoTrojler">Logo på trøjer</option>
@@ -260,10 +244,10 @@
                 <input name="startDate" type="date" class="border rounded px-2 py-1 w-full" />
                 <label class="block text-sm">Slut Dato</label>
                 <input name="endDate" type="date" class="border rounded px-2 py-1 w-full" />
-                <label class="block text-sm">Arkiveret</label>
-                <select name="archived" class="border rounded px-2 py-1 w-full">
-                  <option value="true">True</option>
-                  <option value="false" selected>False</option>
+                <label class="block text-sm">Opfyldt</label>
+                <select name="active" class="border rounded px-2 py-1 w-full">
+                  <option value="true">Opfyldt</option>
+                  <option value="false" selected>Ikke opfyldt</option>
                 </select>
                 <div class="flex justify-end space-x-2 mt-2">
                   <button type="button" class="px-3 py-1 bg-gray-200 rounded" onclick="closeModal('addServiceModal')">Annuller</button>

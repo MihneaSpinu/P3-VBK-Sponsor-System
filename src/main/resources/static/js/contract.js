@@ -44,7 +44,7 @@ function populateViewContracts(sponsorId) {
 		const formattedStart = formatDisplayDate(start);
 		const formattedEnd = formatDisplayDate(end);
 		const payment = n.getAttribute('data-payment') || '';
-		const status = n.getAttribute('data-status') || '';
+		const status = n.getAttribute('data-active') || '';
 		const pdfFileName = n.getAttribute('data-pdf-filename') || '';
 
 		const container = document.createElement('div');
@@ -107,8 +107,14 @@ function populateViewContracts(sponsorId) {
 		const dType = document.createElement('div'); dType.textContent = `Type: ${type}`;
 		const dStart = document.createElement('div'); dStart.textContent = `Start: ${formattedStart}`;
 		const dEnd = document.createElement('div'); dEnd.textContent = `End: ${formattedEnd}`;
-		const dPayment = document.createElement('div'); dPayment.textContent = `Payment: ${payment}`;
-		const dStatus = document.createElement('div'); dStatus.textContent = `Status: ${status}`;
+		const dPayment = document.createElement('div'); dPayment.textContent = `Beløb: ${payment}`;
+		let statusString;
+		if(status == true || status == 'true') {
+			statusString = "Aktiv";
+		} else if(status == false || status == 'false') {
+			statusString = "Inaktiv";
+		}
+		const dStatus = document.createElement('div'); dStatus.textContent = `Status: ${statusString}`;
 		details.appendChild(dType);
 		details.appendChild(dStart);
 		details.appendChild(dEnd);
@@ -145,7 +151,7 @@ function populateViewContracts(sponsorId) {
 						const sstart = sn.getAttribute('data-start') || '';
 						const send = sn.getAttribute('data-end') || '';
 						const samount = sn.getAttribute('data-amount') || '';
-						const sarchived = sn.getAttribute('data-archived') || '';
+						const sactive = sn.getAttribute('data-active') || '';
 
 						const sCard = document.createElement('div');
 						sCard.className = 'border rounded p-2 mb-2 bg-gray-100';
@@ -188,13 +194,13 @@ function populateViewContracts(sponsorId) {
 							'IGANG': 'Igang',
 							'UDFORT': 'Udført',
 							'INAKTIV': 'Inaktiv',
-							'true': 'Arkiveret',
-							'false': 'Aktiv'
+							'true': 'Ikke opfyldt',
+							'false': 'Opfyldt'
 						};
 						const displayType = typeLabels[stype] || stype || '';
 						const displayStart = formatDisplayDate(sstart);
 						const displayEnd = formatDisplayDate(send);
-						const displayStatus = statusLabels[String(sarchived)] || sarchived || '';
+						const displayStatus = statusLabels[String(sactive)] || sactive || '';
 						sDetails.textContent = '';
 						const sLine = function (label, value) { const d = document.createElement('div'); d.textContent = label + ' ' + (value || ''); return d; };
 						sDetails.appendChild(sLine('Type:', displayType));
@@ -247,12 +253,12 @@ function populateViewContracts(sponsorId) {
 						const sStartInp = document.createElement('input'); sStartInp.name='startDate'; sStartInp.type='date'; sStartInp.value=sstart; sStartInp.className='border rounded px-2 py-1 w-full'; sForm.appendChild(sStartInp);
 						const sEndLab = document.createElement('label'); sEndLab.className='block text-sm'; sEndLab.textContent='Slut Dato'; sForm.appendChild(sEndLab);
 						const sEndInp = document.createElement('input'); sEndInp.name='endDate'; sEndInp.type='date'; sEndInp.value=send; sEndInp.className='border rounded px-2 py-1 w-full'; sForm.appendChild(sEndInp);
-						const sStatusLab = document.createElement('label'); sStatusLab.className='block text-sm'; sStatusLab.textContent='Arkiveret'; sForm.appendChild(sStatusLab);
-						const sStatusSel = document.createElement('select'); sStatusSel.name='archived'; sStatusSel.className='border rounded px-2 py-1 w-full';
-						const sOptTrue = document.createElement('option'); sOptTrue.value = 'true'; sOptTrue.textContent = 'True';
-						const sOptFalse = document.createElement('option'); sOptFalse.value = 'false'; sOptFalse.textContent = 'False';
-						sStatusSel.appendChild(sOptTrue); sStatusSel.appendChild(sOptFalse);
-						if (String(sarchived) === 'true') sStatusSel.value = 'true'; else sStatusSel.value = 'false';
+						const sStatusLab = document.createElement('label'); sStatusLab.className='block text-sm'; sStatusLab.textContent='Status'; sForm.appendChild(sStatusLab);
+						const sStatusSel = document.createElement('select'); sStatusSel.name='active'; sStatusSel.className='border rounded px-2 py-1 w-full';
+						const sOptTrue = document.createElement('option'); sOptTrue.value = 'true'; sOptTrue.textContent = 'Ikke opfyldt';
+						const sOptFalse = document.createElement('option'); sOptFalse.value = 'false'; sOptFalse.textContent = 'Opfyldt';
+						sStatusSel.appendChild(sOptTrue); sStatusSel.appendChild(sOptFalse); 
+						if (String(sactive) === 'true') sStatusSel.value = 'true'; else sStatusSel.value = 'false';
 						sForm.appendChild(sStatusSel);
 						const sBtnRow = document.createElement('div'); sBtnRow.className='flex justify-end space-x-2 mt-2';
 						const sCancel = document.createElement('button'); sCancel.type='button'; sCancel.className='px-3 py-1 bg-gray-200 rounded'; sCancel.textContent='Cancel';
@@ -302,18 +308,20 @@ function populateViewContracts(sponsorId) {
 
 		const endInput = document.createElement('input'); endInput.name = 'endDate'; endInput.type = 'date'; endInput.value = end || '' ; endInput.className = 'border rounded px-2 py-1 w-full'; addLabelAndControl(form, 'Slut Dato', endInput);
 
-		const paymentInput = document.createElement('input'); paymentInput.name = 'payment'; paymentInput.type = 'number'; paymentInput.value = payment; paymentInput.className = 'border rounded px-2 py-1 w-full'; addLabelAndControl(form, 'Payment', paymentInput);
-
+		const paymentInput = document.createElement('input'); paymentInput.name = 'payment'; paymentInput.type = 'number'; paymentInput.value = payment; paymentInput.className = 'border rounded px-2 py-1 w-full'; addLabelAndControl(form, 'Beløb', paymentInput);
+		
+		
 		const statusSelect = document.createElement('select'); statusSelect.id = `status-select-${idx}`; statusSelect.name = 'status'; statusSelect.className = 'border rounded px-2 py-1 w-full';
 		const optTrue = document.createElement('option'); optTrue.value = 'true'; optTrue.textContent = 'True';
 		const optFalse = document.createElement('option'); optFalse.value = 'false'; optFalse.textContent = 'False';
-
+		
 		const pdfInput = document.createElement('input'); pdfInput.type = 'file'; pdfInput.name = 'pdffile'; pdfInput.accept = 'application/pdf'; pdfInput.className = 'border rounded px-2 py-1 w-full'; addLabelAndControl(form, 'Upload PDF', pdfInput);
 
+		/*
 		statusSelect.appendChild(optTrue); statusSelect.appendChild(optFalse);
 		if (String(status) === 'true' || status === true) statusSelect.value = 'true'; else statusSelect.value = 'false';
-		addLabelAndControl(form, 'Aktive', statusSelect);
-
+		addLabelAndControl(form, 'Aktiv', statusSelect);
+		*/
 		const btnRow = document.createElement('div'); btnRow.className = 'flex justify-end space-x-2 mt-2';
 		const btnCancel = document.createElement('button'); btnCancel.type = 'button'; btnCancel.className = 'px-3 py-1 bg-gray-200 rounded'; btnCancel.textContent = 'Cancel';
 		const btnSave = document.createElement('button'); btnSave.type = 'submit'; btnSave.className = 'px-3 py-1 bg-green-500 text-white rounded'; btnSave.textContent = 'Save';
@@ -353,7 +361,7 @@ function populateViewContracts(sponsorId) {
 				}
 			}
 			const statusSel = document.getElementById('status-select-' + idx);
-			if (statusSel) statusSel.value = String(status) === 'true' || String(status) === 'True' ? 'true' : 'false';
+			if (statusSel) statusSel.value = String(status) === 'true' || String(status) === 'True' ? 'Aktiv' : 'Inaktiv';
 		} catch (err) {
 			console.error('populateViewContracts: cannot populate selects', err);
 		}

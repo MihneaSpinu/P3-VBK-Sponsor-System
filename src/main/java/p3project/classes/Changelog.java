@@ -1,9 +1,10 @@
 package p3project.classes;
 
 import java.lang.reflect.Field;
+
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
 import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
 
 @Entity
@@ -13,7 +14,7 @@ public class Changelog extends Eventlog {
     protected Changelog() {};
 
     public <T> Changelog(User user, T changedObject, Field field, Object before, Object after) {
-        super(user, changedObject, "UPDATED");
+        super(user, changedObject, "Opdaterede");
 
         this.field = field == null ? "-" : field.getName();
         this.before = before == null || before == "" ? "-" : before.toString();

@@ -17,6 +17,10 @@
         The username and password is given by that admin</p>
     </div>
         <div class ="box2"> 
+        <!--Warning message-->
+        <div th:if="${responseMessage}" class="mb-4 px-4 py-2 bg-yellow-100 text-yellow-800 border-l-4 border-yellow-500 rounded">
+          <p th:text="${responseMessage}"></p>
+        </div>
             <h2>Login</h2>
             <form id="loginForm">
                 <input type="text" id="username" name="username" placeholder="Enter Username" required>

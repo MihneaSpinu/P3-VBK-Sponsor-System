@@ -120,7 +120,7 @@ function escapeHtml(s) {
 		if (!sel) return;
 		const v = sel.value;
 		document.querySelectorAll('.sponsor-item').forEach(function (el) {
-			const status = el.getAttribute('data-status');
+			const status = el.getAttribute('data-active');
 			if (v === 'all') {
 				el.style.display = '';
 			} else if (v === 'active') {
