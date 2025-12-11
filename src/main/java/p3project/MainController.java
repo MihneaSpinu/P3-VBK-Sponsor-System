@@ -76,6 +76,7 @@ public class MainController {
         model.addAttribute("sponsors", sponsorRepository.findAll());
         model.addAttribute("contracts", contractRepository.findAll());
         model.addAttribute("services", serviceRepository.findAll());
+        updateActiveFields();
         return "sponsors";
     }
 
@@ -145,6 +146,7 @@ public class MainController {
             redirectAttributes.addFlashAttribute("responseMessage", "FEJL!! PRØV IGEN");
             return "redirect:/sponsors";
         }
+
         return handleUpdateRequest(service, storedService, request, redirectAttributes);
 
     }
@@ -250,7 +252,8 @@ public class MainController {
         User user = getUserFromToken(request);
         Eventlog log = new Eventlog(user, service, "Oprettede");
         logRepository.save(log);
-
+        service.setActive(true);
+        serviceIsActive(service);
         try {
             serviceRepository.save(service);
             redirectAttributes.addFlashAttribute("responseMessage", "tilføjet service: " + service.getName());
@@ -423,8 +426,9 @@ public class MainController {
 
         List<Sponsor> sponsors = sponsorRepository.findAll();
         List<Sponsor> archivedSponsors = new ArrayList<>();
+        updateActiveFields();
         for(Sponsor sponsor : sponsors) {
-            if(!sponsorIsActive(sponsor)) {
+            if(!sponsor.getActive()) {
                 archivedSponsors.add(sponsor);
             }
         }
@@ -535,6 +539,7 @@ public class MainController {
             service.setActive(false);
             serviceRepository.save(service);
         }
+        //System.out.println("Service: " + service.getName() + " is " + service.getActive());
         return service.getActive();
     }
 
@@ -543,7 +548,8 @@ public class MainController {
         List<Service> services = serviceRepository.findAll();
         for(Service service : services) {
             if(contract.getId().equals(service.getContractId())) {
-
+             //System.out.println("Contract: " + contract.getName() + " is " + contract.getActive());
+                
                 if(LocalDate.now().isAfter(contract.getEndDate())) {
                     service.setActive(false);
                     contractRepository.save(contract);
@@ -565,18 +571,24 @@ public class MainController {
 
 
 
-    private boolean sponsorIsActive(Sponsor sponsor) {
+    private void updateActiveFields() {
         List<Contract> contracts = contractRepository.findAll();
-        for(Contract contract : contracts) {
-            if(sponsor.getId().equals(contract.getSponsorId()) && contractIsActive(contract)){
-                sponsor.setActive(true);
-                sponsorRepository.save(sponsor);
-                return true;
+        List<Sponsor> sponsors = sponsorRepository.findAll();
+
+        for (Sponsor sponsor : sponsors) {
+
+            boolean sponsorActive = false; // default
+
+            for (Contract contract : contracts) {
+                if (sponsor.getId().equals(contract.getSponsorId()) && contractIsActive(contract)) {
+                    sponsorActive = true; // found an active one
+                    break;                // stop checking further contracts
+                }
             }
+
+            sponsor.setActive(sponsorActive);
+            sponsorRepository.save(sponsor);
         }
-        sponsor.setActive(false);
-        sponsorRepository.save(sponsor);
-        return false;
     }
 
         
@@ -589,8 +601,10 @@ public class MainController {
         Iterable<Service> services = serviceRepository.findAll();
         boolean userIsAdmin = userIsAdmin(request);
         List<Sponsor> activeSponsors = new ArrayList<>();
+        updateActiveFields();
+
         for(Sponsor sponsor : sponsors) {
-            if(sponsorIsActive(sponsor)) {
+            if(sponsor.getActive()) {
                 activeSponsors.add(sponsor);
             }
         }

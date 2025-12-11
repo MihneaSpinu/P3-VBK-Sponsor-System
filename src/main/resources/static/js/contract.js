@@ -107,8 +107,13 @@ function populateViewContracts(sponsorId) {
 		const dType = document.createElement('div'); dType.textContent = `Type: ${type}`;
 		const dStart = document.createElement('div'); dStart.textContent = `Start: ${formattedStart}`;
 		const dEnd = document.createElement('div'); dEnd.textContent = `End: ${formattedEnd}`;
-		const dPayment = document.createElement('div'); dPayment.textContent = `Payment: ${payment}`;
-		const statusString = status ? 'Aktiv' : 'Inaktiv';
+		const dPayment = document.createElement('div'); dPayment.textContent = `Beløb: ${payment}`;
+		let statusString;
+		if(status == true || status == 'true') {
+			statusString = "Aktiv";
+		} else if(status == false || status == 'false') {
+			statusString = "Inaktiv";
+		}
 		const dStatus = document.createElement('div'); dStatus.textContent = `Status: ${statusString}`;
 		details.appendChild(dType);
 		details.appendChild(dStart);
@@ -189,8 +194,8 @@ function populateViewContracts(sponsorId) {
 							'IGANG': 'Igang',
 							'UDFORT': 'Udført',
 							'INAKTIV': 'Inaktiv',
-							'true': 'Opfyldt',
-							'false': 'Ikke opfyldt'
+							'true': 'Ikke opfyldt',
+							'false': 'Opfyldt'
 						};
 						const displayType = typeLabels[stype] || stype || '';
 						const displayStart = formatDisplayDate(sstart);
@@ -248,12 +253,12 @@ function populateViewContracts(sponsorId) {
 						const sStartInp = document.createElement('input'); sStartInp.name='startDate'; sStartInp.type='date'; sStartInp.value=sstart; sStartInp.className='border rounded px-2 py-1 w-full'; sForm.appendChild(sStartInp);
 						const sEndLab = document.createElement('label'); sEndLab.className='block text-sm'; sEndLab.textContent='Slut Dato'; sForm.appendChild(sEndLab);
 						const sEndInp = document.createElement('input'); sEndInp.name='endDate'; sEndInp.type='date'; sEndInp.value=send; sEndInp.className='border rounded px-2 py-1 w-full'; sForm.appendChild(sEndInp);
-						const sStatusLab = document.createElement('label'); sStatusLab.className='block text-sm'; sStatusLab.textContent='Aktiv'; sForm.appendChild(sStatusLab);
+						const sStatusLab = document.createElement('label'); sStatusLab.className='block text-sm'; sStatusLab.textContent='Status'; sForm.appendChild(sStatusLab);
 						const sStatusSel = document.createElement('select'); sStatusSel.name='active'; sStatusSel.className='border rounded px-2 py-1 w-full';
-						const sOptTrue = document.createElement('option'); sOptTrue.value = 'true'; sOptTrue.textContent = 'True';
-						const sOptFalse = document.createElement('option'); sOptFalse.value = 'false'; sOptFalse.textContent = 'False';
+						const sOptTrue = document.createElement('option'); sOptTrue.value = 'true'; sOptTrue.textContent = 'Ikke opfyldt';
+						const sOptFalse = document.createElement('option'); sOptFalse.value = 'false'; sOptFalse.textContent = 'Opfyldt';
 						sStatusSel.appendChild(sOptTrue); sStatusSel.appendChild(sOptFalse); 
-						if (String(sactive) === 'true') sStatusSel.value = 'false'; else sStatusSel.value = 'true';
+						if (String(sactive) === 'true') sStatusSel.value = 'true'; else sStatusSel.value = 'false';
 						sForm.appendChild(sStatusSel);
 						const sBtnRow = document.createElement('div'); sBtnRow.className='flex justify-end space-x-2 mt-2';
 						const sCancel = document.createElement('button'); sCancel.type='button'; sCancel.className='px-3 py-1 bg-gray-200 rounded'; sCancel.textContent='Cancel';
@@ -303,7 +308,8 @@ function populateViewContracts(sponsorId) {
 
 		const endInput = document.createElement('input'); endInput.name = 'endDate'; endInput.type = 'date'; endInput.value = end || '' ; endInput.className = 'border rounded px-2 py-1 w-full'; addLabelAndControl(form, 'Slut Dato', endInput);
 
-		const paymentInput = document.createElement('input'); paymentInput.name = 'payment'; paymentInput.type = 'number'; paymentInput.value = payment; paymentInput.className = 'border rounded px-2 py-1 w-full'; addLabelAndControl(form, 'Payment', paymentInput);
+		const paymentInput = document.createElement('input'); paymentInput.name = 'payment'; paymentInput.type = 'number'; paymentInput.value = payment; paymentInput.className = 'border rounded px-2 py-1 w-full'; addLabelAndControl(form, 'Beløb', paymentInput);
+		
 		
 		const statusSelect = document.createElement('select'); statusSelect.id = `status-select-${idx}`; statusSelect.name = 'status'; statusSelect.className = 'border rounded px-2 py-1 w-full';
 		const optTrue = document.createElement('option'); optTrue.value = 'true'; optTrue.textContent = 'True';

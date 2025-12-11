@@ -63,7 +63,10 @@
                   <div class="text-sm">Email: <span th:text="${sponsor.email}">email</span></div>
                   <div class="text-sm">Telefon: <span th:text="${sponsor.phoneNumber}">Telefon</span></div>
                   <div class="text-sm">CVR: <span th:text="${sponsor.cvrNumber}">cvr</span></div>
-                  <div class="text-sm">active: <span th:text="${sponsor.active}">active</span></div>
+
+                  <div class="text-sm">
+                      Status: <span th:text="${sponsor.active} ? 'Aktiv' : 'Inaktiv'"></span>
+                  </div>
                   <div class="text-sm">Kommentar: <span th:text="${sponsor.comments}">kommentar</span></div>
                   <!-- Kontroller for sponsor: edit og delete -->
                   <div class="mt-2">
@@ -86,11 +89,7 @@
                     <input name="phoneNumber" type="tel" inputmode="numeric" pattern="^[0-9]+$" title="Digits only" th:value="${sponsor.phoneNumber}" class="border rounded px-2 py-1 w-full" />
                     <label class="block text-sm mt-2">CVR</label>
                     <input name="cvrNumber" th:value="${sponsor.cvrNumber}" class="border rounded px-2 py-1 w-full" />
-                    <label class="block text-sm mt-2">Aktiv</label>
-                    <select name="active" class="border rounded px-2 py-1 w-full">
-                      <option value="true" th:selected="${sponsor.active}">True</option>
-                      <option value="false" th:selected="${!sponsor.active}">False</option>
-                    </select>
+
                     <label class="block text-sm mt-2">Kommentar</label>
                     <input name="comments" th:value="${sponsor.comments}" class="border rounded px-2 py-1 w-full" />
                     <div class="mt-2">
@@ -118,11 +117,7 @@
                   <input id="phoneNumber" name="phoneNumber" type="tel" inputmode="numeric" pattern="^[0-9]+$" title="Digits only" class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm">CVR</label>
                   <input id="cvrNumber" name="cvrNumber" class="border rounded px-2 py-1 w-full" />
-                  <label class="block text-sm">Aktive</label>
-                  <select id="active" name="active" class="border rounded px-2 py-1 w-full">
-                    <option value="true">True</option>
-                    <option value="false" selected>False</option>
-                  </select>
+
                   <label class="block text-sm">Kommentar</label>
                   <input id="comments" name="comments" class="border rounded px-2 py-1 w-full" />
                   <button type="submit" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded">Add Sponsor</button>
@@ -199,7 +194,7 @@
                 <input name="startDate" type="date" required class="border rounded px-2 py-1 w-full" />
                 <label class="block text-sm">Slut Dato</label>
                 <input name="endDate" type="date" required class="border rounded px-2 py-1 w-full" />
-                <label class="block text-sm">Payment (integer)</label>
+                <label class="block text-sm">Beløb</label>
                 <input name="payment" type="number" value="0" required class="border rounded px-2 py-1 w-full" />
                 <label class="block text-sm">Type</label>
                 <input name="type" value="Standard" class="border rounded px-2 py-1 w-full" />
