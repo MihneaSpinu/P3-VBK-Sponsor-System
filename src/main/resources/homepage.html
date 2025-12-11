@@ -11,7 +11,6 @@
   <link rel="stylesheet" th:href="@{/css/Modal.css}" href="static/css/Modal.css">
   <link rel="stylesheet" th:href="@{/css/Table.css}" href="static/css/Table.css">
   <link rel="stylesheet" th:href="@{/css/homepage.css}" href="static/css/homepage.css">
-
 </head>
 
 <body class="bg-gray-100 text-gray-900">
@@ -63,194 +62,278 @@
           <div class="px-6 py-3">Active periods</div>
         </div>
 
-<div class="space-y-4 mt-0">
+        <div class="space-y-4 mt-0">
 
-  <!-- LOOP THROUGH SPONSORS -->
-  <div th:each="sponsor : ${sponsors}" class="bg-white shadow-md rounded-lg overflow-hidden">
+          <!-- LOOP THROUGH SPONSORS -->
+          <div th:each="sponsor : ${sponsors}" class="bg-white shadow-md rounded-lg overflow-hidden">
 
-    <div class="grid grid-cols-4 text-sm">
+            <div class="grid grid-cols-4 text-sm">
 
-      <!-- COLUMN 1 — Sponsor Name -->
-      <div class="border-r p-4 flex items-stretch">
-        <div onclick="location.hash='Smodal'"
-             class="bg-gray-200 rounded px-4 py-3 w-full text-center hover:bg-gray-300 sponsor-open-btn"
-             th:attr="data-sponsor-id=${sponsor.id}"
-             th:text="${sponsor.name}">
-        </div>
-      </div>
+              <!-- COLUMN 1 — Sponsor Name -->
+              <div class="border-r p-4 flex items-stretch">
+                <div onclick="location.hash='Smodal'"
+                  class="bg-gray-200 rounded px-4 py-3 w-full text-center hover:bg-gray-300 sponsor-open-btn"
+                  th:attr="data-sponsor-id=${sponsor.id}"
+                  th:text="${sponsor.name}">
+                </div>
+              </div>
 
-    <!-- COLUMN 2 — All services for all this sponsor's contracts -->
-    <div class="border-r p-4 flex items-stretch">
-        <div class="flex flex-col gap-2 w-full">
-              <!-- loop contracts for this sponsor -->
-              <div th:each="contract : ${contracts}" 
-                  th:if="${contract.sponsorId == sponsor.id}">
-                  <!-- loop services for this contract -->
-                  <div th:each="svc : ${services}"
-                      th:if="${svc.contractId == contract.id}"
-                      class="bg-gray-200 rounded px-4 py-3 text-center">
+              <!-- COLUMN 2 — All services for all this sponsor's contracts -->
+              <div class="border-r p-4 flex items-stretch">
+                <div class="flex flex-col gap-2 w-full">
+                  <!-- loop contracts for this sponsor -->
+                  <div th:each="contract : ${contracts}"
+                       th:if="${contract.sponsorId == sponsor.id}">
+                    <!-- loop services for this contract -->
+                    <div th:each="svc : ${services}"
+                         th:if="${svc.contractId == contract.id}"
+                         class="bg-gray-200 rounded px-4 py-3 text-center">
                       <span th:text="${svc.name}"></span>
                       <span class="text-xs text-gray-500"
-                            th:text="' (Contract #' + ${contract.id} + ')'">
+                            th:text="' (Fra kontrakten: ' + ${contract.name} + ')'">
                       </span>
+                    </div>
+                  </div>
                 </div>
-            </div>  
-        </div>
-      </div>
+              </div>
 
-    <!-- COLUMN 3 — Contract Status for each contract -->
-    <div class="border-r p-4 flex items-stretch">
-        <div class="flex flex-col gap-2 w-full">
-            <!-- Loop through contracts for this sponsor -->
-            <div th:each="contract : ${contracts}"
-                th:if="${contract.sponsorId == sponsor.id}">
+              <!-- COLUMN 3 — Contract Status for each contract -->
+              <div class="border-r p-4 flex items-stretch">
+                <div class="flex flex-col gap-2 w-full">
+                  <!-- Loop through contracts for this sponsor -->
+                  <div th:each="contract : ${contracts}"
+                       th:if="${contract.sponsorId == sponsor.id}">
 
-                <!-- Loop through services for this contract -->
-                <div th:each="svc : ${services}"
-                    th:if="${svc.contractId == contract.id}"
-                    th:classappend="${svc.archived} ? 'bg-red-400' : 'bg-green-400'"
-                    class="rounded px-4 py-3 text-center"
-                    th:text="${!svc.archived ? 'Aktiv' : 'Inaktiv'}">
+                    <!-- Loop through services for this contract -->
+                    <div th:each="svc : ${services}"
+                         th:if="${svc.contractId == contract.id}"
+                         th:attr="data-service-id=${svc.id},data-archived=${svc.archived},data-service-name=${svc.name}"
+                         th:classappend="${svc.archived} ? 'bg-red-400' : 'bg-green-400'"
+                         class="rounded px-4 py-3 text-center status-btn"
+                         th:text="${!svc.archived ? 'Aktiv' : 'Inaktiv'}">
+                      <!-- No onclick here; JS handles opening the modal -->
+                    </div>
+
+                  </div>
+
                 </div>
+              </div>
+
+              <!-- COLUMN 4 — Contract Date Range -->
+              <div class="p-4 flex items-stretch">
+                <div class="flex flex-col gap-2 w-full">
+                  <!--Loop through contracts-->
+                  <div th:each="contract : ${contracts}"
+                       th:if="${contract.sponsorId == sponsor.id}">
+                    <div class="bg-gray-200 rounded px-4 py-3 text-center"
+                         th:each="svc : ${services}"
+                         th:if="${svc.contractId == contract.id}"
+                         th:text="${#temporals.format(svc.startDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(svc.endDate, 'dd/MM/yyyy')}">
+                    </div>
+                  </div>
+                </div>
+              </div>
 
             </div>
+          </div>
 
         </div>
-    </div>
 
-      <!-- COLUMN 4 — Contract Date Range -->
-      <div class="p-4 flex items-stretch">
-        <div class="flex flex-col gap-2 w-full">
-          <!--Loop through contracts-->
-          <div th:each="contract : ${contracts}"
-              th:if="${contract.sponsorId == sponsor.id}">
-                <div class="bg-gray-200 rounded px-4 py-3 text-center"
-                th:each="svc : ${services}"
-                th:if="${svc.contractId == contract.id}"
-                th:text="${#temporals.format(svc.startDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(svc.endDate, 'dd/MM/yyyy')}">
-                </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Filter Modal -->
+  <div id="filterModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg w-11/12 max-w-2xl p-6 shadow-lg">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">Filter sponsors</h2>
+        <button id="closeFilterBtn" class="text-gray-600 hover:text-gray-900">✕</button>
+      </div>
+
+      <form id="filterForm" class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Name contains</label>
+          <input id="filterName" type="text" class="mt-1 block w-full rounded border-gray-300 shadow-sm"
+                 placeholder="e.g. Spar">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Active start (from)</label>
+          <input id="filterDateFrom" type="date" class="mt-1 block w-full rounded border-gray-300 shadow-sm">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Active end (to)</label>
+          <input id="filterDateTo" type="date" class="mt-1 block w-full rounded border-gray-300 shadow-sm">
+        </div>
+
+        <!-- Hidden so filter.js still works -->
+        <input type="hidden" id="filterDescription" name="filterDescription" value="">
+        <input type="hidden" id="filterMinPayment" name="filterMinPayment" value="">
+        <input type="hidden" id="filterMaxPayment" name="filterMaxPayment" value="">
+
+        <div class="col-span-2 flex justify-between mt-4">
+          <div>
+            <button id="applyFilterBtn" type="button"
+                    class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Apply</button>
+            <button id="clearFilterBtn" type="button"
+                    class="ml-2 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Clear</button>
+          </div>
+          <div>
+            <button id="closeFilterBtnBottom" type="button"
+                    class="bg-white border px-3 py-2 rounded hover:bg-gray-50">Close</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sponsor Modal-->
+  <div id="Smodal">
+    <div class="ModalBox">
+      <h1 class="ModalTitle">Information omkring sponsoren:</h1>
+      <a class="CloseModal" href="#" onclick="location.hash=''; return false;">X</a>
+      <div class="SponsorModal">
+      </div>
+      <div class="ModalRow">
+        <div th:each="sponsor : ${sponsors}" class="bg-white shadow-md rounded-lg overflow-hidden">
+          <div class="hidden sponsor-modal-template"
+               th:attr="id='sponsor-modal-'+${sponsor.id}">
+            <h2 class="text-xl font-semibold mb-2" th:text="${sponsor.name}"></h2>
+            <p><strong>Kontaktperson:</strong> <span th:text="${sponsor.contactPerson}">Kontaktperson</span></p>
+            <p><strong>Email:</strong> <span th:text="${sponsor.email}">email</span></p>
+            <p><strong>Telefon:</strong> <span th:text="${sponsor.phoneNumber}">Telefon</span></p>
+            <p><strong>CVR:</strong> <span th:text="${sponsor.cvrNumber}">CVR</span></p>
+            <p><strong>Status:</strong> <span th:text="${sponsor.status}">status</span></p>
+            <p><strong>Kommentar:</strong> <span th:text="${sponsor.comments}">kommentar</span></p>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
-</div>
+  <!-- Tjeneste / Status Modal -->
+  <div id="statusModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg w-11/12 max-w-md p-6 shadow-lg">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">Change service status</h2>
+        <button onclick="closeStatusModal()" class="text-gray-600 hover:text-gray-900">✕</button>
+      </div>
 
+      <p id="statusServiceName" class="mb-2 font-medium">Service</p>
+
+      <div class="flex gap-3 mb-4">
+        <button id="setActiveBtn" class="px-4 py-2 rounded bg-green-500 text-white">Aktiv</button>
+        <button id="setInactiveBtn" class="px-4 py-2 rounded bg-red-500 text-white">Inaktiv</button>
+      </div>
+
+      <div class="flex justify-end gap-2">
+        <button id="statusSaveBtn" class="bg-green-500 text-white px-4 py-2 rounded">Save</button>
+        <button onclick="closeStatusModal()" class="bg-gray-200 px-4 py-2 rounded">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let statusEditing = { serviceId: null, archived: null, element: null };
+    let selectedActive = true;
+
+    function openStatusModal(el, evt) {
+      console.log('openStatusModal called', el, evt);
+      try { if (evt && evt.stopPropagation) evt.stopPropagation(); } catch (err) { console.warn('stopPropagation failed', err); }
+
+      const id = el && el.getAttribute ? el.getAttribute('data-service-id') : null;
+      const name = el && el.getAttribute ? el.getAttribute('data-service-name') || ('Service ' + id) : ('Service ' + id);
+      const archivedAttr = el && el.getAttribute ? el.getAttribute('data-archived') : null;
+      const archived = archivedAttr === 'true' || archivedAttr === '1';
+
+      statusEditing = { serviceId: id, archived: archived, element: el };
+      document.getElementById('statusServiceName').textContent = name + ' (ID: ' + id + ')';
+      setSelectedStatus(!archived);
+
+      // Just show the modal; no hash needed
+      document.getElementById('statusModal').classList.remove('hidden');
+    }
+
+    function closeStatusModal() {
+      document.getElementById('statusModal').classList.add('hidden');
+      statusEditing = { serviceId: null, archived: null, element: null };
+    }
+
+    function setSelectedStatus(active) {
+      selectedActive = active;
+      const aBtn = document.getElementById('setActiveBtn');
+      const iBtn = document.getElementById('setInactiveBtn');
+      if (active) {
+        aBtn.classList.add('ring', 'ring-2', 'ring-green-300');
+        aBtn.classList.remove('opacity-60');
+        iBtn.classList.remove('ring', 'ring-2', 'ring-red-300');
+        iBtn.classList.add('opacity-60');
+      } else {
+        iBtn.classList.add('ring', 'ring-2', 'ring-red-300');
+        iBtn.classList.remove('opacity-60');
+        aBtn.classList.remove('ring', 'ring-2', 'ring-green-300');
+        aBtn.classList.add('opacity-60');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const a = document.getElementById('setActiveBtn');
+      const i = document.getElementById('setInactiveBtn');
+      const save = document.getElementById('statusSaveBtn');
+
+      a && a.addEventListener('click', () => setSelectedStatus(true));
+      i && i.addEventListener('click', () => setSelectedStatus(false));
+
+      save && save.addEventListener('click', () => {
+        if (!statusEditing.serviceId) return closeStatusModal();
+        const id = statusEditing.serviceId;
+        const active = selectedActive;
+
+        // Send the change to the server
+        const body = new URLSearchParams();
+        body.append('serviceId', id);
+        body.append('archived', (!active).toString()); // archived=true when not active
+
+        fetch('/sponsors/setServiceArchived', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: body.toString(),
+          credentials: 'same-origin'
+        }).then(res => {
+          if (!res.ok) throw new Error('Server responded ' + res.status);
+          return res.text();
+        }).then(() => {
+          // Update all matching elements in the page on success
+          const els = document.querySelectorAll('[data-service-id]');
+          els.forEach(el => {
+            if (String(el.getAttribute('data-service-id')) === String(id)) {
+              el.textContent = active ? 'Aktiv' : 'Inaktiv';
+              el.setAttribute('data-archived', active ? 'false' : 'true');
+              el.classList.remove('bg-red-400', 'bg-green-400');
+              el.classList.add(active ? 'bg-green-400' : 'bg-red-400');
+            }
+          });
+          closeStatusModal();
+        }).catch(err => {
+          console.error('Failed to update service archived flag', err);
+          alert('Kunne ikke opdatere status på serveren. Prøv igen.');
+        });
+      });
+
+      // Delegated listener: capture clicks on any current or future `.status-btn`.
+      console.log('homepage: setting up delegated status-btn click handler');
+      document.addEventListener('click', function (e) {
+        const btn = e.target.closest && e.target.closest('.status-btn');
+        if (!btn) return;
+        console.log('homepage: status-btn clicked', btn.getAttribute('data-service-id'));
+        e.stopPropagation();
+        openStatusModal(btn, e);
+      });
+    });
+  </script>
+
+  <script th:src="@{/js/sponsors.js}" defer></script>
 </body>
-<!-- Filter Modal -->
-<div id="filterModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-  <div class="bg-white rounded-lg w-11/12 max-w-2xl p-6 shadow-lg">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-semibold">Filter sponsors</h2>
-      <button id="closeFilterBtn" class="text-gray-600 hover:text-gray-900">✕</button>
-    </div>
-
-    <form id="filterForm" class="grid grid-cols-2 gap-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Name contains</label>
-        <input id="filterName" type="text" class="mt-1 block w-full rounded border-gray-300 shadow-sm"
-          placeholder="e.g. Spar">
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Active start (from)</label>
-        <input id="filterDateFrom" type="date" class="mt-1 block w-full rounded border-gray-300 shadow-sm">
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Active end (to)</label>
-        <input id="filterDateTo" type="date" class="mt-1 block w-full rounded border-gray-300 shadow-sm">
-      </div>
-
-      <!-- Hidden so filter.js still works -->
-      <input type="hidden" id="filterDescription" name="filterDescription" value="">
-      <input type="hidden" id="filterMinPayment" name="filterMinPayment" value="">
-      <input type="hidden" id="filterMaxPayment" name="filterMaxPayment" value="">
-
-      <div class="col-span-2 flex justify-between mt-4">
-        <div>
-          <button id="applyFilterBtn" type="button"
-            class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Apply</button>
-          <button id="clearFilterBtn" type="button"
-            class="ml-2 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Clear</button>
-        </div>
-        <div>
-          <button id="closeFilterBtnBottom" type="button"
-            class="bg-white border px-3 py-2 rounded hover:bg-gray-50">Close</button>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Sponsor Modal-->
-<div id="Smodal">
-  <div class="ModalBox">
-    <h1 class="ModalTitle">Information omkring sponsoren:</h1>
-    <a class="CloseModal" href="#">X</a>
-    <div class="SponsorModal">
-    </div>
-    <div class="ModalRow">
-      <div th:each="sponsor : ${sponsors}" class="bg-white shadow-md rounded-lg overflow-hidden">
-      <div class="hidden sponsor-modal-template"
-          th:attr="id='sponsor-modal-'+${sponsor.id}">
-        <h2 class="text-xl font-semibold mb-2" th:text="${sponsor.name}"></h2>
-        <p><strong>Kontaktperson:</strong> <span th:text="${sponsor.contactPerson}">Kontaktperson</span></p>
-        <p><strong>Email:</strong> <span th:text="${sponsor.email}">email</span></p>
-        <p><strong>Telefon:</strong> <span th:text="${sponsor.phoneNumber}">Telefon</span></p>
-        <p><strong>CVR:</strong> <span th:text="${sponsor.cvrNumber}">CVR</span></p>
-        <p><strong>Status:</strong> <span th:text="${sponsor.status}">status</span></p>
-        <p><strong>Kommentar:</strong> <span th:text="${sponsor.comments}">kommentar</span></p>
-    </div>
-  </div>
-</div>
-
-<!-- Contract Modal-->
-<div id="Cmodal">
-  <div class="ModalBox">
-    <h1 class="ModalTitle">Indsæt sponsor navn</h1>
-    <a class="CloseModal" href="#Smodal">X</a>
-    <div class="ContractModal">
-    </div>
-    <div class="ModalRow">
-      <div class="ContractInfo">
-        <h3 class="title">Kontrakt type</h3>
-        <div class="ModalTag">Guld kontrakt</div>
-      </div>
-      <div class="ContractStatus">
-        <h3 class="title">Status</h3>
-        <div class="ModalTagRed">Inaktiv</div>
-      </div>
-      <div class="ContractInfo">
-        <h3 class="title">Dato</h3>
-        <div class="ModalTag">02/02/2025 - 02/02/2026</div>
-      </div>
-      <div class="ContractInfo">
-        <h3 class="title">Ydelser</h3>
-        <div class="ModalTag">Logo på hold trøje</div>
-        <div class="ModalTag">Logo på bande</div>
-        <div class="ModalTag">10 gratis billeter per sæson</div>
-        <div class="ModalTag">Logo i klubhus</div>
-        <div class="ModalTag">3 gratis hotdog per kamp</div>
-      </div>
-      <div class="ContractInfo">
-        <h3 class="title">Betaling</h3>
-        <div class="ModalTag">25.000 kr</div>
-      </div>
-    </div>
-    <div class="ModalRow">
-      <div>
-        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank"><button class="ModalTag">Åben
-            PDF</button></a>
-      </div>
-      <label class="ModalTag" style="cursor:pointer;">
-        Vedhæft PDF
-        <input type="file" accept="application/pdf" style="display:none;">
-      </label>
-    </div>
-  </div>
-</div>
-<script th:src="@{/js/sponsors.js}" defer></script>
 </html>

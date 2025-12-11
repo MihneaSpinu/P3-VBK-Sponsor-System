@@ -376,6 +376,28 @@ public class MainController {
         return "redirect:/sponsors";
     }
 
+    // Toggle archived flag for a service
+    @PostMapping(path = "/sponsors/setServiceArchived")
+    public ResponseEntity<String> setServiceArchived(@RequestParam Long serviceId, @RequestParam boolean archived, HttpServletRequest request) {
+        if(!userHasValidToken(request)) return ResponseEntity.status(403).body("forbidden");
+        if(!userIsAdmin(request))       return ResponseEntity.status(403).body("forbidden");
+
+        Service service = serviceRepository.findById(serviceId).orElse(null);
+        if (service == null) return ResponseEntity.status(404).body("not found");
+
+        service.setArchived(archived);
+        serviceRepository.save(service);
+
+        try {
+            User user = getUserFromToken(request);
+            Eventlog log = new Eventlog(user, service, "UPDATED");
+            logRepository.save(log);
+        } catch (Exception ex) {
+        }
+
+        return ResponseEntity.ok("ok");
+    }
+
 
     @GetMapping("/getFile/{contractId}")
     public ResponseEntity<byte[]> getFile(@PathVariable long contractId) {
