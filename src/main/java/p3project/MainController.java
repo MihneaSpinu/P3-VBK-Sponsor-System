@@ -215,7 +215,7 @@ public class MainController {
 
         sponsorRepository.save(sponsor);
 
-        redirectAttributes.addFlashAttribute("responseMessage", "tilføjet sponsor:");
+        redirectAttributes.addFlashAttribute("responseMessage", "tilføjet sponsor: " + sponsor.getName());
         return "redirect:/sponsors";
     }
 
@@ -253,7 +253,7 @@ public class MainController {
 
         try {
             serviceRepository.save(service);
-            redirectAttributes.addFlashAttribute("responseMessage", "tilføjet service: [navn]");
+            redirectAttributes.addFlashAttribute("responseMessage", "tilføjet service: " + service.getName());
             return "redirect:/sponsors";
         } catch (IllegalArgumentException ex) {
             redirectAttributes.addFlashAttribute("responseMessage", "FEJL");
@@ -533,6 +533,7 @@ public class MainController {
             LocalDate.now().isAfter(service.getEndDate())) {
 
             service.setActive(false);
+            serviceRepository.save(service);
         }
         return service.getActive();
     }
@@ -545,17 +546,20 @@ public class MainController {
 
                 if(LocalDate.now().isAfter(contract.getEndDate())) {
                     service.setActive(false);
+                    contractRepository.save(contract);
                     continue;
                 }
 
                 if(serviceIsActive(service)) {
                     contract.setActive(true);
+                    contractRepository.save(contract);
                     return true;
                 }
 
             }
         }
         contract.setActive(false);
+        contractRepository.save(contract);
         return contract.getActive();
     }
 
@@ -566,10 +570,12 @@ public class MainController {
         for(Contract contract : contracts) {
             if(sponsor.getId().equals(contract.getSponsorId()) && contractIsActive(contract)){
                 sponsor.setActive(true);
+                sponsorRepository.save(sponsor);
                 return true;
             }
         }
         sponsor.setActive(false);
+        sponsorRepository.save(sponsor);
         return false;
     }
 

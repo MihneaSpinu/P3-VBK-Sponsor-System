@@ -203,11 +203,7 @@
                 <input name="payment" type="number" value="0" required class="border rounded px-2 py-1 w-full" />
                 <label class="block text-sm">Type</label>
                 <input name="type" value="Standard" class="border rounded px-2 py-1 w-full" />
-                <label class="block text-sm">Aktive</label>
-                <select name="active" class="border rounded px-2 py-1 w-full">
-                  <option value="true">True</option>
-                  <option value="false" selected>False</option>
-                </select>
+
                 <input type="file" accept=".pdf" id="fileyesyes" name = "pdffile">
                 <div class="flex justify-end space-x-2 mt-2">
                   <button type="button" class="px-3 py-1 bg-gray-200 rounded" onclick="closeModal('addContractModal')">Annuller</button>
@@ -253,10 +249,10 @@
                 <input name="startDate" type="date" class="border rounded px-2 py-1 w-full" />
                 <label class="block text-sm">Slut Dato</label>
                 <input name="endDate" type="date" class="border rounded px-2 py-1 w-full" />
-                <label class="block text-sm">Arkiveret</label>
+                <label class="block text-sm">Opfyldt</label>
                 <select name="active" class="border rounded px-2 py-1 w-full">
-                  <option value="true">True</option>
-                  <option value="false" selected>False</option>
+                  <option value="true">Opfyldt</option>
+                  <option value="false" selected>Ikke opfyldt</option>
                 </select>
                 <div class="flex justify-end space-x-2 mt-2">
                   <button type="button" class="px-3 py-1 bg-gray-200 rounded" onclick="closeModal('addServiceModal')">Annuller</button>
