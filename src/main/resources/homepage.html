@@ -75,7 +75,8 @@
       <!-- COLUMN 1 — Sponsor Name -->
       <div class="border-r p-4 flex items-stretch">
         <div onclick="location.hash='Smodal'"
-             class="bg-gray-200 rounded px-4 py-3 w-full text-center hover:bg-gray-300"
+             class="bg-gray-200 rounded px-4 py-3 w-full text-center hover:bg-gray-300 sponsor-open-btn"
+             th:attr="data-sponsor-id=${sponsor.id}"
              th:text="${sponsor.name}">
         </div>
       </div>
@@ -189,34 +190,21 @@
 <!-- Sponsor Modal-->
 <div id="Smodal">
   <div class="ModalBox">
-    <h1 class="ModalTitle">Indsæt sponsor navn</h1>
+    <h1 class="ModalTitle">Information omkring sponsoren:</h1>
     <a class="CloseModal" href="#">X</a>
     <div class="SponsorModal">
     </div>
     <div class="ModalRow">
-      <div class="SponsorContract">
-        <h2 class="title">Kontrakter</h2>
-        <a class="ModalTag contract-clickable" href="#Cmodal">Kontrakt #1</a>
-        <a class="ModalTag contract-clickable" href="#Cmodal">Kontrakt #2</a>
-        <a class="ModalTag contract-clickable" href="#Cmodal">Kontrakt #3</a>
-      </div>
-      <div class="SponsorContactInfo">
-        <h2 class="title">Kontakt information</h2>
-        <p><span id="SponsorCity" class="ModalTag">By og postnummer</span></p>
-        <p><span id="SponsorAdress" class="ModalTag">Adresse</span></p>
-        <p><span id="SponsorCVR" class="ModalTag">CVR nummer</span></p>
-        <p><span id="SponsorContactPerson" class="ModalTag">Kontaktperson</span></p>
-        <p><span id="SponsorEmail" class="ModalTag">Email</span></p>
-        <p><span id="SponsorPhoneNumber" class="ModalTag">Telefonnummer</span></p>
-        <button class="ModalTag">Opdater info</button>
-
-      </div>
-      <div class="SponsorStatus">
-        <h2 class="title">Status</h2>
-        <div class="ModalTagRed">Inaktiv</div>
-        <div class="ModalTagYellow">Igang</div>
-        <div class="ModalTagGreen">Aktiv</div>
-      </div>
+      <div th:each="sponsor : ${sponsors}" class="bg-white shadow-md rounded-lg overflow-hidden">
+      <div class="hidden sponsor-modal-template"
+          th:attr="id='sponsor-modal-'+${sponsor.id}">
+        <h2 class="text-xl font-semibold mb-2" th:text="${sponsor.name}"></h2>
+        <p><strong>Kontaktperson:</strong> <span th:text="${sponsor.contactPerson}">Kontaktperson</span></p>
+        <p><strong>Email:</strong> <span th:text="${sponsor.email}">email</span></p>
+        <p><strong>Telefon:</strong> <span th:text="${sponsor.phoneNumber}">Telefon</span></p>
+        <p><strong>CVR:</strong> <span th:text="${sponsor.cvrNumber}">CVR</span></p>
+        <p><strong>Status:</strong> <span th:text="${sponsor.status}">status</span></p>
+        <p><strong>Kommentar:</strong> <span th:text="${sponsor.comments}">kommentar</span></p>
     </div>
   </div>
 </div>
@@ -266,5 +254,5 @@
     </div>
   </div>
 </div>
-
+<script th:src="@{/js/sponsors.js}" defer></script>
 </html>
