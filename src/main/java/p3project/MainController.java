@@ -107,7 +107,7 @@ public class MainController {
 
         Sponsor storedSponsor = sponsorRepository.findById(sponsor.getId()).orElse(null);
         if(storedSponsor == null) {
-            redirectAttributes.addAttribute("responseMessage", "Interen servervejl, prøv igen");
+            redirectAttributes.addAttribute("responseMessage", "Intern servervejl, prøv igen");
             return "redirect:/sponsors";
         }
 
@@ -121,7 +121,7 @@ public class MainController {
 
         Contract storedContract = contractRepository.findById(contract.getId()).orElse(null);
         if(storedContract == null) {
-            redirectAttributes.addAttribute("responseMessage", "Interen servervejl, prøv igen");
+            redirectAttributes.addAttribute("responseMessage", "Intern servervejl, prøv igen");
             return "redirect:/sponsors";
         }
         //If a file is sent parse the data
@@ -146,7 +146,7 @@ public class MainController {
         service.setActive(true);
         service.setActive(serviceIsActive(service));
         if(storedService == null) {
-            redirectAttributes.addAttribute("responseMessage", "Interen servervejl, prøv igen");
+            redirectAttributes.addAttribute("responseMessage", "Intern servervejl, prøv igen");
             return "redirect:/sponsors";
         }
         return handleUpdateRequest(service, storedService, request, redirectAttributes);
@@ -166,7 +166,7 @@ public class MainController {
             redirectAttributes.addAttribute("repsonseMessage", message);
             return "redirect:/sponsors";
         } catch (ClassNotFoundException error) {
-            redirectAttributes.addAttribute("responseMessage","Interen serverfejl, prøv igen");
+            redirectAttributes.addAttribute("responseMessage","Intern serverfejl, prøv igen");
             return "redirect:/sponsors";
         }
     }
@@ -255,7 +255,7 @@ public class MainController {
             redirectAttributes.addAttribute("responseMessage", "Tilføjet kontrakt: " + contract.getName());
             return "redirect:/sponsors";
         } catch (IllegalArgumentException ex) {
-            redirectAttributes.addAttribute("responseMessage","Interen servervejl, prøv igen");
+            redirectAttributes.addAttribute("responseMessage","Intern serverfejl, prøv igen");
             return "redirect:/sponsors";
         }
     }
@@ -281,7 +281,7 @@ public class MainController {
             redirectAttributes.addFlashAttribute("responseMessage", "Tilføjet service: " + service.getName());
             return "redirect:/sponsors";
         } catch (IllegalArgumentException ex) {
-            redirectAttributes.addFlashAttribute("responseMessage", "Interen serverfejl, prøv igen");
+            redirectAttributes.addFlashAttribute("responseMessage", "Intern serverfejl, prøv igen");
             return "redirect:/sponsors";
         }
     }
@@ -331,7 +331,7 @@ public class MainController {
 
         Service service = serviceRepository.findById(serviceId).orElse(null);
         if(service == null) {
-            redirectAttributes.addFlashAttribute("responseMessage", "Interen servervejl, prøv igen");
+            redirectAttributes.addFlashAttribute("responseMessage", "Intern servervejl, prøv igen");
             return "redirect:/sponsors";
         }
 
@@ -353,7 +353,7 @@ public class MainController {
 
         Sponsor sponsor = sponsorRepository.findById(sponsorId).orElse(null);
         if(sponsor == null) {
-            redirectAttributes.addFlashAttribute("responseMessage", "Interen servervejl, prøv igen");
+            redirectAttributes.addFlashAttribute("responseMessage", "Intern servervejl, prøv igen");
             return "redirect:/sponsors";
         }
 
@@ -382,7 +382,7 @@ public class MainController {
 
         Contract contract = contractRepository.findById(contractId).orElse(null);
         if(contract == null) {
-            redirectAttributes.addFlashAttribute("responseMessage", "Interen servervejl, prøv igen");
+            redirectAttributes.addFlashAttribute("responseMessage", "Intern servervejl, prøv igen");
             return "redirect:/sponsors";
         }
 
