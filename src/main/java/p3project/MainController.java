@@ -105,7 +105,13 @@ public class MainController {
         if(!userHasValidToken(request)) return "redirect:/login";
         if(!userIsAdmin(request))       return "redirect:/homepage";
 
+        if (!sponsorIsValid(sponsor)){
+            redirectAttributes.addFlashAttribute("responseMessage", "Sponsor is invalid");
+            return "redirect:/sponsors";
+        }
+
         Sponsor storedSponsor = sponsorRepository.findById(sponsor.getId()).orElse(null);
+
         if(storedSponsor == null) {
             redirectAttributes.addAttribute("responseMessage", "Intern servervejl, prøv igen");
             return "redirect:/sponsors";
@@ -118,6 +124,11 @@ public class MainController {
     public String updateContractFields(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(!userHasValidToken(request)) return "redirect:/login";
         if(!userIsAdmin(request))       return "redirect:/homepage";
+
+        if (!contractIsValid(contract)){
+            redirectAttributes.addFlashAttribute("responseMessage", "Sponsor is invalid");
+            return "redirect:/sponsors";
+        }
 
         Contract storedContract = contractRepository.findById(contract.getId()).orElse(null);
         if(storedContract == null) {
@@ -140,6 +151,11 @@ public class MainController {
     public String updateServiceFields(@ModelAttribute Service service, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(!userHasValidToken(request)) return "redirect:/login";
         if(!userIsAdmin(request))       return "redirect:/homepage";
+
+        if(!serviceIsValid(service)){
+            redirectAttributes.addFlashAttribute("responseMessage", "Tjenesten er ikke valid");
+            return "redirect:/sponsors";
+        }
 
         Service storedService = serviceRepository.findById(service.getId()).orElse(null);
         
