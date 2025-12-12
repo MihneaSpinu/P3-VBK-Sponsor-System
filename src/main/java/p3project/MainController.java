@@ -107,7 +107,7 @@ public class MainController {
 
         Sponsor storedSponsor = sponsorRepository.findById(sponsor.getId()).orElse(null);
         if(storedSponsor == null) {
-            redirectAttributes.addAttribute("responseMessage", "FEJL!! PRØV IGEN");
+            redirectAttributes.addAttribute("responseMessage", "Interen servervejl, prøv igen");
             return "redirect:/sponsors";
         }
 
@@ -121,7 +121,7 @@ public class MainController {
 
         Contract storedContract = contractRepository.findById(contract.getId()).orElse(null);
         if(storedContract == null) {
-            redirectAttributes.addAttribute("responseMessage", "FEJL!! PRØV IGEN");
+            redirectAttributes.addAttribute("responseMessage", "Interen servervejl, prøv igen");
             return "redirect:/sponsors";
         }
         //If a file is sent parse the data
@@ -142,8 +142,11 @@ public class MainController {
         if(!userIsAdmin(request))       return "redirect:/homepage";
 
         Service storedService = serviceRepository.findById(service.getId()).orElse(null);
+        
+        service.setActive(true);
+        service.setActive(serviceIsActive(service));
         if(storedService == null) {
-            redirectAttributes.addAttribute("responseMessage", "FEJL!! PRØV IGEN");
+            redirectAttributes.addAttribute("responseMessage", "Interen servervejl, prøv igen");
             return "redirect:/sponsors";
         }
         return handleUpdateRequest(service, storedService, request, redirectAttributes);
@@ -155,10 +158,15 @@ public class MainController {
         Integer fieldsChanged;
         try {
             fieldsChanged = compareFields(requestObject, storedObject, request);
-            redirectAttributes.addAttribute("repsonseMessage", "Opdateret " + fieldsChanged + " felter");
+            String message;
+            if(fieldsChanged == 0) message = "Ingen felter ændret";
+            else if(fieldsChanged == 1) message = "Opdateret 1 felt";
+            else message = "Opdateret " + fieldsChanged + " felter";
+            
+            redirectAttributes.addAttribute("repsonseMessage", message);
             return "redirect:/sponsors";
         } catch (ClassNotFoundException error) {
-            redirectAttributes.addAttribute("responseMessage","FEJL!! PRØ GEN");
+            redirectAttributes.addAttribute("responseMessage","Interen serverfejl, prøv igen");
             return "redirect:/sponsors";
         }
     }
@@ -210,13 +218,18 @@ public class MainController {
         if(!userHasValidToken(request)) return "redirect:/login";
         if(!userIsAdmin(request))       return "redirect:/homepage";
 
+        if (!sponsorIsValid(sponsor)){
+            redirectAttributes.addFlashAttribute("responseMessage", "Sponsor is invalid");
+            return "redirect:/sponsors";
+        }
+
         User user = getUserFromToken(request);
-        Eventlog log = new Eventlog(user, sponsor, "CREATED");
+        Eventlog log = new Eventlog(user, sponsor, "Oprettede");
         logRepository.save(log);
 
         sponsorRepository.save(sponsor);
 
-        redirectAttributes.addAttribute("responseMessage", "tilføjet sponsor:");
+        redirectAttributes.addFlashAttribute("responseMessage", "tilføjet sponsor: " + sponsor.getName());
         return "redirect:/sponsors";
     }
 
@@ -227,17 +240,22 @@ public class MainController {
         if(!userHasValidToken(request)) return "redirect:/login";
         if(!userIsAdmin(request))       return "redirect:/homepage";
 
+        if (!contractIsValid(contract)){
+            redirectAttributes.addFlashAttribute("responseMessage", "Sponsor is invalid");
+            return "redirect:/sponsors";
+        }
+
         User user = getUserFromToken(request);
-        Eventlog log = new Eventlog(user, contract, "CREATED");
+        Eventlog log = new Eventlog(user, contract, "Oprettede");
         logRepository.save(log);
 
         try {
             parseContract(contract, pdffile);
             contractRepository.save(contract);
-            redirectAttributes.addAttribute("responseMessage", "Tilføejt klntrakt:");
+            redirectAttributes.addAttribute("responseMessage", "Tilføjet kontrakt: " + contract.getName());
             return "redirect:/sponsors";
         } catch (IllegalArgumentException ex) {
-            redirectAttributes.addAttribute("responseMessage","FEJL!! PRØV IOGEN");
+            redirectAttributes.addAttribute("responseMessage","Interen servervejl, prøv igen");
             return "redirect:/sponsors";
         }
     }
@@ -249,15 +267,21 @@ public class MainController {
         if(!userIsAdmin(request))       return "redirect:/homepage";
 
         User user = getUserFromToken(request);
-        Eventlog log = new Eventlog(user, service, "CREATED");
+        Eventlog log = new Eventlog(user, service, "Oprettede");
         logRepository.save(log);
+        service.setActive(true);
+        serviceIsActive(service);
 
+        if(!serviceIsValid(service)){
+            redirectAttributes.addFlashAttribute("responseMessage", "Tjenesten er ikke valid");
+            return "redirect:/sponsors";
+        }
         try {
             serviceRepository.save(service);
-            redirectAttributes.addAttribute("responseMessage", "tilføjet service: [navn]");
+            redirectAttributes.addFlashAttribute("responseMessage", "Tilføjet service: " + service.getName());
             return "redirect:/sponsors";
         } catch (IllegalArgumentException ex) {
-            redirectAttributes.addAttribute("responseMessage", "FEJL");
+            redirectAttributes.addFlashAttribute("responseMessage", "Interen serverfejl, prøv igen");
             return "redirect:/sponsors";
         }
     }
@@ -266,12 +290,11 @@ public class MainController {
     private boolean sponsorIsValid(Sponsor sponsor) {
         if(sponsor.getName() == null || sponsor.getName().isEmpty()) return false;
 
-        if(sponsor.getPhoneNumber().matches("[\\+\\-0-9]*")) return false;
+        if(!sponsor.getPhoneNumber().matches("[\\+\\-0-9]*")) return false;
 
-        if(sponsor.getCvrNumber().length() != 8
-        || !sponsor.getCvrNumber().matches("[0-9]*")
-        ) return false;
-
+        if(sponsor.getCvrNumber().length() != 8) return false;
+    
+        if(!sponsor.getCvrNumber().matches("[0-9]*")) return false;
         return true;
     }
 
@@ -308,12 +331,12 @@ public class MainController {
 
         Service service = serviceRepository.findById(serviceId).orElse(null);
         if(service == null) {
-            redirectAttributes.addFlashAttribute("responseMessage", "FEJL PRØV IGEN");
+            redirectAttributes.addFlashAttribute("responseMessage", "Interen servervejl, prøv igen");
             return "redirect:/sponsors";
         }
 
         User user = getUserFromToken(request);
-        Eventlog log = new Eventlog(user, service, "DELETED");
+        Eventlog log = new Eventlog(user, service, "Slettede");
         logRepository.save(log);
 
         serviceRepository.deleteById(serviceId);
@@ -330,12 +353,12 @@ public class MainController {
 
         Sponsor sponsor = sponsorRepository.findById(sponsorId).orElse(null);
         if(sponsor == null) {
-            redirectAttributes.addFlashAttribute("responseMessage", "FEJL PRØV IGEN");
+            redirectAttributes.addFlashAttribute("responseMessage", "Interen servervejl, prøv igen");
             return "redirect:/sponsors";
         }
 
         User user = getUserFromToken(request);
-        Eventlog log = new Eventlog(user, sponsor, "DELETED");
+        Eventlog log = new Eventlog(user, sponsor, "Slettede");
         logRepository.save(log);
 
         sponsorRepository.deleteById(sponsorId);
@@ -359,12 +382,12 @@ public class MainController {
 
         Contract contract = contractRepository.findById(contractId).orElse(null);
         if(contract == null) {
-            redirectAttributes.addFlashAttribute("responseMessage", "FEJL PRØV IGEN");
+            redirectAttributes.addFlashAttribute("responseMessage", "Interen servervejl, prøv igen");
             return "redirect:/sponsors";
         }
 
         User user = getUserFromToken(request);
-        Eventlog log = new Eventlog(user, contract, "DELETED");
+        Eventlog log = new Eventlog(user, contract, "Slettede");
         logRepository.save(log);
 
         Iterable<Service> services = serviceRepository.findAll();
@@ -392,7 +415,7 @@ public class MainController {
 
         try {
             User user = getUserFromToken(request);
-            Eventlog log = new Eventlog(user, service, "UPDATED");
+            Eventlog log = new Eventlog(user, service, "Opdattede");
             logRepository.save(log);
         } catch (Exception ex) {
         }

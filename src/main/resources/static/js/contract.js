@@ -69,7 +69,7 @@ function populateViewContracts(sponsorId) {
 		const btnDownload = document.createElement('button');
 		btnDownload.type = 'button';
 		btnDownload.className = 'px-2 py-1 text-sm bg-green-300 rounded';
-		btnDownload.textContent = pdfFileName ? `Download: ${pdfFileName}` : 'Download PDF';
+		btnDownload.textContent = pdfFileName ? `Download: ${pdfFileName}` : 'Ingen PDF indsat';
 		btnDownload.onclick = function () {
 			const pdfAvailable = n.getAttribute('data-has-pdf');
 			if (pdfAvailable === 'true') {
@@ -165,12 +165,12 @@ function populateViewContracts(sponsorId) {
 						const sEdit = document.createElement('button');
 						sEdit.type = 'button';
 						sEdit.className = 'px-2 py-1 text-sm bg-yellow-200 rounded';
-						sEdit.textContent = 'Edit';
+						sEdit.textContent = 'Rediger Tjeneste';
 
 						const sDelete = document.createElement('button');
 						sDelete.type = 'button';
 						sDelete.className = 'px-2 py-1 text-sm bg-red-300 rounded';
-						sDelete.textContent = 'Slet';
+						sDelete.textContent = 'Slet Tjeneste';
 
 						sButtons.appendChild(sEdit);
 						sButtons.appendChild(sDelete);

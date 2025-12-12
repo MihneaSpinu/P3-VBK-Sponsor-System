@@ -222,9 +222,9 @@
                 <div class="menu">
                     <button class="menu-btn" onclick="location.href='/homepage'">Forside</button>
                     <button class="menu-btn" onclick="location.href='/archive'">Arkiv</button>
-                    <button class="menu-btn" onclick="location.href='/sponsors'">Sponsors</button>
+                    <button class="menu-btn" onclick="location.href='/sponsors'">Sponsor Administration</button>
                     <button class="menu-btn" onclick="location.href='/changelog'">Hændelses log</button>
-                    <button class="menu-btn" onclick="location.href='/AdminPanel'">Tilføj bruger</button>
+                    <button class="menu-btn" onclick="location.href='/AdminPanel'">Bruger Administration</button>
                 </div>
             </div>
             
@@ -256,22 +256,26 @@
                     <table class="min-w-full text-sm">
                         <tbody>
                             <tr th:each="user : ${users}" class="hover:bg-gray-50">
-                                <td class="px-6 py-4 flex items-center justify-between">
-                                    <!-- Username on the left -->
-                                    <span th:text="${user.name}" class="font-medium text-gray-800"></span>
+                                <td class="px-6 py-4">
+                                    <div style="display:grid;grid-template-columns:1fr 180px auto;align-items:center;gap:1rem;width:100%;">
+                                        <div style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
+                                            <span th:text="${user.name}" class="font-medium text-gray-800"></span>
+                                        </div>
 
-                                    <!-- Admin status centered -->
-                                    <span th:text="${user.isAdmin ? 'Admin' : 'Ikke admin'}"
-                                        th:classappend="${user.isAdmin} ? 'text-green-600 font-semibold' : 'text-gray-600'"
-                                        class="mx-auto">
-                                    </span>
+                                        <div style="text-align:center;">
+                                            <span th:text="${user.isAdmin ? 'Admin' : 'Ikke admin'}"
+                                                th:classappend="${user.isAdmin} ? 'text-green-600 font-semibold' : 'text-gray-600'">
+                                            </span>
+                                        </div>
 
-                                    <!-- Delete button on the right -->
-                                    <form th:action="@{/users/delete/{id}(id=${user.id})}" method="post">
-                                        <button type="submit" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">
-                                            Delete
-                                        </button>
-                                    </form>
+                                        <div style="text-align:right;">
+                                            <form th:action="@{/users/delete/{id}(id=${user.id})}" method="post" th:onsubmit="return confirm('Er du sikker på at du vil slette denne bruger?')">
+                                                <button type="submit" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">
+                                                    Slet
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>

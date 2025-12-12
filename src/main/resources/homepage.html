@@ -26,9 +26,9 @@
         <div class="menu">
           <button class="menu-btn" onclick="location.href='/homepage'">Forside</button>
           <button class="menu-btn" onclick="location.href='/archive'">Arkiv</button>
-          <button th:if="${userIsAdmin}" class="menu-btn" onclick="location.href='/sponsors'">Sponsors</button>
+          <button th:if="${userIsAdmin}" class="menu-btn" onclick="location.href='/sponsors'">Sponsor Administration</button>
           <button th:if="${userIsAdmin}" class="menu-btn" onclick="location.href='/changelog'">Hændelses log</button>
-          <button th:if="${userIsAdmin}" class="menu-btn" onclick="location.href='/AdminPanel'">Tilføj bruger</button>
+          <button th:if="${userIsAdmin}" class="menu-btn" onclick="location.href='/AdminPanel'">Bruger Administration</button>
         </div>
       </div>
 
@@ -111,9 +111,9 @@
             <div th:each="svc : ${services}"
                   th:if="${svc.contractId == contract.id}"
                   th:attr="data-service-id=${svc.id},data-active=${svc.active},data-service-name=${svc.name}"
-                  th:classappend="${svc.active} ? 'bg-green-400' : 'bg-red-400'"
+                  th:classappend="${svc.active} ? 'bg-red-400' : 'bg-green-400'"
                   class="rounded px-4 py-3 text-center status-btn"
-                  th:text="${svc.active ? 'Aktiv' : 'Inaktiv'}">
+                  th:text="${svc.active ? 'Ikke opfyldt' : 'Opfyldt'}">
                 </div>
 
             </div>
@@ -215,20 +215,20 @@
   <div id="statusModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="bg-white rounded-lg w-11/12 max-w-md p-6 shadow-lg">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold">Change service status</h2>
+        <h2 class="text-lg font-semibold">Ændre status på tjeneste</h2>
         <button onclick="closeStatusModal()" class="text-gray-600 hover:text-gray-900">✕</button>
       </div>
 
       <p id="statusServiceName" class="mb-2 font-medium">Service</p>
 
       <div class="flex gap-3 mb-4">
-        <button id="setActiveBtn" class="px-4 py-2 rounded bg-green-500 text-white">Aktiv</button>
-        <button id="setInactiveBtn" class="px-4 py-2 rounded bg-red-500 text-white">Inaktiv</button>
+        <button id="setActiveBtn" class="px-4 py-2 rounded bg-red-400 text-white">Ikke opfyldt</button>
+        <button id="setInactiveBtn" class="px-4 py-2 rounded bg-green-400 text-white">Opfyldt</button>
       </div>
 
       <div class="flex justify-end gap-2">
-        <button id="statusSaveBtn" class="bg-green-500 text-white px-4 py-2 rounded">Save</button>
-        <button onclick="closeStatusModal()" class="bg-gray-200 px-4 py-2 rounded">Cancel</button>
+        <button id="statusSaveBtn" class="bg-green-400 text-white px-4 py-2 rounded">Gem</button>
+        <button onclick="closeStatusModal()" class="bg-gray-200 px-4 py-2 rounded">Annuller</button>
       </div>
     </div>
   </div>
@@ -247,7 +247,7 @@
       const active = activeAttr === 'true' || activeAttr === '1';
 
       statusEditing = { serviceId: id, active: active, element: el };
-      document.getElementById('statusServiceName').textContent = name + ' (ID: ' + id + ')';
+      document.getElementById('statusServiceName').textContent = name;
 
       // BEFORE: setSelectedStatus(!active);
       setSelectedStatus(active);  // <-- use current active state
@@ -264,14 +264,14 @@
       const aBtn = document.getElementById('setActiveBtn');
       const iBtn = document.getElementById('setInactiveBtn');
       if (active) {
-        aBtn.classList.add('ring', 'ring-2', 'ring-green-300');
+        aBtn.classList.add('ring', 'ring-2', 'ring-red-300');
         aBtn.classList.remove('opacity-60');
-        iBtn.classList.remove('ring', 'ring-2', 'ring-red-300');
+        iBtn.classList.remove('ring', 'ring-2', 'ring-green-300');
         iBtn.classList.add('opacity-60');
       } else {
-        iBtn.classList.add('ring', 'ring-2', 'ring-red-300');
+        iBtn.classList.add('ring', 'ring-2', 'ring-green-300');
         iBtn.classList.remove('opacity-60');
-        aBtn.classList.remove('ring', 'ring-2', 'ring-green-300');
+        aBtn.classList.remove('ring', 'ring-2', 'ring-red-300');
         aBtn.classList.add('opacity-60');
       }
     }
@@ -308,13 +308,13 @@
           const els = document.querySelectorAll('[data-service-id]');
           els.forEach(el => {
             if (String(el.getAttribute('data-service-id')) === String(id)) {
-              el.textContent = active ? 'Aktiv' : 'Inaktiv';
+              el.textContent = active ? 'Ikke opfyldt' : 'Opfyldt';
 
               // BEFORE: el.setAttribute('data-active', active ? 'false' : 'true');
               el.setAttribute('data-active', active ? 'true' : 'false'); // <-- keep it consistent
 
               el.classList.remove('bg-red-400', 'bg-green-400');
-              el.classList.add(active ? 'bg-green-400' : 'bg-red-400');
+              el.classList.add(active ? 'bg-red-400' : 'bg-green-400');
             }
           });
           closeStatusModal();
