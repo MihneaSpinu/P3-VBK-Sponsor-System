@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -78,20 +77,12 @@ public class SponsorFunctions {
     public boolean sponsorIsValid(Sponsor sponsor) {
         if(sponsor.getName() == null || sponsor.getName().isEmpty()) return false;
 
-        if(!sponsor.getPhoneNumber().matches("[\\+\\-0-9]*")) return false;
+        if(sponsor.getPhoneNumber() != null && !sponsor.getPhoneNumber().matches("[\\+\\-0-9]*")) return false;
 
-        if(sponsor.getCvrNumber().length() != 8) return false;
+        if(sponsor.getCvrNumber() != null && sponsor.getCvrNumber().length() != 8) return false;
     
-        if(!sponsor.getCvrNumber().matches("[0-9]*")) return false;
+        if(sponsor.getCvrNumber() != null && !sponsor.getCvrNumber().matches("[0-9]*")) return false;
         return true;
-    }
-
-    public String returnSponsorPage(Model model) {
-        model.addAttribute("sponsors", sponsorRepository.findAll());
-        model.addAttribute("contracts", contractRepository.findAll());
-        model.addAttribute("services", serviceRepository.findAll());
-        updateActiveFields();
-        return "sponsors";
     }
 
     
