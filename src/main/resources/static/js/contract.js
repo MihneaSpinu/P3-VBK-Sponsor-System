@@ -340,6 +340,26 @@ function populateViewContracts(sponsorId) {
 				document.getElementById('addServiceContractId').value = id;
 				document.getElementById('addServiceContractName').textContent = name || ('#' + id);
 				const f = modal.querySelector('form'); if (f) f.reset();
+				(function ensureAddWrapper() {
+					const sel = document.getElementById('addServiceType');
+					const wrapper = document.getElementById('amountOrDivisionWrapper');
+					if (!sel || !wrapper) return;
+					function render() {
+						wrapper.textContent = '';
+						if (sel.value === 'LogoTrojler' || sel.value === 'LogoBukser') {
+							const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Divisionen'; wrapper.appendChild(lab);
+							const divSel = document.createElement('select'); divSel.name='amountOrDivision'; divSel.className='border rounded px-2 py-1 w-full';
+							for (let i=1;i<=10;i++) { const o = document.createElement('option'); o.value = String(i); o.textContent = String(i); divSel.appendChild(o); }
+							wrapper.appendChild(divSel);
+						} else {
+							const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Antal'; wrapper.appendChild(lab);
+							const inp = document.createElement('input'); inp.name='amountOrDivision'; inp.type='number'; inp.value='0'; inp.className='border rounded px-2 py-1 w-full'; wrapper.appendChild(inp);
+						}
+					}
+					sel.removeEventListener && sel.removeEventListener('change', render);
+					sel.addEventListener('change', render);
+					render();
+				})();
 				modal.style.display = 'flex';
 			} catch (e) { console.error('openAddService error', e); }
 		});
