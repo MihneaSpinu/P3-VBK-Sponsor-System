@@ -306,6 +306,7 @@ function populateViewContracts(sponsorId) {
 		const sponsorSelect = document.createElement('select'); sponsorSelect.id = `sponsor-select-${idx}`; sponsorSelect.name = 'sponsorId'; sponsorSelect.className = 'border rounded px-2 py-1 w-full'; addLabelAndControl(form, 'Sponsor', sponsorSelect);
 
 		const nameInput = document.createElement('input'); nameInput.name = 'name'; nameInput.type = 'text'; nameInput.value = name; nameInput.className = 'border rounded px-2 py-1 w-full'; addLabelAndControl(form, 'Navn', nameInput);
+		nameInput.required = true;
 
 		const typeInput = document.createElement('input'); typeInput.name = 'type'; typeInput.type = 'text'; typeInput.value = type; typeInput.className = 'border rounded px-2 py-1 w-full'; addLabelAndControl(form, 'Type', typeInput);
 
@@ -365,6 +366,7 @@ function populateViewContracts(sponsorId) {
 					sel.addEventListener('change', render);
 					render();
 				}
+				ensureAddWrapper();
 				modal.style.display = 'flex';
 			} catch (e) { console.error('openAddService error', e); }
 		});
