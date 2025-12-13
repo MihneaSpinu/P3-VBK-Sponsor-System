@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpServletRequest;
 import p3project.classes.Contract;
 import p3project.classes.Eventlog;
+import p3project.classes.Service;
 import p3project.classes.Sponsor;
 import p3project.classes.User;
 import p3project.repositories.ContractRepository;
@@ -145,9 +146,14 @@ public class SponsorFunctions {
         sponsorRepository.deleteById(sponsorId);
         
         Iterable<Contract> contracts = contractRepository.findAll();
+        Iterable<Service> services = serviceRepository.findAll();
         for (Contract contract : contracts) {
-            if (sponsorId.equals(contract.getSponsorId())) {
-                // SLET OGSÅ TILHØRENDE SERVICES TIL KONTRAKTERNE, SÆT I FUNKTION MÅSKE
+            if (sponsorId.equals(contract.getSponsorId())) {    
+                for (Service service : services) {
+                    if (contract.getId().equals(service.getContractId())) {
+                        serviceRepository.deleteById(service.getId());
+                    }
+                }
                 contractRepository.deleteById(contract.getId());
             }
         }

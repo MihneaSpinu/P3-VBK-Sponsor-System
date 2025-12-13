@@ -54,6 +54,14 @@ public class HomepageController {
         
         return showhomepage(model, request);
     }
+
+    @GetMapping("/") 
+    public String defaultMapping(HttpServletRequest request) {
+        if(userHasValidToken(request)) {
+            return "redirect:/homepage";
+        }
+        return "redirect:/login";
+    }
     
     private boolean userHasValidToken(HttpServletRequest request) {
         return userFunctions.userHasValidToken(request);

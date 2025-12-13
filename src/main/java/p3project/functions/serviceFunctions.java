@@ -100,8 +100,8 @@ public class ServiceFunctions{
         User user = getUserFromToken(request);
         Eventlog log = new Eventlog(user, service, "Oprettede");
         logRepository.save(log);
-        service.setActive(true);
-        serviceIsActive(service);
+
+        System.out.println("\n\nACTIVE: " + service.getActive());
 
         if(!serviceIsValid(service)){
             redirectAttributes.addFlashAttribute("responseMessage", "Tjenesten er ikke valid");

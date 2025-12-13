@@ -62,7 +62,6 @@ public class ContractFunctions{
         List<Service> services = serviceRepository.findAll();
         for(Service service : services) {
             if(contract.getId().equals(service.getContractId())) {
-             //System.out.println("Contract: " + contract.getName() + " is " + contract.getActive());
                 
                 if(LocalDate.now().isAfter(contract.getEndDate())) {
                     service.setActive(false);
