@@ -19,7 +19,8 @@ public class Service {
     private String name;
     private String type;
     private boolean active;
-    private int amountOrDivision;
+    private Integer amount;
+    private Integer division;
     private LocalDate startDate;
     private LocalDate endDate;
 
@@ -32,7 +33,7 @@ public class Service {
         this.name = name;
         this.type = type;
         this.active = active;
-        this.amountOrDivision = amountOrDivision;
+        this.amount = amountOrDivision;
         this.startDate = startDate;
         this.endDate = endDate;
     }
@@ -70,7 +71,7 @@ public class Service {
     public Service(String type, boolean active, int amountOrDuration) {
         this.type = type;
         this.active = active;
-        this.amountOrDivision = amountOrDuration;
+        this.amount = amountOrDuration;
     }
 
     public void setActive(boolean active) {
@@ -81,11 +82,26 @@ public class Service {
         return this.active;
     }
 
-    public int getAmountOrDivision() { 
-        return amountOrDivision; 
+    public Integer getAmount() {
+        return amount == null ? 0 : amount;
     }
-    public void setAmountOrDivision(int amountOrDivision) { 
-        this.amountOrDivision = amountOrDivision; 
+    public void setAmount(Integer amount) {
+        this.amount = amount;
+    }
+
+    public Integer getDivision() {
+        return division == null ? 0 : division;
+    }
+    public void setDivision(Integer division) {
+        this.division = division;
+    }
+
+    // Backwards compatibility for code still using amountOrDivision
+    public int getAmountOrDivision() {
+        return getAmount();
+    }
+    public void setAmountOrDivision(int value) {
+        this.amount = value;
     }
 
     public LocalDate getStartDate() { 

@@ -151,6 +151,7 @@ function populateViewContracts(sponsorId) {
 						const sstart = sn.getAttribute('data-start') || '';
 						const send = sn.getAttribute('data-end') || '';
 						const samount = sn.getAttribute('data-amount') || '';
+						const sdivision = sn.getAttribute('data-division') || '';
 						const sactive = sn.getAttribute('data-active') || '';
 
 						const sCard = document.createElement('div');
@@ -206,7 +207,11 @@ function populateViewContracts(sponsorId) {
 						sDetails.appendChild(sLine('Type:', displayType));
 						sDetails.appendChild(sLine('Start:', displayStart));
 						sDetails.appendChild(sLine('End:', displayEnd));
-						sDetails.appendChild(sLine('Amount/Division:', samount));
+						if (stype === 'LogoTrojler' || stype === 'LogoBukser') {
+							sDetails.appendChild(sLine('Division:', sdivision));
+						} else {
+							sDetails.appendChild(sLine('Antal:', samount));
+						}
 						sDetails.appendChild(sLine('Status:', displayStatus));
 						sCard.appendChild(sDetails);
 
@@ -235,15 +240,15 @@ function populateViewContracts(sponsorId) {
 						function updateSAmountWrapper() {
 							sAmtWrapper.textContent = '';
 							const v = sTypeSel.value;
-							if (v === 'LogoTrojler' || v === 'LogoBukser') {
+								if (v === 'LogoTrojler' || v === 'LogoBukser') {
 								const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Divisionen'; sAmtWrapper.appendChild(lab);
-								const divSel = document.createElement('select'); divSel.name='amountOrDivision'; divSel.className='border rounded px-2 py-1 w-full';
-								const prev = parseInt(samount) || 1;
+								const divSel = document.createElement('select'); divSel.name='division'; divSel.className='border rounded px-2 py-1 w-full';
+								const prev = parseInt(sdivision) || 1;
 								for (let i=1;i<=10;i++) { const o = document.createElement('option'); o.value = String(i); o.textContent = String(i); if(i===prev) o.selected=true; divSel.appendChild(o); }
 								sAmtWrapper.appendChild(divSel);
 							} else {
 								const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Antal'; sAmtWrapper.appendChild(lab);
-								const inp = document.createElement('input'); inp.name='amountOrDivision'; inp.type='number'; inp.value = (samount || '0'); inp.className='border rounded px-2 py-1 w-full'; sAmtWrapper.appendChild(inp);
+								const inp = document.createElement('input'); inp.name='amount'; inp.type='number'; inp.value = (samount || '0'); inp.className='border rounded px-2 py-1 w-full'; sAmtWrapper.appendChild(inp);
 							}
 						}
 						updateSAmountWrapper();
@@ -340,7 +345,7 @@ function populateViewContracts(sponsorId) {
 				document.getElementById('addServiceContractId').value = id;
 				document.getElementById('addServiceContractName').textContent = name || ('#' + id);
 				const f = modal.querySelector('form'); if (f) f.reset();
-				(function ensureAddWrapper() {
+					function ensureAddWrapper() {
 					const sel = document.getElementById('addServiceType');
 					const wrapper = document.getElementById('amountOrDivisionWrapper');
 					if (!sel || !wrapper) return;
@@ -348,18 +353,18 @@ function populateViewContracts(sponsorId) {
 						wrapper.textContent = '';
 						if (sel.value === 'LogoTrojler' || sel.value === 'LogoBukser') {
 							const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Divisionen'; wrapper.appendChild(lab);
-							const divSel = document.createElement('select'); divSel.name='amountOrDivision'; divSel.className='border rounded px-2 py-1 w-full';
+							const divSel = document.createElement('select'); divSel.name='division'; divSel.className='border rounded px-2 py-1 w-full';
 							for (let i=1;i<=10;i++) { const o = document.createElement('option'); o.value = String(i); o.textContent = String(i); divSel.appendChild(o); }
 							wrapper.appendChild(divSel);
 						} else {
 							const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Antal'; wrapper.appendChild(lab);
-							const inp = document.createElement('input'); inp.name='amountOrDivision'; inp.type='number'; inp.value='0'; inp.className='border rounded px-2 py-1 w-full'; wrapper.appendChild(inp);
+							const inp = document.createElement('input'); inp.name='amount'; inp.type='number'; inp.value='0'; inp.className='border rounded px-2 py-1 w-full'; wrapper.appendChild(inp);
 						}
 					}
 					sel.removeEventListener && sel.removeEventListener('change', render);
 					sel.addEventListener('change', render);
 					render();
-				})();
+				}
 				modal.style.display = 'flex';
 			} catch (e) { console.error('openAddService error', e); }
 		});
@@ -386,7 +391,7 @@ function populateViewContracts(sponsorId) {
 			console.error('populateViewContracts: cannot populate selects', err);
 		}
 	});
-}
+};
 
 function postDeleteContract(contractId, sponsorId) {
 	try {

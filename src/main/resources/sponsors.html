@@ -167,7 +167,8 @@
                 data-name=${service.name},data-type=${service.type},
                 data-start=${service.startDate},
                 data-end=${service.endDate},
-                data-amount=${service.amountOrDivision},
+                data-amount=${service.amount},
+                data-division=${service.division},
                 data-active=${service.active}"
                 >
             </div>
@@ -248,7 +249,7 @@
                 </select>
                 <div id="amountOrDivisionWrapper">
                   <label class="block text-sm">Antal</label>
-                  <input name="amountOrDivision" type="number" value="0" class="border rounded px-2 py-1 w-full" />
+                  <input name="amount" type="number" value="0" class="border rounded px-2 py-1 w-full" />
                 </div>
                 <label class="block text-sm">Start Dato</label>
                 <input name="startDate" type="date" class="border rounded px-2 py-1 w-full" />
