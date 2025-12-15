@@ -30,36 +30,32 @@ function postDeleteService(serviceId, contractId) {
 (function setupServiceModal() {
 	function updateWrapper(sel, wrapper) {
 		const v = sel.value;
+		try { console.debug('service.js:updateWrapper selected value ->', v); } catch (e) {}
 		wrapper.textContent = '';
 		if (v === 'LogoTrojler' || v === 'LogoBukser') {
+			try { console.debug('service.js:rendering Division select for', v); } catch (e) {}
 			const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Divisionen'; wrapper.appendChild(lab);
-			const divSel = document.createElement('select'); divSel.name='amountOrDivision'; divSel.className='border rounded px-2 py-1 w-full';
+			const divSel = document.createElement('select'); divSel.name='division'; divSel.className='border rounded px-2 py-1 w-full';
 			for (let i=1;i<=10;i++) { const o = document.createElement('option'); o.value = String(i); o.textContent = String(i); divSel.appendChild(o); }
 			wrapper.appendChild(divSel);
 		} else {
 			const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Antal'; wrapper.appendChild(lab);
-			const inp = document.createElement('input'); inp.name='amountOrDivision'; inp.type='number'; inp.value='0'; inp.className='border rounded px-2 py-1 w-full'; wrapper.appendChild(inp);
+			const inp = document.createElement('input'); inp.name='amount'; inp.type='number'; inp.value='0'; inp.className='border rounded px-2 py-1 w-full'; wrapper.appendChild(inp);
 		}
 	}
 
-    btnAddService.addEventListener('click', function () {
-			try {
-				const modal = document.getElementById('addServiceModal');
-				if (!modal) return;
-				document.getElementById('addServiceContractId').value = id;
-				document.getElementById('addServiceContractName').textContent = name || ('#' + id);
-				const f = modal.querySelector('form'); if (f) f.reset();
-				modal.style.display = 'flex';
-			} catch (e) { console.error('openAddService error', e); }
-		});
-
-    
-		const sel = document.getElementById('addServiceType');
-		if (!sel) return;
-		const wrapper = document.getElementById('amountOrDivisionWrapper');
-		if (!wrapper) return;
+	const sel = document.getElementById('addServiceType');
+	const wrapper = document.getElementById('amountOrDivisionWrapper');
+	if (sel && wrapper) {
 		function update() { updateWrapper(sel, wrapper); }
 		sel.addEventListener('change', update);
 		update();
+	}
+	window.updateAddServiceWrapper = function () {
+		const s = document.getElementById('addServiceType');
+		const w = document.getElementById('amountOrDivisionWrapper');
+		if (!s || !w) return;
+		updateWrapper(s, w);
+	};
 })();
 
