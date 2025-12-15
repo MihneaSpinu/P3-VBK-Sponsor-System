@@ -2,8 +2,6 @@ package p3project.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,12 +11,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import p3project.classes.Sponsor;
 import p3project.functions.SponsorFunctions;
 import p3project.functions.UserFunctions;
-import p3project.repositories.SponsorRepository;
 
 @Controller
 public class SponsorController {
-    @Autowired
-    private SponsorRepository sponsorRepository;
 
     @Autowired
     private SponsorFunctions sponsorFunctions;
@@ -43,9 +38,6 @@ public class SponsorController {
         return sponsorFunctions.updateSponsor(sponsor, request, redirectAttributes);
     }
 
-    private String returnSponsorPage(Model model) {
-        return sponsorFunctions.returnSponsorPage(model);
-    }
 
     public String deleteSponsor(@RequestParam Long sponsorId, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         return sponsorFunctions.deleteSponsor(sponsorId, request, redirectAttributes);
@@ -59,13 +51,6 @@ public class SponsorController {
         if(!userIsAdmin(request))       return "redirect:/homepage";
 
         return updateSponsor(sponsor, request, redirectAttributes);
-    }
-
-    @GetMapping("/sponsors")
-    public String showSponsors(Model model, HttpServletRequest request) {
-        if(!userHasValidToken(request)) return "redirect:/login";
-        if(!userIsAdmin(request))       return "redirect:/homepage";
-        return returnSponsorPage(model);
     }
 
     @PostMapping("/sponsors/add")

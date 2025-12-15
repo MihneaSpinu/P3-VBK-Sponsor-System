@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.util.WebUtils;
 
 import jakarta.servlet.http.Cookie;
@@ -69,11 +68,6 @@ public class LoginFunctions {
             return "redirect:/homepage";
         }        
         return "login";
-    }
-
-    @GetMapping("/")
-    public String home() {
-        return "redirect:/login";
     }
 
 }

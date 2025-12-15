@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -12,6 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpServletRequest;
 import p3project.classes.Contract;
 import p3project.classes.Eventlog;
+import p3project.classes.Service;
 import p3project.classes.Sponsor;
 import p3project.classes.User;
 import p3project.repositories.ContractRepository;
@@ -77,20 +77,12 @@ public class SponsorFunctions {
     public boolean sponsorIsValid(Sponsor sponsor) {
         if(sponsor.getName() == null || sponsor.getName().isEmpty()) return false;
 
-        if(!sponsor.getPhoneNumber().matches("[\\+\\-0-9]*")) return false;
+        if(!sponsor.getPhoneNumber().equals("") && !sponsor.getPhoneNumber().matches("[\\+\\-0-9]*")) return false;
 
-        if(sponsor.getCvrNumber().length() != 8) return false;
+        if(!sponsor.getCvrNumber().equals("") && sponsor.getCvrNumber().length() != 8) return false;
     
-        if(!sponsor.getCvrNumber().matches("[0-9]*")) return false;
+        if(!sponsor.getCvrNumber().equals("") && !sponsor.getCvrNumber().matches("[0-9]*")) return false;
         return true;
-    }
-
-    public String returnSponsorPage(Model model) {
-        model.addAttribute("sponsors", sponsorRepository.findAll());
-        model.addAttribute("contracts", contractRepository.findAll());
-        model.addAttribute("services", serviceRepository.findAll());
-        updateActiveFields();
-        return "sponsors";
     }
 
     
@@ -145,9 +137,14 @@ public class SponsorFunctions {
         sponsorRepository.deleteById(sponsorId);
         
         Iterable<Contract> contracts = contractRepository.findAll();
+        Iterable<Service> services = serviceRepository.findAll();
         for (Contract contract : contracts) {
-            if (sponsorId.equals(contract.getSponsorId())) {
-                // SLET OGSÅ TILHØRENDE SERVICES TIL KONTRAKTERNE, SÆT I FUNKTION MÅSKE
+            if (sponsorId.equals(contract.getSponsorId())) {    
+                for (Service service : services) {
+                    if (contract.getId().equals(service.getContractId())) {
+                        serviceRepository.deleteById(service.getId());
+                    }
+                }
                 contractRepository.deleteById(contract.getId());
             }
         }

@@ -42,6 +42,7 @@ public class ServiceFunctions{
         if((service.getType().equals("Banner")      || 
             service.getType().equals("LogoTrojer")  || 
             service.getType().equals("LogoBukser")) &&
+            service.getEndDate() != null                      &&
             LocalDate.now().isAfter(service.getEndDate())) {
 
             service.setActive(false);
@@ -60,9 +61,10 @@ public class ServiceFunctions{
 
         try {
             User user = getUserFromToken(request);
-            Eventlog log = new Eventlog(user, service, "Opdattede");
+            Eventlog log = new Eventlog(user, service, "Opdaterede");
             logRepository.save(log);
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
+            return ResponseEntity.internalServerError().body("Internal server error");
         }
 
         return ResponseEntity.ok("ok");
@@ -99,14 +101,15 @@ public class ServiceFunctions{
 
         serviceRepository.deleteById(serviceId);
         return "redirect:/sponsors";
-
     }
+
+
     public String addServiceForContract(Service service, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         User user = getUserFromToken(request);
         Eventlog log = new Eventlog(user, service, "Oprettede");
         logRepository.save(log);
-        service.setActive(true);
-        serviceIsActive(service);
+
+        System.out.println("\n\nACTIVE: " + service.getActive());
 
         if(!serviceIsValid(service)){
             redirectAttributes.addFlashAttribute("responseMessage", "Tjenesten er ikke valid");
