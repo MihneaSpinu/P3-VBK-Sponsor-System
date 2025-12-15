@@ -10,10 +10,12 @@ import p3project.functions.ViewFunctions;;
 
 @Controller
 public class ViewController {
+
     @Autowired
     private UserFunctions userFunctions;
 
-    @Autowired ViewFunctions viewFunctions;
+    @Autowired 
+    ViewFunctions viewFunctions;
 
   
     private boolean userHasValidToken(HttpServletRequest request) {
@@ -54,6 +56,7 @@ public class ViewController {
 
     @GetMapping("/archive")
     public String showArchivePageMapping(Model model, HttpServletRequest request) {
+        if(!userHasValidToken(request)) return "redirect:/login";
         return showArchivePage(model, request);
     }
 

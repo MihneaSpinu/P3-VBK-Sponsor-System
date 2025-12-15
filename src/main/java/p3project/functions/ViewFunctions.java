@@ -62,7 +62,6 @@ public class ViewFunctions {
 
     
      public String showArchivePage(Model model, HttpServletRequest request) {
-        if(!userHasValidToken(request)) return "redirect:/login";
         boolean userIsAdmin = userIsAdmin(request);
         model.addAttribute("userIsAdmin", userIsAdmin);
 
