@@ -45,8 +45,7 @@ public class ContractTest {
         assertNull(contract.getType());
         assertNull(contract.getStartDate());
         assertNull(contract.getEndDate());
-        assertEquals(0, contract.getPayment()); //Int by default is 0. When no values givin its 0.
-        //assertEquals(status, contract.getStatus)); no get status
+        assertEquals(0, contract.getPaymentAsInt());
 
     }
 
