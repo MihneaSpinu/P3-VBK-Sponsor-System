@@ -77,8 +77,13 @@ public class ServiceFunctions{
         LocalDate start = service.getStartDate();
         LocalDate end = service.getEndDate();
         if(start != null && end != null && start.isAfter(end)) return false;
-
-        if(service.getAmountOrDivision() < 0) return false;
+        // Validate amount/division depending on service type
+        String t = service.getType() == null ? "" : service.getType();
+        if (t.equals("LogoTrojler") || t.equals("LogoBukser")) {
+            if (service.getDivision() < 0) return false;
+        } else {
+            if (service.getAmount() < 0) return false;
+        }
 
         return true;
     }
