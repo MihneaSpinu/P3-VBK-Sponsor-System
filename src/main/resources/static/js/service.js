@@ -32,7 +32,7 @@ function postDeleteService(serviceId, contractId) {
 		const v = sel.value;
 		try { console.debug('service.js:updateWrapper selected value ->', v); } catch (e) {}
 		wrapper.textContent = '';
-		if (v === 'LogoTrojler' || v === 'LogoBukser') {
+		if (v === 'LogoTrojer' || v === 'LogoBukser') {
 			try { console.debug('service.js:rendering Division select for', v); } catch (e) {}
 			const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Divisionen'; wrapper.appendChild(lab);
 			const divSel = document.createElement('select'); divSel.name='division'; divSel.className='border rounded px-2 py-1 w-full';

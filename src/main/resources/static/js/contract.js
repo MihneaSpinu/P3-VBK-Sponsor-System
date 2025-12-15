@@ -143,16 +143,16 @@ function populateViewContracts(sponsorId) {
 			const servicesContainer = document.getElementById('servicesData');
 			if (servicesContainer) {
 				const serviceNodes = servicesContainer.querySelectorAll('.service-data');
-				serviceNodes.forEach(function (sn) {
-					if (String(sn.getAttribute('data-contract-id')) === String(id)) {
-						const sid = sn.getAttribute('data-id');
-						const sname = sn.getAttribute('data-name') || '';
-						const stype = sn.getAttribute('data-type') || '';
-						const sstart = sn.getAttribute('data-start') || '';
-						const send = sn.getAttribute('data-end') || '';
-						const samount = sn.getAttribute('data-amount') || '';
-						const sdivision = sn.getAttribute('data-division') || '';
-						const sactive = sn.getAttribute('data-active') || '';
+				serviceNodes.forEach(function (serviceNode) {
+					if (String(serviceNode.getAttribute('data-contract-id')) === String(id)) {
+						const sid = serviceNode.getAttribute('data-id');
+						const sname = serviceNode.getAttribute('data-name') || '';
+						const stype = serviceNode.getAttribute('data-type') || '';
+						const sstart = serviceNode.getAttribute('data-start') || '';
+						const send = serviceNode.getAttribute('data-end') || '';
+						const samount = serviceNode.getAttribute('data-amount') || '';
+						const sdivision = serviceNode.getAttribute('data-division') || '';
+						const sactive = serviceNode.getAttribute('data-active') || '';
 
 						const sCard = document.createElement('div');
 						sCard.className = 'border rounded p-2 mb-2 bg-gray-100';
@@ -185,29 +185,23 @@ function populateViewContracts(sponsorId) {
 							'Billeter': 'Billeter',
 							'Kuponer': 'Kuponer',
 							'Banner': 'Banner',
-							'LogoTrojler': 'Logo på trøjer',
-							'LogoBukser': 'Logo på bukser',
-							'Tickets': 'Tickets',
-							'Coupons': 'Coupons'
+							'LogoTrojer': 'Logo på trøjer',
+							'LogoBukser': 'Logo på bukser'
 						};
 						const statusLabels = {
-							'AKTIV': 'Aktiv',
-							'IGANG': 'Igang',
-							'UDFORT': 'Udført',
-							'INAKTIV': 'Inaktiv',
 							'true': 'Ikke opfyldt',
 							'false': 'Opfyldt'
 						};
 						const displayType = typeLabels[stype] || stype || '';
-						const displayStart = formatDisplayDate(sstart);
-						const displayEnd = formatDisplayDate(send);
+						const displayStart = sstart == "" ? "" : formatDisplayDate(sstart);
+						const displayEnd = send == "" ? "" : formatDisplayDate(send);
 						const displayStatus = statusLabels[String(sactive)] || sactive || '';
 						sDetails.textContent = '';
 						const sLine = function (label, value) { const d = document.createElement('div'); d.textContent = label + ' ' + (value || ''); return d; };
 						sDetails.appendChild(sLine('Type:', displayType));
 						sDetails.appendChild(sLine('Start:', displayStart));
 						sDetails.appendChild(sLine('End:', displayEnd));
-						if (stype === 'LogoTrojler' || stype === 'LogoBukser') {
+						if (stype === 'LogoTrojer' || stype === 'LogoBukser') {
 							sDetails.appendChild(sLine('Division:', sdivision));
 						} else {
 							sDetails.appendChild(sLine('Antal:', samount));
@@ -222,7 +216,7 @@ function populateViewContracts(sponsorId) {
 						sForm.action = '/update/service';
 						sForm.method = 'POST';
 						const sIdInput = document.createElement('input'); sIdInput.type = 'hidden'; sIdInput.name = 'id'; sIdInput.value = sid; sForm.appendChild(sIdInput);
-						const serviceContractId = document.createElement('input'); serviceContractId.type = 'hidden'; serviceContractId.name = 'contractId'; serviceContractId.value = sn.getAttribute('data-contract-id'); sForm.appendChild(serviceContractId);
+						const serviceContractId = document.createElement('input'); serviceContractId.type = 'hidden'; serviceContractId.name = 'contractId'; serviceContractId.value = serviceNode.getAttribute('data-contract-id'); sForm.appendChild(serviceContractId);
 						const sNameLab = document.createElement('label'); sNameLab.className = 'block text-sm'; sNameLab.textContent = 'Info/Kommentar'; sForm.appendChild(sNameLab);
 						const sNameInp = document.createElement('input'); sNameInp.name = 'name'; sNameInp.type = 'text'; sNameInp.value = sname; sNameInp.className='border rounded px-2 py-1 w-full'; sForm.appendChild(sNameInp);
 
@@ -240,7 +234,7 @@ function populateViewContracts(sponsorId) {
 						function updateSAmountWrapper() {
 							sAmtWrapper.textContent = '';
 							const v = sTypeSel.value;
-								if (v === 'LogoTrojler' || v === 'LogoBukser') {
+								if (v === 'LogoTrojer' || v === 'LogoBukser') {
 								const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Divisionen'; sAmtWrapper.appendChild(lab);
 								const divSel = document.createElement('select'); divSel.name='division'; divSel.className='border rounded px-2 py-1 w-full';
 								const prev = parseInt(sdivision) || 1;
@@ -352,7 +346,7 @@ function populateViewContracts(sponsorId) {
 					if (!sel || !wrapper) return;
 					function render() {
 						wrapper.textContent = '';
-						if (sel.value === 'LogoTrojler' || sel.value === 'LogoBukser') {
+						if (sel.value === 'LogoTrojer' || sel.value === 'LogoBukser') {
 							const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Divisionen'; wrapper.appendChild(lab);
 							const divSel = document.createElement('select'); divSel.name='division'; divSel.className='border rounded px-2 py-1 w-full';
 							for (let i=1;i<=10;i++) { const o = document.createElement('option'); o.value = String(i); o.textContent = String(i); divSel.appendChild(o); }

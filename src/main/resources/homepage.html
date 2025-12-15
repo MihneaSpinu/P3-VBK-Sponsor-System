@@ -124,14 +124,28 @@
       <!-- COLUMN 4 — Contract Date Range -->
       <div class="p-4 flex items-stretch">
         <div class="flex flex-col gap-2 w-full">
-          <!--Loop through contracts-->
-          <div th:each="contract : ${contracts}"
-              th:if="${contract.sponsorId == sponsor.id}">
-                <div class="bg-gray-200 rounded px-4 py-3 text-center"
+          <!-- Loop through contracts -->
+          <div th:each="contract : ${contracts}" th:if="${contract.sponsorId == sponsor.id}">
+            <div class="bg-gray-200 rounded px-4 py-3 text-center"
                 th:each="svc : ${services}"
-                th:if="${svc.contractId == contract.id}"
-                th:text="${#temporals.format(svc.startDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(svc.endDate, 'dd/MM/yyyy')}">
-                </div>
+                th:if="${svc.contractId == contract.id}">
+                
+              <!-- If both startDate and endDate are provided for service -->
+              <span th:if="${svc.startDate != null and svc.endDate != null}"
+                    th:text="${#temporals.format(svc.startDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(svc.endDate, 'dd/MM/yyyy')}"></span>
+
+              <!-- If startDate is provided, but endDate is missing, fallback to contract's endDate -->
+              <span th:if="${svc.startDate != null and svc.endDate == null}"
+                    th:text="${#temporals.format(svc.startDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(contract.endDate, 'dd/MM/yyyy')}"></span>
+              
+              <!-- If endDate is provided, but startDate is missing, fallback to contract's startDate -->
+              <span th:if="${svc.endDate != null and svc.startDate == null}"
+                    th:text="${#temporals.format(contract.startDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(svc.endDate, 'dd/MM/yyyy')}"></span>
+              
+              <!-- If both startDate and endDate are missing for the service, fallback to contract dates -->
+              <span th:if="${svc.startDate == null and svc.endDate == null}"
+                    th:text="${#temporals.format(contract.startDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(contract.endDate, 'dd/MM/yyyy')}"></span>
+            </div>
           </div>
         </div>
       </div>

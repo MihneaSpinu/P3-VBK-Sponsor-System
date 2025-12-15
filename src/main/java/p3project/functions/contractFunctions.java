@@ -25,7 +25,7 @@ import p3project.repositories.LogRepository;
 import p3project.repositories.ServiceRepository;
 
 @Component
-public class ContractFunctions{
+public class ContractFunctions {
 
     @Autowired
     private ServiceRepository serviceRepository;
@@ -89,7 +89,8 @@ public class ContractFunctions{
 
         LocalDate start = contract.getStartDate();
         LocalDate end = contract.getEndDate();
-        if(start != null && end != null && start.isAfter(end)) return false;
+        if(start == null || end == null) return false;
+        if(start.isAfter(end)) return false;
 
         return true;
     }

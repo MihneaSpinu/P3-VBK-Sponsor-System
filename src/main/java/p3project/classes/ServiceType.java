@@ -4,7 +4,7 @@ public enum ServiceType {
    Billeter,
    Kuponer,
    Banner,
-   LogoTrojler,
+   LogoTrojer,
    LogoBukser,
    Tickets,
    Coupons

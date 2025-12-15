@@ -16,7 +16,7 @@ import p3project.repositories.ServiceRepository;
 
 
 @Component
-public class ServiceFunctions{
+public class ServiceFunctions {
 
     @Autowired
     private ServiceRepository serviceRepository;
@@ -79,7 +79,7 @@ public class ServiceFunctions{
         if(start != null && end != null && start.isAfter(end)) return false;
         // Validate amount/division depending on service type
         String t = service.getType() == null ? "" : service.getType();
-        if (t.equals("LogoTrojler") || t.equals("LogoBukser")) {
+        if (t.equals("LogoTrojer") || t.equals("LogoBukser")) {
             if (service.getDivision() < 0) return false;
         } else {
             if (service.getAmount() < 0) return false;
