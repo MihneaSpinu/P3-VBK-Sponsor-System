@@ -42,11 +42,6 @@ public class ViewFunctions {
     @Autowired
     private UserFunctions userFunctions;
 
-
-    private boolean userHasValidToken(HttpServletRequest request) {
-        return userFunctions.userHasValidToken(request);
-    }
-
     private void updateActiveFields(){
         sponsorFunctions.updateActiveFields();
     }

@@ -96,6 +96,7 @@ public class UserFunctions {
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt(8));
 
         user.setPassword(hashedPassword);
+        user.setIsAdmin(true);
         userRepository.save(user);
 
         return "redirect:/login";

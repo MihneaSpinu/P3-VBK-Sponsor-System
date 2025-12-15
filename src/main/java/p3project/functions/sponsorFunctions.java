@@ -77,11 +77,11 @@ public class SponsorFunctions {
     public boolean sponsorIsValid(Sponsor sponsor) {
         if(sponsor.getName() == null || sponsor.getName().isEmpty()) return false;
 
-        if(sponsor.getPhoneNumber() != null && !sponsor.getPhoneNumber().matches("[\\+\\-0-9]*")) return false;
+        if(!sponsor.getPhoneNumber().equals("") && !sponsor.getPhoneNumber().matches("[\\+\\-0-9]*")) return false;
 
-        if(sponsor.getCvrNumber() != null && sponsor.getCvrNumber().length() != 8) return false;
+        if(!sponsor.getCvrNumber().equals("") && sponsor.getCvrNumber().length() != 8) return false;
     
-        if(sponsor.getCvrNumber() != null && !sponsor.getCvrNumber().matches("[0-9]*")) return false;
+        if(!sponsor.getCvrNumber().equals("") && !sponsor.getCvrNumber().matches("[0-9]*")) return false;
         return true;
     }
 

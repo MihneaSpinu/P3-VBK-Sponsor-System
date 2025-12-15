@@ -32,17 +32,35 @@ function postDeleteService(serviceId, contractId) {
 		const v = sel.value;
 		wrapper.textContent = '';
 		if (v === 'LogoTrojler' || v === 'LogoBukser') {
-			const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Divisionen'; wrapper.appendChild(lab);
-			const divSel = document.createElement('select'); divSel.name='amountOrDivision'; divSel.className='border rounded px-2 py-1 w-full';
-			for (let i=1;i<=10;i++) { const o = document.createElement('option'); o.value = String(i); o.textContent = String(i); divSel.appendChild(o); }
+			const lab = document.createElement('label'); 
+			lab.className='block text-sm'; 
+			lab.textContent='Divisionen'; 
+			wrapper.appendChild(lab);
+
+			const divSel = document.createElement('select'); 
+			divSel.name='amountOrDivision'; 
+			divSel.className='border rounded px-2 py-1 w-full';
+			for (let i = 1; i <= 10; i++) { 
+				const o = document.createElement('option'); 
+				o.value = String(i); o.textContent = String(i); 
+				divSel.appendChild(o); 
+			}
 			wrapper.appendChild(divSel);
 		} else {
-			const lab = document.createElement('label'); lab.className='block text-sm'; lab.textContent='Antal'; wrapper.appendChild(lab);
-			const inp = document.createElement('input'); inp.name='amountOrDivision'; inp.type='number'; inp.value='0'; inp.className='border rounded px-2 py-1 w-full'; wrapper.appendChild(inp);
+			const label = document.createElement('label'); 
+			label.className='block text-sm'; 
+			label.textContent='Antal'; 
+			wrapper.appendChild(label);
+			const input = document.createElement('input'); 
+			input.name='amountOrDivision'; 
+			input.type='number'; 
+			input.value='0'; 
+			input.className='border rounded px-2 py-1 w-full'; 
+			wrapper.appendChild(input);
 		}
 	}
 
-    btnAddService.addEventListener('click', function () {
+    btnAddService.addEventListener('click', () => {
 			try {
 				const modal = document.getElementById('addServiceModal');
 				if (!modal) return;
@@ -58,7 +76,9 @@ function postDeleteService(serviceId, contractId) {
 		if (!sel) return;
 		const wrapper = document.getElementById('amountOrDivisionWrapper');
 		if (!wrapper) return;
-		function update() { updateWrapper(sel, wrapper); }
+		function update() { 
+			updateWrapper(sel, wrapper); 
+		}
 		sel.addEventListener('change', update);
 		update();
 })();
