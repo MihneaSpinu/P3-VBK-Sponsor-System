@@ -41,7 +41,7 @@ class ContractRepositoryTest {
         assertThat(savedContract.getId()).isNotNull();
         assertThat(savedContract.getStartDate()).isEqualTo(LocalDate.of(2024, 1, 1));
         assertThat(savedContract.getEndDate()).isEqualTo(LocalDate.of(2024, 12, 31));
-        assertThat(savedContract.getPayment()).isEqualTo(50000);
+        assertThat(savedContract.getPaymentAsInt()).isEqualTo(50000);
         assertThat(savedContract.getActive()).isTrue();
         assertThat(savedContract.getType()).isEqualTo("Premium");
         assertThat(savedContract.getSponsorId()).isEqualTo(1L);
@@ -68,7 +68,7 @@ class ContractRepositoryTest {
         // Then
         assertThat(foundContract).isPresent();
         assertThat(foundContract.get().getStartDate()).isEqualTo(LocalDate.of(2023, 6, 1));
-        assertThat(foundContract.get().getPayment()).isEqualTo(25000);
+        assertThat(foundContract.get().getPaymentAsInt()).isEqualTo(25000);
         assertThat(foundContract.get().getActive()).isFalse();
         assertThat(foundContract.get().getType()).isEqualTo("Standard");
 
@@ -111,7 +111,7 @@ class ContractRepositoryTest {
 
         // Then
         assertThat(updatedContract.getId()).isEqualTo(savedContract.getId());
-        assertThat(updatedContract.getPayment()).isEqualTo(20000);
+        assertThat(updatedContract.getPaymentAsInt()).isEqualTo(20000);
         assertThat(updatedContract.getType()).isEqualTo("Premium");
         assertThat(updatedContract.getActive()).isFalse();
 
@@ -183,7 +183,7 @@ class ContractRepositoryTest {
         // Then
         assertThat(savedContract.getId()).isNotNull();
         assertThat(savedContract.getStartDate()).isEqualTo(LocalDate.of(2024, 5, 1));
-        assertThat(savedContract.getPayment()).isEqualTo(35000);
+        assertThat(savedContract.getPaymentAsInt()).isEqualTo(35000);
 
     }
 
