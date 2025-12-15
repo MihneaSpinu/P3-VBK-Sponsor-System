@@ -46,9 +46,9 @@ public class EventlogFunctions {
         try {
             fieldsChanged = compareFields(requestObject, storedObject, request);
             String message;
-            if(fieldsChanged == 0) message = "Ingen felter ændret";
+            if(fieldsChanged == 0)      message = "Ingen felter ændret";
             else if(fieldsChanged == 1) message = "Opdateret 1 felt";
-            else message = "Opdateret " + fieldsChanged + " felter";
+            else                        message = "Opdateret " + fieldsChanged + " felter";
             
             redirectAttributes.addFlashAttribute("responseMessage", message);
             return "redirect:/sponsors";

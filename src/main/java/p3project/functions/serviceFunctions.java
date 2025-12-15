@@ -42,7 +42,7 @@ public class ServiceFunctions {
         if((service.getType().equals("Banner")      || 
             service.getType().equals("LogoTrojer")  || 
             service.getType().equals("LogoBukser")) &&
-            service.getEndDate() != null                      &&
+            service.getEndDate() != null            &&
             LocalDate.now().isAfter(service.getEndDate())) {
 
             service.setActive(false);

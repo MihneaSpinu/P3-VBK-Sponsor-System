@@ -13,26 +13,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import p3project.classes.Contract;
-import p3project.classes.User;
 import p3project.functions.ContractFunctions;
 import p3project.functions.UserFunctions;
-import p3project.repositories.ContractRepository;
-import p3project.repositories.LogRepository;
-import p3project.repositories.ServiceRepository;
-
-
 
 @Controller
 public class ContractController{
-    
-    @Autowired
-    private ContractRepository contractRepository;
-
-    @Autowired
-    private LogRepository logRepository;
-
-    @Autowired
-    private ServiceRepository serviceRepository;
 
     @Autowired
     private UserFunctions userFunctions;
@@ -53,9 +38,6 @@ public class ContractController{
         return userFunctions.userIsAdmin(request);
     }
 
-    private User getUserFromToken(HttpServletRequest request) throws RuntimeException {
-        return userFunctions.getUserFromToken(request);
-    }
     private String addContractForSponsor(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         return contractFunctions.addContractForSponsor(contract, pdffile, request, redirectAttributes);
     }    
