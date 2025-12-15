@@ -9,6 +9,16 @@
     <link rel="stylesheet" th:href="@{/css/Modal.css}" href="static/css/Modal.css">
     <link rel="stylesheet" th:href="@{/css/Table.css}" href="static/css/Table.css">
     <link rel="stylesheet" th:href="@{/css/sponsors.css}" href="static/css/sponsors.css">
+    <style>
+      html, body, .sidebar, .menu, .menu-btn, .logo, button, input, select, textarea, h1, h2, h3, p, div, span {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+      font-weight: 400 !important;
+    }
+    .logo {
+      font-weight: 600 !important;
+      font-size: 1.00rem;
+    }
+    </style>
   </head>
   <body class="bg-gray-100 text-gray-900">
     <div class="flex min-h-screen">
@@ -21,9 +31,9 @@
           <div class="menu">
           <button class="menu-btn" onclick="location.href='/homepage'">Forside</button>
           <button class="menu-btn" onclick="location.href='/archive'">Arkiv</button>
-          <button class="menu-btn" onclick="location.href='/sponsors'">Sponsors</button>
+          <button class="menu-btn" onclick="location.href='/sponsors'">Sponsor Administration</button>
           <button class="menu-btn" onclick="location.href='/changelog'">Hændelses log</button>
-          <button class="menu-btn" onclick="location.href='/AdminPanel'">Tilføj bruger</button>
+          <button class="menu-btn" onclick="location.href='/AdminPanel'">Bruger Administration</button>
           </div>
         </div>
 
@@ -157,7 +167,8 @@
                 data-name=${service.name},data-type=${service.type},
                 data-start=${service.startDate},
                 data-end=${service.endDate},
-                data-amount=${service.amountOrDivision},
+                data-amount=${service.amount},
+                data-division=${service.division},
                 data-active=${service.active}"
                 >
             </div>
@@ -226,8 +237,8 @@
               </div>
               <form action="/sponsors/addService" method="POST" class="space-y-2">
                 <input id="addServiceContractId" type="hidden" name="contractId" />
-                <label class="block text-sm">Kommentar</label>
-                <input name="name" type="text" class="border rounded px-2 py-1 w-full" />
+                <label class="block text-sm">Navn</label>
+                <input name="name" type="text" required class="border rounded px-2 py-1 w-full" />
                 <label class="block text-sm">Type</label>
                 <select id="addServiceType" name="type" class="border rounded px-2 py-1 w-full">
                   <option value="Billetter">Billetter</option>
@@ -238,7 +249,7 @@
                 </select>
                 <div id="amountOrDivisionWrapper">
                   <label class="block text-sm">Antal</label>
-                  <input name="amountOrDivision" type="number" value="0" class="border rounded px-2 py-1 w-full" />
+                  <input name="amount" type="number" value="0" class="border rounded px-2 py-1 w-full" />
                 </div>
                 <label class="block text-sm">Start Dato</label>
                 <input name="startDate" type="date" class="border rounded px-2 py-1 w-full" />
@@ -246,8 +257,8 @@
                 <input name="endDate" type="date" class="border rounded px-2 py-1 w-full" />
                 <label class="block text-sm">Opfyldt</label>
                 <select name="active" class="border rounded px-2 py-1 w-full">
-                  <option value="true">Opfyldt</option>
-                  <option value="false" selected>Ikke opfyldt</option>
+                  <option value="false">Opfyldt</option>
+                  <option value="true" selected>Ikke opfyldt</option>
                 </select>
                 <div class="flex justify-end space-x-2 mt-2">
                   <button type="button" class="px-3 py-1 bg-gray-200 rounded" onclick="closeModal('addServiceModal')">Annuller</button>

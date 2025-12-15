@@ -26,9 +26,9 @@
         <div class="menu">
           <button class="menu-btn" onclick="location.href='/homepage'">Forside</button>
           <button class="menu-btn" onclick="location.href='/archive'">Arkiv</button>
-          <button th:if="${userIsAdmin}" class="menu-btn" onclick="location.href='/sponsors'">Sponsors</button>
+          <button th:if="${userIsAdmin}" class="menu-btn" onclick="location.href='/sponsors'">Sponsor Administration</button>
           <button th:if="${userIsAdmin}" class="menu-btn" onclick="location.href='/changelog'">Hændelses log</button>
-          <button th:if="${userIsAdmin}" class="menu-btn" onclick="location.href='/AdminPanel'">Tilføj bruger</button>
+          <button th:if="${userIsAdmin}" class="menu-btn" onclick="location.href='/AdminPanel'">Bruger Administration</button>
         </div>
       </div>
 
