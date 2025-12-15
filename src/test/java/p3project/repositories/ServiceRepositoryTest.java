@@ -6,7 +6,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import p3project.classes.Service;
-import p3project.classes.ServiceType;
 
 import java.util.List;
 import java.util.Optional;

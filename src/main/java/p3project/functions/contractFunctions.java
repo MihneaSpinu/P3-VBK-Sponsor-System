@@ -145,10 +145,10 @@ public class ContractFunctions {
         try {
             parseContract(contract, pdffile);
             contractRepository.save(contract);
-            redirectAttributes.addAttribute("responseMessage", "Tilføjet kontrakt: " + contract.getName());
+            redirectAttributes.addFlashAttribute("responseMessage", "Tilføjet kontrakt: " + contract.getName());
             return "redirect:/sponsors";
         } catch (IllegalArgumentException ex) {
-            redirectAttributes.addAttribute("responseMessage","Intern serverfejl, prøv igen");
+            redirectAttributes.addFlashAttribute("responseMessage","Intern serverfejl, prøv igen");
             return "redirect:/sponsors";
         }
     }
@@ -161,7 +161,7 @@ public class ContractFunctions {
 
         Contract storedContract = contractRepository.findById(contract.getId()).orElse(null);
         if(storedContract == null) {
-            redirectAttributes.addAttribute("responseMessage", "Intern serverfejl, prøv igen");
+            redirectAttributes.addFlashAttribute("responseMessage", "Intern serverfejl, prøv igen");
             return "redirect:/sponsors";
         }
         //If a file is sent parse the data

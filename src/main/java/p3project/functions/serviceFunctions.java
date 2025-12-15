@@ -42,7 +42,7 @@ public class ServiceFunctions {
         if((service.getType().equals("Banner")      || 
             service.getType().equals("LogoTrojer")  || 
             service.getType().equals("LogoBukser")) &&
-            service.getEndDate() != null            &&
+            service.getEndDate() != null                      &&
             LocalDate.now().isAfter(service.getEndDate())) {
 
             service.setActive(false);
@@ -112,12 +112,12 @@ public class ServiceFunctions {
         System.out.println("\n\nACTIVE: " + service.getActive());
 
         if(!serviceIsValid(service)){
-            redirectAttributes.addFlashAttribute("responseMessage", "Tjenesten er ikke valid");
+            redirectAttributes.addFlashAttribute("responseMessage", "Ugyldig information indtastet");
             return "redirect:/sponsors";
         }
         try {
             serviceRepository.save(service);
-            redirectAttributes.addFlashAttribute("responseMessage", "Tilføjet service: " + service.getName());
+            redirectAttributes.addFlashAttribute("responseMessage", "Tilføjet tjeneste: " + service.getName());
             return "redirect:/sponsors";
         } catch (IllegalArgumentException ex) {
             redirectAttributes.addFlashAttribute("responseMessage", "Intern serverfejl, prøv igen");
@@ -128,14 +128,12 @@ public class ServiceFunctions {
     public String updateServiceFields(Service service, HttpServletRequest request, RedirectAttributes redirectAttributes) {
 
         if(!serviceIsValid(service)){
-            redirectAttributes.addFlashAttribute("responseMessage", "Tjenesten er ikke valid");
+            redirectAttributes.addFlashAttribute("responseMessage", "Ugyldig information indtastet");
             return "redirect:/sponsors";
         }
 
         Service storedService = serviceRepository.findById(service.getId()).orElse(null);
         
-        service.setActive(true);
-        service.setActive(serviceIsActive(service));
         if(storedService == null) {
             redirectAttributes.addAttribute("responseMessage", "Intern serverfejl, prøv igen");
             return "redirect:/sponsors";

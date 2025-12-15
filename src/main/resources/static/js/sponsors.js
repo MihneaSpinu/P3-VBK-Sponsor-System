@@ -1,4 +1,3 @@
-// Sponsors modal behavior (extracted from homepage inline script)
 document.addEventListener('DOMContentLoaded', function () {
   try {
     const modal = document.getElementById('Smodal');
@@ -83,36 +82,7 @@ function escapeHtml(s) {
 
 // Attach phone input handlers and sponsor filter behavior on load
 (function () {
-	function attachPhoneHandlers(el) {
-		if (!el) return;
-		el.addEventListener('keydown', function (e) {
-			const k = e.key;
-			if (k.length !== 1) return;
-			if (!/^[0-9]$/.test(k)) {
-				e.preventDefault();
-			}
-		});
-		el.addEventListener('paste', function (e) {
-			e.preventDefault();
-			const text = (e.clipboardData || window.clipboardData).getData('text') || '';
-			const filtered = text.replace(/[^0-9]/g, '');
-			const start = el.selectionStart;
-			const end = el.selectionEnd;
-			const before = el.value.slice(0, start);
-			const after = el.value.slice(end);
-			el.value = before + filtered + after;
-			const caret = start + filtered.length;
-			el.setSelectionRange(caret, caret);
-		});
-		el.addEventListener('input', function () {
-			const cleaned = el.value.replace(/[^0-9]/g, '');
-			if (cleaned !== el.value) {
-				const pos = Math.max(0, el.selectionStart - (el.value.length - cleaned.length));
-				el.value = cleaned;
-				el.setSelectionRange(pos, pos);
-			}
-		});
-	}
+
 
 	// filter function
 	function applySponsorFilter() {
@@ -133,8 +103,6 @@ function escapeHtml(s) {
 
 	// init on DOMContentLoaded
 	document.addEventListener('DOMContentLoaded', function () {
-		attachPhoneHandlers(document.getElementById('phoneNumber'));
-		document.querySelectorAll('input[name="phoneNumber"]').forEach(attachPhoneHandlers);
 		const filterEl = document.getElementById('sponsorFilter');
 		if (filterEl) {
 			filterEl.value = 'active';

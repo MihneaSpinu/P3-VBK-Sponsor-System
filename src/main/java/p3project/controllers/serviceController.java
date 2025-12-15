@@ -76,6 +76,7 @@ public class ServiceController{
     public String updateServiceFieldsMapping(@ModelAttribute Service service, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(!userHasValidToken(request)) return "redirect:/login";
         if(!userIsAdmin(request))       return "redirect:/homepage";
+        System.out.println("\n\nACTIVE: " + service.getActive() + "\n\n");
 
         return updateServiceFields(service, request, redirectAttributes);
 

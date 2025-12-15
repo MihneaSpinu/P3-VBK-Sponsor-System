@@ -324,8 +324,8 @@
             if (String(el.getAttribute('data-service-id')) === String(id)) {
               el.textContent = active ? 'Ikke opfyldt' : 'Opfyldt';
 
-              // BEFORE: el.setAttribute('data-active', active ? 'false' : 'true');
-              el.setAttribute('data-active', active ? 'true' : 'false'); // <-- keep it consistent
+
+              el.setAttribute('data-active', active ? 'true' : 'false'); 
 
               el.classList.remove('bg-red-400', 'bg-green-400');
               el.classList.add(active ? 'bg-red-400' : 'bg-green-400');
