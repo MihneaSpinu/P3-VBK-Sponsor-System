@@ -38,17 +38,4 @@ public class UserTest {
         //assertNull(user.getEmail());
         assertNull(user.getId());
     }
-    
-    @Test
-    public void testUserEmailValidation() {
-        // Arrange
-        User user = new User();
-        
-        // Act
-        //user.setEmail("valid@email.com");
-        
-        // Assert
-        //assertTrue(user.getEmail().contains("@"));
-        //assertTrue(user.getEmail().contains("."));
-    }
 }
