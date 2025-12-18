@@ -69,7 +69,7 @@ public class ViewFunctions {
         model.addAttribute("contracts", contracts);
         model.addAttribute("services", services);
         
-        return "archive";
+        return "homepage";
     }   
 
 

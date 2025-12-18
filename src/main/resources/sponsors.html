@@ -9,16 +9,9 @@
     <link rel="stylesheet" th:href="@{/css/Modal.css}" href="static/css/Modal.css">
     <link rel="stylesheet" th:href="@{/css/Table.css}" href="static/css/Table.css">
     <link rel="stylesheet" th:href="@{/css/sponsors.css}" href="static/css/sponsors.css">
-    <style>
-      html, body, .sidebar, .menu, .menu-btn, .logo, button, input, select, textarea, h1, h2, h3, p, div, span {
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-      font-weight: 400 !important;
-    }
-    .logo {
-      font-weight: 600 !important;
-      font-size: 1.00rem;
-    }
-    </style>
+    <script th:src="@{/js/sponsors.js}" src="static/js/sponsors.js" defer></script>
+    <script th:src="@{/js/service.js}" src="static/js/service.js" defer></script>
+    <script th:src="@{/js/contract.js}" src="static/js/contract.js" defer></script>
   </head>
   <body class="bg-gray-100 text-gray-900">
     <div class="flex min-h-screen">
@@ -80,10 +73,10 @@
                   <div class="text-sm">Kommentar: <span th:text="${sponsor.comments}">kommentar</span></div>
                   <!-- Kontroller for sponsor: edit og delete -->
                   <div class="mt-2">
-                    <button type="button" class="px-3 py-1 bg-gray-200 rounded" th:onclick="|toggleSponsorEdit(${stat.index})|">Edit</button>
+                    <button type="button" class="px-3 py-1 bg-gray-200 rounded" th:onclick="|toggleSponsorEdit(${stat.index})|">Rediger</button>
                     <form th:action="@{/sponsors/delete}" method="POST" style="display:inline" th:onsubmit="return confirm('Delete sponsor and its contracts? This cannot be undone.')">
                       <input type="hidden" name="sponsorId" th:value="${sponsor.id}" />
-                      <button type="submit" class="px-3 py-1 ml-2 bg-red-200 rounded">Delete</button>
+                      <button type="submit" class="px-3 py-1 ml-2 bg-red-200 rounded">Slet</button>
                     </form>
                   </div>
 
@@ -104,13 +97,13 @@
                     <input name="comments" th:value="${sponsor.comments}" class="border rounded px-2 py-1 w-full" />
                     <div class="mt-2">
                       <button type="submit" class="px-3 py-1 bg-green-200 rounded">Gem</button>
-                      <button type="button" class="px-3 py-1 ml-2 bg-gray-200 rounded" th:onclick="|toggleSponsorEdit(${stat.index})|">Cancel</button>
+                      <button type="button" class="px-3 py-1 ml-2 bg-gray-200 rounded" th:onclick="|toggleSponsorEdit(${stat.index})|">Annuller</button>
                     </div>
                   </form>
                 </div>
               </div>
-              <!-- Hvis ingen sponsorer findes, visses en beseked -->
-              <div th:if="${#lists.isEmpty(sponsors)}">Ingen sponsors endnu.</div>
+              <!-- Hvis ingen sponsorer findes, vises en beseked -->
+              <div th:if="${#lists.isEmpty(sponsors)}">Ingen sponsore endnu.</div>
             </section>
 
             <div>
@@ -130,7 +123,7 @@
 
                   <label class="block text-sm">Kommentar</label>
                   <input id="comments" name="comments" class="border rounded px-2 py-1 w-full" />
-                  <button type="submit" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded">Add Sponsor</button>
+                  <button type="submit" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded">Tilføj Sponsor</button>
                 </form>
               </section>
             </div>
@@ -266,9 +259,6 @@
                 </div>
               </form>
             </div>
-                  <script th:src="@{/js/sponsors.js}" src="static/js/sponsors.js" defer></script>
-                  <script th:src="@{/js/service.js}" src="static/js/service.js" defer></script>
-                  <script th:src="@{/js/contract.js}" src="static/js/contract.js" defer></script>
           </div>
         </div>
       </main>

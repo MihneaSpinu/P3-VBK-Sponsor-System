@@ -587,10 +587,12 @@ function postDeleteContract(contractId, sponsorId) {
 		form.method 		= 	'POST';
 		form.action 		= 	'/sponsors/deleteContract';
 		form.style.display 	= 	'none';
+
 		const inputId 		= 	document.createElement('input'); 
 		inputId.type 		= 	'hidden'; 
 		inputId.name 		= 	'contractId'; 
 		inputId.value 		= 	contractId; ;
+		
 		const inputSponsor 	= 	document.createElement('input'); 
 		inputSponsor.type 	= 	'hidden'; 
 		inputSponsor.name 	= 	'sponsorId'; 

@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Forside</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script th:src="@{/js/filter.js}"></script>
+  <script th:src="@{/js/filter.js}" defer></script>
+  <script th:src="@{/js/homepage.js}" defer></script>
   <link rel="stylesheet" th:href="@{/css/Sidebar.css}" href="static/css/Sidebar.css">
   <link rel="stylesheet" th:href="@{/css/Modal.css}" href="static/css/Modal.css">
   <link rel="stylesheet" th:href="@{/css/Table.css}" href="static/css/Table.css">
@@ -159,28 +160,26 @@
   <div id="filterModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
   <div class="bg-white rounded-lg w-11/12 max-w-2xl p-6 shadow-lg">
     <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-semibold">Filter sponsors</h2>
+      <h2 class="text-lg font-semibold">Filter sponsore</h2>
       <button id="closeFilterBtn" class="text-gray-600 hover:text-gray-900">✕</button>
     </div>
 
     <form id="filterForm" class="grid grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700">Name contains</label>
-        <input id="filterName" type="text" class="mt-1 block w-full rounded border-gray-300 shadow-sm"
-          placeholder="e.g. Spar">
+        <label class="block text-sm font-medium text-gray-700">Navn indeholder</label>
+        <input id="filterName" type="text" class="mt-1 block w-full rounded border-gray-300 shadow-sm">
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700">Active start (from)</label>
+        <label class="block text-sm font-medium text-gray-700">Start (fra)</label>
         <input id="filterDateFrom" type="date" class="mt-1 block w-full rounded border-gray-300 shadow-sm">
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700">Active end (to)</label>
+        <label class="block text-sm font-medium text-gray-700">Slut (til)</label>
         <input id="filterDateTo" type="date" class="mt-1 block w-full rounded border-gray-300 shadow-sm">
       </div>
 
-      <!-- Hidden so filter.js still works -->
       <input type="hidden" id="filterDescription" name="filterDescription" value="">
       <input type="hidden" id="filterMinPayment" name="filterMinPayment" value="">
       <input type="hidden" id="filterMaxPayment" name="filterMaxPayment" value="">
@@ -188,13 +187,13 @@
       <div class="col-span-2 flex justify-between mt-4">
         <div>
           <button id="applyFilterBtn" type="button"
-            class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Apply</button>
+            class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Anvend</button>
           <button id="clearFilterBtn" type="button"
-            class="ml-2 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Clear</button>
+            class="ml-2 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Ryd</button>
         </div>
         <div>
           <button id="closeFilterBtnBottom" type="button"
-            class="bg-white border px-3 py-2 rounded hover:bg-gray-50">Close</button>
+            class="bg-white border px-3 py-2 rounded hover:bg-gray-50">Luk</button>
         </div>
       </div>
     </form>
@@ -204,7 +203,7 @@
 <!-- Sponsor Modal-->
 <div id="Smodal">
   <div class="ModalBox">
-    <h1 class="ModalTitle">Information omkring sponsoren:</h1>
+    <h1 class="ModalTitle">Sponsor Information:</h1>
     <a class="CloseModal" href="#" onclick="location.hash=''; return false; ">X</a>
     <div class="SponsorModal">
     </div>
@@ -214,11 +213,11 @@
           th:attr="id='sponsor-modal-'+${sponsor.id}">
         <h2 class="text-xl font-semibold mb-2" th:text="${sponsor.name}"></h2>
         <p><strong>Kontaktperson:</strong> <span th:text="${sponsor.contactPerson}">Kontaktperson</span></p>
-        <p><strong>Email:</strong> <span th:text="${sponsor.email}">email</span></p>
+        <p><strong>Email:</strong> <span th:text="${sponsor.email}">Email</span></p>
         <p><strong>Telefon:</strong> <span th:text="${sponsor.phoneNumber}">Telefon</span></p>
         <p><strong>CVR:</strong> <span th:text="${sponsor.cvrNumber}">CVR</span></p>
-        <p><strong>Status:</strong> <span th:text="${sponsor.active}">status</span></p>
-        <p><strong>Kommentar:</strong> <span th:text="${sponsor.comments}">kommentar</span></p>
+        <p><strong>Status:</strong> <span th:text="${sponsor.active} ? 'Aktiv' : 'Inaktiv'">Status</span></p>
+        <p><strong>Kommentar:</strong> <span th:text="${sponsor.comments}">Kommentar</span></p>
   </div>
         </div>
       </div>
@@ -247,6 +246,5 @@
     </div>
   </div>
 
-  <script th:src="@{/js/sponsors.js}" defer></script>
 </body>
 </html>
