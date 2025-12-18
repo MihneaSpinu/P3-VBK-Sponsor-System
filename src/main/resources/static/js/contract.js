@@ -240,7 +240,7 @@ function populateViewContracts(sponsorId) {
 
 						const serviceNameLabel = document.createElement('label'); 
 						serviceNameLabel.className = 'block text-sm'; 
-						serviceNameLabel.textContent = 'Info/Kommentar'; 
+						serviceNameLabel.textContent = 'Navn'; 
 						updateServiceForm.appendChild(serviceNameLabel);
 
 						const serviceNameInput = document.createElement('input'); 
@@ -273,7 +273,7 @@ function populateViewContracts(sponsorId) {
 						serviceAmountContainer.id = 's-amount-wrapper-' + serviceId; 
 						updateServiceForm.appendChild(serviceAmountContainer);
 
-						function updateSAmountWrapper() {
+						function updateServiceAmount() {
 
 							serviceAmountContainer.textContent = '';
 							if (serviceTypeSelect.value === 'LogoTrojer' || serviceTypeSelect.value === 'LogoBukser') {
@@ -292,10 +292,8 @@ function populateViewContracts(sponsorId) {
 									const option = document.createElement('option'); 
 									option.value = String(i); 
 									option.textContent = String(i); 
-									if(i === prev) {
-										option.selected=true; 
-										divSelect.appendChild(option); 
-									}
+									if(i === prev) option.selected = true;  
+									divSelect.appendChild(option);
 								}
 								serviceAmountContainer.appendChild(divSelect);
 							} else {
@@ -313,8 +311,8 @@ function populateViewContracts(sponsorId) {
 								serviceAmountContainer.appendChild(amountInput);
 							}
 						}
-						updateSAmountWrapper();
-						serviceTypeSelect.addEventListener('change', updateSAmountWrapper);
+						updateServiceAmount();
+						serviceTypeSelect.addEventListener('change', updateServiceAmount);
 
 						const serviceStartLabel = document.createElement('label'); 
 						serviceStartLabel.className='block text-sm'; 
@@ -407,13 +405,8 @@ function populateViewContracts(sponsorId) {
 		hiddenId.type 					= 	'hidden'; 
 		hiddenId.name 					= 	'id'; 
 		hiddenId.value 					= 	id;
-		const hiddenSponsorName 		= 	document.createElement('input'); 
-		hiddenSponsorName.type		 	= 	'hidden'; 
-		hiddenSponsorName.name 			= 	'sponsorName'; 
-		hiddenSponsorName.value 		= 	document.getElementById('viewModalSponsorName').textContent || "";
-		
+
 		updateContractForm.appendChild(hiddenId); 
-		updateContractForm.appendChild(hiddenSponsorName);
 
 		function addLabelAndElement(parent, labelText, element) {
 			const label = document.createElement('label'); 
@@ -520,10 +513,10 @@ function populateViewContracts(sponsorId) {
 				function render() {
 					wrapper.textContent = '';
 					if (select.value === 'LogoTrojer' || select.value === 'LogoBukser') {
-						const lab = document.createElement('label'); 
-						lab.className ='block text-sm'; 
-						lab.textContent ='Divisionen'; 
-						wrapper.appendChild(lab);
+						const label = document.createElement('label'); 
+						label.className ='block text-sm'; 
+						label.textContent ='Divisionen'; 
+						wrapper.appendChild(label);
 						const select = document.createElement('select'); 
 						select.name ='division'; 
 						select.className ='border rounded px-2 py-1 w-full';
