@@ -17,12 +17,12 @@ public class UserTest {
         
         // Act - Set properties
         user.setName("John Doe");
-        //user.setEmail("john@example.com");
+        user.setPassword("john123");
         user.setId(1L);
         
         // Assert - Check that properties were set correctly
         assertEquals("John Doe", user.getName());
-        //assertEquals("john@example.com", user.getEmail());
+        assertEquals("john123", user.getPassword());
         assertEquals(1L, user.getId());
     }
     
