@@ -146,7 +146,7 @@ class SponsorFunctionsTest {
 
         when(contractFunctions.contractIsActive(contract)).thenReturn(true);
 
-        assertThat(sponsorFunctions.contractIsActive(contract)).isTrue();
+        assertThat(contractFunctions.contractIsActive(contract)).isTrue();
     }
 
     @Test
@@ -156,7 +156,7 @@ class SponsorFunctionsTest {
 
         when(contractFunctions.contractIsActive(contract)).thenReturn(false);
 
-        assertThat(sponsorFunctions.contractIsActive(contract)).isFalse();
+        assertThat(contractFunctions.contractIsActive(contract)).isFalse();
     }
 
     @Test

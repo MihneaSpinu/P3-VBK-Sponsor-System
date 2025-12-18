@@ -34,21 +34,14 @@ public class ViewFunctions {
     private SponsorRepository sponsorRepository;
 
     @Autowired
-    private SponsorFunctions sponsorFunctions;
-
-    @Autowired
     private LogRepository logRepository;
 
     @Autowired
-    private UserFunctions userFunctions;
+    private SponsorFunctions spF;
 
-    private void updateActiveFields(){
-        sponsorFunctions.updateActiveFields();
-    }
+    @Autowired
+    private UserFunctions uF;
 
-    private boolean userIsAdmin(HttpServletRequest request) {
-        return userFunctions.userIsAdmin(request);
-    }
 
     public String showAdminPanelPage(Model model, HttpServletRequest request) {
         model.addAttribute("users", userRepository.findAll());
@@ -57,12 +50,12 @@ public class ViewFunctions {
 
     
      public String showArchivePage(Model model, HttpServletRequest request) {
-        boolean userIsAdmin = userIsAdmin(request);
+        boolean userIsAdmin = uF.userIsAdmin(request);
         model.addAttribute("userIsAdmin", userIsAdmin);
 
         List<Sponsor> sponsors = sponsorRepository.findAll();
         List<Sponsor> archivedSponsors = new ArrayList<>();
-        updateActiveFields();
+        spF.updateActiveFields();
         for(Sponsor sponsor : sponsors) {
             if(!sponsor.getActive()) {
                 archivedSponsors.add(sponsor);
@@ -94,9 +87,9 @@ public class ViewFunctions {
         Iterable<Sponsor> sponsors = sponsorRepository.findAll();
         Iterable<Contract> contracts = contractRepository.findAll();
         Iterable<Service> services = serviceRepository.findAll();
-        boolean userIsAdmin = userIsAdmin(request);
+        boolean userIsAdmin = uF.userIsAdmin(request);
         List<Sponsor> activeSponsors = new ArrayList<>();
-        updateActiveFields();
+        spF.updateActiveFields();
 
         for(Sponsor sponsor : sponsors) {
             if(sponsor.getActive()) {
@@ -116,7 +109,7 @@ public class ViewFunctions {
         model.addAttribute("sponsors", sponsorRepository.findAll());
         model.addAttribute("contracts", contractRepository.findAll());
         model.addAttribute("services", serviceRepository.findAll());
-        updateActiveFields();
+        spF.updateActiveFields();
         return "sponsors";
     }
 

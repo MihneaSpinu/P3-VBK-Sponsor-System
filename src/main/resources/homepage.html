@@ -134,15 +134,15 @@
               <span th:if="${svc.startDate != null and svc.endDate != null}"
                     th:text="${#temporals.format(svc.startDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(svc.endDate, 'dd/MM/yyyy')}"></span>
 
-              <!-- If startDate is provided, but endDate is missing, fallback to contract's endDate -->
+              <!-- If startDate is provided, but endDate is missing -->
               <span th:if="${svc.startDate != null and svc.endDate == null}"
                     th:text="${#temporals.format(svc.startDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(contract.endDate, 'dd/MM/yyyy')}"></span>
               
-              <!-- If endDate is provided, but startDate is missing, fallback to contract's startDate -->
+              <!-- If endDate is provided, but startDate is missing -->
               <span th:if="${svc.endDate != null and svc.startDate == null}"
                     th:text="${#temporals.format(contract.startDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(svc.endDate, 'dd/MM/yyyy')}"></span>
               
-              <!-- If both startDate and endDate are missing for the service, fallback to contract dates -->
+              <!-- If both startDate and endDate are missing for the service -->
               <span th:if="${svc.startDate == null and svc.endDate == null}"
                     th:text="${#temporals.format(contract.startDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(contract.endDate, 'dd/MM/yyyy')}"></span>
             </div>
@@ -246,110 +246,6 @@
       </div>
     </div>
   </div>
-
-  <script>
-    let statusEditing = { serviceId: null, active: null, element: null };
-    let selectedActive = true;
-
-    function openStatusModal(el, evt) {
-      console.log('openStatusModal called', el, evt);
-      try { if (evt && evt.stopPropagation) evt.stopPropagation(); } catch (err) { console.warn('stopPropagation failed', err); }
-
-      const id = el && el.getAttribute ? el.getAttribute('data-service-id') : null;
-      const name = el && el.getAttribute ? el.getAttribute('data-service-name') || ('Service ' + id) : ('Service ' + id);
-      const activeAttr = el && el.getAttribute ? el.getAttribute('data-active') : null;
-      const active = activeAttr === 'true' || activeAttr === '1';
-
-      statusEditing = { serviceId: id, active: active, element: el };
-      document.getElementById('statusServiceName').textContent = name;
-
-      // BEFORE: setSelectedStatus(!active);
-      setSelectedStatus(active);  // <-- use current active state
-      document.getElementById('statusModal').classList.remove('hidden');
-    }
-
-    function closeStatusModal() {
-      document.getElementById('statusModal').classList.add('hidden');
-      statusEditing = { serviceId: null, active: null, element: null };
-    }
-
-    function setSelectedStatus(active) {
-      selectedActive = active;
-      const aBtn = document.getElementById('setActiveBtn');
-      const iBtn = document.getElementById('setInactiveBtn');
-      if (active) {
-        aBtn.classList.add('ring', 'ring-2', 'ring-red-300');
-        aBtn.classList.remove('opacity-60');
-        iBtn.classList.remove('ring', 'ring-2', 'ring-green-300');
-        iBtn.classList.add('opacity-60');
-      } else {
-        iBtn.classList.add('ring', 'ring-2', 'ring-green-300');
-        iBtn.classList.remove('opacity-60');
-        aBtn.classList.remove('ring', 'ring-2', 'ring-red-300');
-        aBtn.classList.add('opacity-60');
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-      const a = document.getElementById('setActiveBtn');
-      const i = document.getElementById('setInactiveBtn');
-      const save = document.getElementById('statusSaveBtn');
-
-      a && a.addEventListener('click', () => setSelectedStatus(true));
-      i && i.addEventListener('click', () => setSelectedStatus(false));
-
-    save && save.addEventListener('click', () => {
-      if (!statusEditing.serviceId) return closeStatusModal();
-      const id = statusEditing.serviceId;
-      const active = selectedActive;  // true if user chose "Aktiv"
-
-      const body = new URLSearchParams();
-      body.append('serviceId', id);
-      // BEFORE: body.append('active', (!active).toString());
-      body.append('active', active.toString());  // <-- send what the user actually chose
-
-      fetch('/sponsors/setServiceArchived', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: body.toString(),
-        credentials: 'same-origin'
-      })
-      .then(res => {
-        if (!res.ok) throw new Error('Server responded ' + res.status);
-        return res.text();
-      })
-      .then(() => {
-          const els = document.querySelectorAll('[data-service-id]');
-          els.forEach(el => {
-            if (String(el.getAttribute('data-service-id')) === String(id)) {
-              el.textContent = active ? 'Ikke opfyldt' : 'Opfyldt';
-
-
-              el.setAttribute('data-active', active ? 'true' : 'false'); 
-
-              el.classList.remove('bg-red-400', 'bg-green-400');
-              el.classList.add(active ? 'bg-red-400' : 'bg-green-400');
-            }
-          });
-          closeStatusModal();
-      })
-      .catch(err => {
-        console.error('Failed to update service archived flag', err);
-        alert('Kunne ikke opdatere status på serveren. Prøv igen.');
-      });
-    });
-
-      // Delegated listener: capture clicks on any current or future `.status-btn`.
-      console.log('homepage: setting up delegated status-btn click handler');
-      document.addEventListener('click', function (e) {
-        const btn = e.target.closest && e.target.closest('.status-btn');
-        if (!btn) return;
-        console.log('homepage: status-btn clicked', btn.getAttribute('data-service-id'));
-        e.stopPropagation();
-        openStatusModal(btn, e);
-      });
-    });
-  </script>
 
   <script th:src="@{/js/sponsors.js}" defer></script>
 </body>

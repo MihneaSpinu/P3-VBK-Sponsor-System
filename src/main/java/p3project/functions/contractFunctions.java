@@ -37,25 +37,15 @@ public class ContractFunctions {
     private LogRepository logRepository;
 
     @Autowired
-    private ServiceFunctions serviceFunctions;
+    private ServiceFunctions seF;
 
     @Autowired
-    private UserFunctions userFunctions;
+    private UserFunctions uF;
 
     @Autowired
-    private EventlogFunctions eventlogFunctions;
+    private EventlogFunctions eF;
 
-    //Wrappers
-    public boolean serviceIsActive(Service service) {
-        return serviceFunctions.serviceIsActive(service);
-    }
-    public User getUserFromToken(HttpServletRequest request) throws RuntimeException {
-        return userFunctions.getUserFromToken(request);
-    }
 
-    private <T> String handleUpdateRequest(T requestObject, T storedObject, HttpServletRequest request, RedirectAttributes redirectAttributes){
-        return eventlogFunctions.handleUpdateRequest(requestObject, storedObject, request, redirectAttributes);
-    }
 
     // del op i 2 funktioner
     public boolean contractIsActive(Contract contract) {  
@@ -69,7 +59,7 @@ public class ContractFunctions {
                     continue;
                 }
 
-                if(serviceIsActive(service)) {
+                if(seF.serviceIsActive(service)) {
                     contract.setActive(true);
                     contractRepository.save(contract);
                     return true;
@@ -117,7 +107,7 @@ public class ContractFunctions {
             return "redirect:/sponsors";
         }
         
-        User user = getUserFromToken(request);
+        User user = uF.getUserFromToken(request);
         Eventlog log = new Eventlog(user, contract, "Slettede");
         logRepository.save(log);
         
@@ -138,7 +128,7 @@ public class ContractFunctions {
             return "redirect:/sponsors";
         }
         
-        User user = getUserFromToken(request);
+        User user = uF.getUserFromToken(request);
         Eventlog log = new Eventlog(user, contract, "Oprettede");
         logRepository.save(log);
         
@@ -172,7 +162,7 @@ public class ContractFunctions {
             contract.setPdfData(storedContract.getPdfData());
             contract.setFileName(storedContract.getFileName());
         }
-        return handleUpdateRequest(contract, storedContract, request, redirectAttributes);
+        return eF.handleUpdateRequest(contract, storedContract, request, redirectAttributes);
     }
 
     public ResponseEntity<byte[]> getFile(long contractId) {

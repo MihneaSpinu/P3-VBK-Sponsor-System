@@ -25,19 +25,11 @@ public class ServiceFunctions {
     private LogRepository logRepository;
 
     @Autowired
-    private UserFunctions userFunctions;
+    private UserFunctions uF;
 
     @Autowired
-    private EventlogFunctions eventlogFunctions;
+    private EventlogFunctions eF;
     
-    public User getUserFromToken(HttpServletRequest request) throws RuntimeException {
-        return userFunctions.getUserFromToken(request);
-    }
-
-    private <T> String handleUpdateRequest(T requestObject, T storedObject, HttpServletRequest request, RedirectAttributes redirectAttributes){
-        return eventlogFunctions.handleUpdateRequest(requestObject, storedObject, request, redirectAttributes);
-    }
-
     public boolean serviceIsActive(Service service) {
         if((service.getType().equals("Banner")      || 
             service.getType().equals("LogoTrojer")  || 
@@ -60,7 +52,7 @@ public class ServiceFunctions {
         serviceRepository.save(service);
 
         try {
-            User user = getUserFromToken(request);
+            User user = uF.getUserFromToken(request);
             Eventlog log = new Eventlog(user, service, "Opdaterede");
             logRepository.save(log);
         } catch (RuntimeException ex) {
@@ -95,7 +87,7 @@ public class ServiceFunctions {
             return "redirect:/sponsors";
         }
 
-        User user = getUserFromToken(request);
+        User user = uF.getUserFromToken(request);
         Eventlog log = new Eventlog(user, service, "Slettede");
         logRepository.save(log);
 
@@ -105,11 +97,9 @@ public class ServiceFunctions {
 
 
     public String addServiceForContract(Service service, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        User user = getUserFromToken(request);
+        User user = uF.getUserFromToken(request);
         Eventlog log = new Eventlog(user, service, "Oprettede");
         logRepository.save(log);
-
-        System.out.println("\n\nACTIVE: " + service.getActive());
 
         if(!serviceIsValid(service)){
             redirectAttributes.addFlashAttribute("responseMessage", "Ugyldig information indtastet");
@@ -138,6 +128,6 @@ public class ServiceFunctions {
             redirectAttributes.addAttribute("responseMessage", "Intern serverfejl, prøv igen");
             return "redirect:/sponsors";
         }
-        return handleUpdateRequest(service, storedService, request, redirectAttributes);
+        return eF.handleUpdateRequest(service, storedService, request, redirectAttributes);
     }
 }

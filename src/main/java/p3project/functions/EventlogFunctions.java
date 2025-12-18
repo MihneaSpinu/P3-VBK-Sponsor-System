@@ -34,12 +34,8 @@ public class EventlogFunctions {
     private ContractRepository contractRepository;
 
     @Autowired
-    private UserFunctions userFunctions;
+    private UserFunctions uF;
     
-    //Wrappers
-    private User getUserFromToken(HttpServletRequest request) {
-        return userFunctions.getUserFromToken(request);
-    }
 
     public <T> String handleUpdateRequest(T requestObject, T storedObject, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         Integer fieldsChanged;
@@ -70,7 +66,7 @@ public class EventlogFunctions {
                 Object after = field.get(requestObject);
                 if (!Objects.equals(before, after)) {
                     if(fieldShouldBeLogged(field)) {
-                        User user = getUserFromToken(request);
+                        User user = uF.getUserFromToken(request);
                         Changelog log = new Changelog(user, requestObject, field, before, after);
                         logRepository.save(log);
                         fieldsChanged++;

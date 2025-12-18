@@ -20,66 +20,39 @@ import p3project.functions.UserFunctions;
 public class ContractController{
 
     @Autowired
-    private UserFunctions userFunctions;
+    private UserFunctions uF;
 
     @Autowired
-    private ContractFunctions contractFunctions;
-
-
-    //Wrappers
-    private boolean userHasValidToken(HttpServletRequest request) {
-        return userFunctions.userHasValidToken(request);
-    }
-    private  String deleteContract(@RequestParam Long contractId, HttpServletRequest request, RedirectAttributes redirectAttributes){
-        return contractFunctions.deleteContract(contractId, request, redirectAttributes);
-    }
-
-    private boolean userIsAdmin(HttpServletRequest request) {
-        return userFunctions.userIsAdmin(request);
-    }
-
-    private String addContractForSponsor(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        return contractFunctions.addContractForSponsor(contract, pdffile, request, redirectAttributes);
-    }    
-
-    private  String updateContractFields(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        return contractFunctions.updateContractFields(contract, pdffile, request, redirectAttributes);
-    }
-
-    public ResponseEntity<byte[]> getFile(@PathVariable long contractId) {
-        return contractFunctions.getFile(contractId);
-    }
-
-
+    private ContractFunctions cF;
 
     // Deletes a contract by ID
     @PostMapping("/sponsors/deleteContract")
     public String deleteContractMapping(@RequestParam Long contractId, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        if(!userHasValidToken(request)) return "redirect:/login";
-        if(!userIsAdmin(request))       return "redirect:/homepage";
+        if(!uF.userHasValidToken(request)) return "redirect:/login";
+        if(!uF.userIsAdmin(request))       return "redirect:/homepage";
 
-        return deleteContract(contractId, request, redirectAttributes);
+        return cF.deleteContract(contractId, request, redirectAttributes);
     }
 
     // Handles creating a new contract for a sponsor
     @PostMapping("/sponsors/addContract")
     public String addContractForSponsorWeb(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        if(!userHasValidToken(request)) return "redirect:/login";
-        if(!userIsAdmin(request))       return "redirect:/homepage";
+        if(!uF.userHasValidToken(request)) return "redirect:/login";
+        if(!uF.userIsAdmin(request))       return "redirect:/homepage";
 
-        return addContractForSponsor(contract, pdffile, request, redirectAttributes);
+        return cF.addContractForSponsor(contract, pdffile, request, redirectAttributes);
     }
 
     @PostMapping("/update/contract")
     public String updateContractFieldsWeb(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        if(!userHasValidToken(request)) return "redirect:/login";
-        if(!userIsAdmin(request))       return "redirect:/homepage";
+        if(!uF.userHasValidToken(request)) return "redirect:/login";
+        if(!uF.userIsAdmin(request))       return "redirect:/homepage";
 
-        return updateContractFields(contract, pdffile, request, redirectAttributes);
+        return cF.updateContractFields(contract, pdffile, request, redirectAttributes);
     }
 
     @GetMapping("/getFile/{contractId}")
     public ResponseEntity<byte[]> getFileMapping(@PathVariable long contractId) {
-        return getFile(contractId);
+        return cF.getFile(contractId);
     }
 }

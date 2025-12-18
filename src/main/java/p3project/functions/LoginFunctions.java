@@ -24,12 +24,8 @@ public class LoginFunctions {
     private UserRepository userRepository;
 
     @Autowired
-    private UserFunctions userFunctions;
+    private UserFunctions uF;
 
-    //Wrappers
-    public boolean userHasValidToken(HttpServletRequest request) {
-        return userFunctions.userHasValidToken(request);
-    }
     
     public String confirmLogin(String username,String password,boolean rememberMe, Model model, HttpServletResponse response) {
         User user = userRepository.findByName(username);
@@ -64,7 +60,7 @@ public class LoginFunctions {
     }
 
     public String loginPage(Model model, HttpServletRequest request) {
-        if (userHasValidToken(request)) {
+        if (uF.userHasValidToken(request)) {
             return "redirect:/homepage";
         }        
         return "login";

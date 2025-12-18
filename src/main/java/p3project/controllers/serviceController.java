@@ -14,71 +14,46 @@ import p3project.functions.ServiceFunctions;
 import p3project.functions.UserFunctions;
 
 @Controller
-public class ServiceController{
+public class ServiceController {
     
     @Autowired
-    private ServiceFunctions serviceFunctions;
+    private ServiceFunctions seF;
 
     @Autowired
-    private UserFunctions userFunctions;
-
-    //Wrappers
-    private boolean userHasValidToken(HttpServletRequest request) {
-        return userFunctions.userHasValidToken(request);
-    }
-
-    private boolean userIsAdmin(HttpServletRequest request) {
-        return userFunctions.userIsAdmin(request);
-    }
-
-    private  ResponseEntity<String> setServiceArchived(Long serviceId, boolean active, HttpServletRequest request) {
-        return serviceFunctions.setServiceArchived(serviceId, active, request);
-    }
-    private String deleteService(Long serviceId, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        return serviceFunctions.deleteService(serviceId, request, redirectAttributes);
-    }
-
-    private String addServiceForContract(Service service, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        return serviceFunctions.addServiceForContract(service, request, redirectAttributes);
-    }
-
-    private String updateServiceFields(Service service, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        return serviceFunctions.updateServiceFields(service, request, redirectAttributes);
-    }
+    private UserFunctions uF;
 
     @PostMapping("/sponsors/setServiceArchived")
     public ResponseEntity<String> setServiceArchivedMapping(@RequestParam Long serviceId, @RequestParam boolean active, HttpServletRequest request) {
-        if(!userHasValidToken(request)) return ResponseEntity.status(403).body("forbidden");
-        if(!userIsAdmin(request))       return ResponseEntity.status(403).body("forbidden");
+        if(!uF.userHasValidToken(request)) return ResponseEntity.status(403).body("forbidden");
+        if(!uF.userIsAdmin(request))       return ResponseEntity.status(403).body("forbidden");
 
-        return setServiceArchived(serviceId, active, request);
+        return seF.setServiceArchived(serviceId, active, request);
     }
 
-        // Deletes a service by ID
+
     @PostMapping("/sponsors/deleteService")
     public String deleteServiceMapping(@RequestParam Long serviceId, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        if(!userHasValidToken(request)) return "redirect:/login";
-        if(!userIsAdmin(request))       return "redirect:/homepage";
+        if(!uF.userHasValidToken(request)) return "redirect:/login";
+        if(!uF.userIsAdmin(request))       return "redirect:/homepage";
 
-        return deleteService(serviceId, request, redirectAttributes);
+        return seF.deleteService(serviceId, request, redirectAttributes);
     }
 
-     // Handles creating a new service for a contract
+
     @PostMapping("/sponsors/addService")
     public String addServiceForContractMapping(@ModelAttribute Service service, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        if(!userHasValidToken(request)) return "redirect:/login";
-        if(!userIsAdmin(request))       return "redirect:/homepage";
+        if(!uF.userHasValidToken(request)) return "redirect:/login";
+        if(!uF.userIsAdmin(request))       return "redirect:/homepage";
 
-        return addServiceForContract(service, request, redirectAttributes);
+        return seF.addServiceForContract(service, request, redirectAttributes);
     }
 
     @PostMapping("/update/service")
     public String updateServiceFieldsMapping(@ModelAttribute Service service, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        if(!userHasValidToken(request)) return "redirect:/login";
-        if(!userIsAdmin(request))       return "redirect:/homepage";
-        System.out.println("\n\nACTIVE: " + service.getActive() + "\n\n");
+        if(!uF.userHasValidToken(request)) return "redirect:/login";
+        if(!uF.userIsAdmin(request))       return "redirect:/homepage";
 
-        return updateServiceFields(service, request, redirectAttributes);
+        return seF.updateServiceFields(service, request, redirectAttributes);
 
     }
 }

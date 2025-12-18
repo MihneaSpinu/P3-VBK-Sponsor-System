@@ -311,7 +311,9 @@
 
       fetch('/sponsors/setServiceArchived', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: { 
+          'Content-Type': 'application/x-www-form-urlencoded' 
+        },
         body: body.toString(),
         credentials: 'same-origin'
       })
@@ -325,8 +327,7 @@
             if (String(el.getAttribute('data-service-id')) === String(id)) {
               el.textContent = active ? 'Aktiv' : 'Inaktiv';
 
-              // BEFORE: el.setAttribute('data-active', active ? 'false' : 'true');
-              el.setAttribute('data-active', active ? 'true' : 'false'); // <-- keep it consistent
+              el.setAttribute('data-active', active ? 'true' : 'false');
 
               el.classList.remove('bg-red-400', 'bg-green-400');
               el.classList.add(active ? 'bg-green-400' : 'bg-red-400');
@@ -340,8 +341,6 @@
       });
     });
 
-      // Delegated listener: capture clicks on any current or future `.status-btn`.
-      console.log('homepage: setting up delegated status-btn click handler');
       document.addEventListener('click', function (e) {
         const btn = e.target.closest && e.target.closest('.status-btn');
         if (!btn) return;
