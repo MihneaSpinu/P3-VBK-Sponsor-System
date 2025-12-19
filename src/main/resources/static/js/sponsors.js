@@ -28,3 +28,39 @@ if (filter) {
 	applySponsorFilter();
 	filter.addEventListener('change', applySponsorFilter);
 }
+
+
+function closeModal(id) {
+	const element = document.getElementById(id);
+	if (!element) return;
+	element.style.display = 'none';
+}
+
+function openAddModal(button) {
+	try {
+		const sponsorId = button.getAttribute('data-sponsor-id');
+		const sponsorName = button.getAttribute('data-sponsor-name') || '';
+		const idElement = document.getElementById('addModalSponsorId');
+		const nameElement = document.getElementById('addModalSponsorName');
+		if (idElement) idElement.value = sponsorId;
+		if (nameElement) nameElement.textContent = sponsorName;
+		const modal = document.getElementById('addContractModal');
+		if (modal) modal.style.display = 'flex';
+	} catch (error) {
+		console.error(error);
+	}
+}
+
+function openViewModal(buttonElement) {
+	try {
+		const sponsorId = buttonElement.getAttribute('data-sponsor-id');
+		const sponsorName = buttonElement.getAttribute('data-sponsor-name') || '';
+		const nameElement = document.getElementById('viewModalSponsorName');
+		if (nameElement) nameElement.textContent = sponsorName || ('#' + sponsorId);
+		if (typeof populateViewContracts === 'function') populateViewContracts(sponsorId);
+		const modal = document.getElementById('viewContractsModal');
+		if (modal) modal.style.display = 'flex';
+	} catch (error) {
+		console.error(error);
+	}
+}

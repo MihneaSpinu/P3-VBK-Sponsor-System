@@ -86,7 +86,7 @@ public class EventlogFunctions {
         return fieldsChanged;
     }
 
-    public boolean fieldShouldBeLogged(Field field) { // jank
+    public boolean fieldShouldBeLogged(Field field) {
         String fieldName = field.getName();
         switch(fieldName) {
             case "pdfData":

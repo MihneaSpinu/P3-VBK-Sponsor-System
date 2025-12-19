@@ -4,7 +4,7 @@
     const closeButtons = modal.querySelectorAll('.CloseModal');
 
     document.querySelectorAll('.sponsor-open-btn').forEach(button => {
-      button.addEventListener('click', function () {
+      button.addEventListener('click', () => {
         const sponsorId = button.getAttribute('data-sponsor-id');
         const template = document.getElementById('sponsor-modal-' + sponsorId);
 
@@ -28,50 +28,6 @@
   } catch (error) {
     console.error(error);
   }
-
-
-function closeModal(id) {
-	const element = document.getElementById(id);
-	if (!element) return;
-	element.style.display = 'none';
-}
-
-function openAddModal(button) {
-	try {
-		const sponsorId = button.getAttribute('data-sponsor-id');
-		const sponsorName = button.getAttribute('data-sponsor-name') || '';
-		const idElement = document.getElementById('addModalSponsorId');
-		const nameElement = document.getElementById('addModalSponsorName');
-		if (idElement) idElement.value = sponsorId;
-		if (nameElement) nameElement.textContent = sponsorName;
-		const modal = document.getElementById('addContractModal');
-		if (modal) modal.style.display = 'flex';
-	} catch (error) {
-		console.error(error);
-	}
-}
-
-function openViewModal(buttonElement) {
-	try {
-		const sponsorId = buttonElement.getAttribute('data-sponsor-id');
-		const sponsorName = buttonElement.getAttribute('data-sponsor-name') || '';
-		const nameElement = document.getElementById('viewModalSponsorName');
-		if (nameElement) nameElement.textContent = sponsorName || ('#' + sponsorId);
-		if (typeof populateViewContracts === 'function') populateViewContracts(sponsorId);
-		const modal = document.getElementById('viewContractsModal');
-		if (modal) modal.style.display = 'flex';
-	} catch (error) {
-		console.error(error);
-	}
-}
-
-
-
-
-
-
-
-
 
 
 let statusEditing = { serviceId: null, active: null, element: null };
@@ -132,15 +88,13 @@ saveButton.addEventListener('click', () => {
 	const id = statusEditing.serviceId;
 	const active = selectedActive;
 
-	const body = new URLSearchParams();
+	const body = new FormData();
 	body.append('serviceId', id);
 	body.append('active', active.toString());
 
 	fetch('/sponsors/setServiceArchived', {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-		body: body.toString(),
-		credentials: 'same-origin'
+		body: body
 	})
 	.then(response => {
 	if (!response.ok) throw new Error('Server responded ' + response.status);

@@ -5,8 +5,8 @@ import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import jakarta.persistence.DiscriminatorColumn; // date, localdate, time?
-import jakarta.persistence.DiscriminatorType; // static for ikke at skrive Action.CREATE etc...
+import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,15 +30,15 @@ public class Eventlog {
     private String objectType;
     private String objectName;
     private String timestamp;
-    private String action; // String måske?
+    private String action;
 
     protected Eventlog() {};
 
     public <T> Eventlog(User user, T targetObject, String action) {
         this.username = user.getName(); 
-        this.objectType = targetObject.getClass().getSimpleName(); // oversæt til dansk på frontend xd
+        this.objectType = targetObject.getClass().getSimpleName();
         try {
-            Method getName = targetObject.getClass().getMethod("getName"); // jank
+            Method getName = targetObject.getClass().getMethod("getName");
             this.objectName = getName.invoke(targetObject).toString();
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException error) {
             this.objectName = "-";

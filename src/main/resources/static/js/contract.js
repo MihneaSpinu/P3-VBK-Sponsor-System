@@ -57,12 +57,7 @@ function populateViewContracts(sponsorId) {
 		const nameText = document.createElement('span');
 		nameText.textContent = name;
 
-		const idSpan = document.createElement('span');
-		idSpan.className = 'text-xs text-gray-500';
-		idSpan.textContent = ` (#${id})`;
-
 		title.appendChild(nameText);
-		title.appendChild(idSpan);
 
 		const buttonContainer = document.createElement('div');
 		buttonContainer.className = 'flex space-x-2';
@@ -168,7 +163,7 @@ function populateViewContracts(sponsorId) {
 						serviceTop.className = 'flex justify-between items-center';
 
 						const serviceTitle = document.createElement('div');
-						serviceTitle.textContent = serviceName + ' ( #' + serviceId + ')';
+						serviceTitle.textContent = serviceName;
 
 						const serviceButtons = document.createElement('div');
 						serviceButtons.className = 'flex space-x-2';
