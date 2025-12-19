@@ -21,7 +21,6 @@ public class ContractTest {
         Contract contract = new Contract();
 
         //set Variables
-        //contract.setId(id) //no set id
         contract.setType(type);
         contract.setStartDate(startDate);
         contract.setEndDate(endDate);
@@ -34,7 +33,6 @@ public class ContractTest {
         assertEquals(startDate, contract.getStartDate());
         assertEquals(endDate, contract.getEndDate());
         assertEquals(payment, contract.getPayment());
-        //assertEquals(status, contract.getStatus)); no get status
 
     }
 

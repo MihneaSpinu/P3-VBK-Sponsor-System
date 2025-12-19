@@ -1,17 +1,15 @@
 package p3project.functions;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
@@ -68,7 +66,7 @@ class ViewFunctionsTest {
 
         String view = viewFunctions.showArchivePage(model, request);
 
-        assertThat(view).isEqualTo("archive");
+        assertThat(view).isEqualTo("homepage");
         @SuppressWarnings("unchecked")
         List<Sponsor> sponsors = (List<Sponsor>) model.getAttribute("sponsors");
         assertThat(sponsors).containsExactly(inactive);

@@ -1,18 +1,20 @@
 package p3project.functions;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import jakarta.servlet.http.HttpServletRequest;
 import p3project.classes.Contract;
@@ -23,10 +25,6 @@ import p3project.repositories.ContractRepository;
 import p3project.repositories.LogRepository;
 import p3project.repositories.ServiceRepository;
 import p3project.repositories.SponsorRepository;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
-
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class SponsorFunctionsTest {
