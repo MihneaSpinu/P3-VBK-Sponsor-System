@@ -1,25 +1,23 @@
 package p3project.controllers;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.hamcrest.Matchers;
-
-import p3project.repositories.UserRepository;
-import p3project.classes.Token;
-import p3project.classes.User;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import jakarta.servlet.http.Cookie;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import p3project.classes.Token;
+import p3project.classes.User;
+import p3project.repositories.UserRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -60,7 +58,7 @@ class ServiceControllerTest {
 
     @Test
     void setServiceArchived_forbiddenWhenNoToken() throws Exception {
-        mockMvc.perform(post("/sponsors/setServiceArchived")
+        mockMvc.perform(post("/api/service/update/active")
                 .param("serviceId", "1")
                 .param("active", "false"))
             .andExpect(status().isForbidden());
@@ -70,7 +68,7 @@ class ServiceControllerTest {
     void setServiceArchived_returnsBodyWhenAuthorized() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/setServiceArchived")
+        mockMvc.perform(post("/api/service/update/active")
             .param("serviceId", "2")
             .param("active", "true")
             .cookie(token))
@@ -81,7 +79,7 @@ class ServiceControllerTest {
     void addService_redirectsWhenAuthorized() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/addService")
+        mockMvc.perform(post("/api/service/add")
                 .param("name", "Print")
             .param("type", "Expo")
             .cookie(token))
@@ -93,7 +91,7 @@ class ServiceControllerTest {
     void addService_withEmptyName_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/addService")
+        mockMvc.perform(post("/api/service/add")
                 .param("name", "")
             .param("type", "Expo")
             .cookie(token))
@@ -105,7 +103,7 @@ class ServiceControllerTest {
     void addService_withBannerType_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/addService")
+        mockMvc.perform(post("/api/service/add")
                 .param("name", "Banner Service")
             .param("type", "Banner")
             .cookie(token))
@@ -117,7 +115,7 @@ class ServiceControllerTest {
     void addService_withLogoTrojerType_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/addService")
+        mockMvc.perform(post("/api/service/add")
                 .param("name", "Logo Jersey")
                 .param("type", "LogoTrojer")
             .param("division", "2")
@@ -130,7 +128,7 @@ class ServiceControllerTest {
     void addService_withLogoBukserType_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/addService")
+        mockMvc.perform(post("/api/service/add")
                 .param("name", "Logo Pants")
                 .param("type", "LogoBukser")
             .param("division", "3")
@@ -143,7 +141,7 @@ class ServiceControllerTest {
     void deleteService_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/deleteService")
+        mockMvc.perform(post("/api/service/delete")
             .param("serviceId", "1")
             .cookie(token))
             .andExpect(status().is3xxRedirection())
@@ -154,7 +152,7 @@ class ServiceControllerTest {
     void deleteService_withNonExistentId_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/deleteService")
+        mockMvc.perform(post("/api/service/delete")
             .param("serviceId", "99999")
             .cookie(token))
             .andExpect(status().is3xxRedirection())
@@ -165,7 +163,7 @@ class ServiceControllerTest {
     void updateService_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/update/service")
+        mockMvc.perform(post("/api/service/update")
             .param("id", "1")
             .param("name", "Updated Service")
             .param("type", "Expo")
@@ -178,7 +176,7 @@ class ServiceControllerTest {
     void updateService_withEmptyName_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/update/service")
+        mockMvc.perform(post("/api/service/update")
             .param("id", "1")
             .param("name", "")
             .param("type", "Expo")
@@ -191,7 +189,7 @@ class ServiceControllerTest {
     void addService_withNegativeAmount_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/addService")
+        mockMvc.perform(post("/api/service/add")
             .param("name", "Service")
             .param("type", "Expo")
             .param("amount", "-100")
@@ -204,7 +202,7 @@ class ServiceControllerTest {
     void setServiceArchived_withInvalidServiceId_forbidden() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/setServiceArchived")
+        mockMvc.perform(post("/api/service/update/active")
             .param("serviceId", "99999")
             .param("active", "false")
             .cookie(token))
@@ -215,7 +213,7 @@ class ServiceControllerTest {
     void updateService_withAllFields_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/update/service")
+        mockMvc.perform(post("/api/service/update")
             .param("id", "1")
             .param("name", "Complete Service")
             .param("type", "Banner")
@@ -229,7 +227,7 @@ class ServiceControllerTest {
     void deleteService_withZeroId_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/deleteService")
+        mockMvc.perform(post("/api/service/delete")
             .param("serviceId", "0")
             .cookie(token))
             .andExpect(status().is3xxRedirection())

@@ -25,8 +25,8 @@ public class ContractController{
     @Autowired
     private ContractFunctions cF;
 
-    // Deletes a contract by ID
-    @PostMapping("/sponsors/deleteContract")
+
+    @PostMapping("/api/contract/delete")
     public String deleteContractMapping(@RequestParam Long contractId, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(!uF.userHasValidToken(request)) return "redirect:/login";
         if(!uF.userIsAdmin(request))       return "redirect:/homepage";
@@ -34,8 +34,8 @@ public class ContractController{
         return cF.deleteContract(contractId, request, redirectAttributes);
     }
 
-    // Handles creating a new contract for a sponsor
-    @PostMapping("/sponsors/addContract")
+
+    @PostMapping("/api/contract/add")
     public String addContractForSponsorWeb(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(!uF.userHasValidToken(request)) return "redirect:/login";
         if(!uF.userIsAdmin(request))       return "redirect:/homepage";
@@ -43,7 +43,7 @@ public class ContractController{
         return cF.addContractForSponsor(contract, pdffile, request, redirectAttributes);
     }
 
-    @PostMapping("/update/contract")
+    @PostMapping("/api/contract/update")
     public String updateContractFieldsWeb(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(!uF.userHasValidToken(request)) return "redirect:/login";
         if(!uF.userIsAdmin(request))       return "redirect:/homepage";
@@ -51,7 +51,7 @@ public class ContractController{
         return cF.updateContractFields(contract, pdffile, request, redirectAttributes);
     }
 
-    @GetMapping("/getFile/{contractId}")
+    @GetMapping("/api/contract/getFile/{contractId}")
     public ResponseEntity<byte[]> getFileMapping(@PathVariable long contractId) {
         return cF.getFile(contractId);
     }

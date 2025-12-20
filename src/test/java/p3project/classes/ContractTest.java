@@ -10,7 +10,7 @@ public class ContractTest {
     
     @Test
     public void testContractCreation(){
-        //Variables
+
         Long id = (long) 222;
         LocalDate startDate = LocalDate.of(2002, 10, 20);
         LocalDate endDate = LocalDate.of(2025, 10, 20);
@@ -20,15 +20,12 @@ public class ContractTest {
 
         Contract contract = new Contract();
 
-        //set Variables
         contract.setType(type);
         contract.setStartDate(startDate);
         contract.setEndDate(endDate);
         contract.setPayment(payment);
         contract.setActive(status);
 
-
-        //assert
         assertEquals(type, contract.getType());
         assertEquals(startDate, contract.getStartDate());
         assertEquals(endDate, contract.getEndDate());

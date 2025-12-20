@@ -38,8 +38,8 @@ public class LoginFunctions {
             String encodedToken = URLEncoder.encode(formattedToken, StandardCharsets.UTF_8);
             int time = rememberMe ? (60 * 60 * 24 * 365) : (60 * 60 * 24); // 1 år vs 1 dag
             ResponseCookie cookie = ResponseCookie.from("token", encodedToken)
-                .httpOnly(true)  // noget med javascript
-                .secure(false)    // HTTPS only
+                .httpOnly(true)  // javascript kan ikke ændre på cookien
+                .secure(true)    // HTTPS only
                 .path("/")       // Bruges til alle sider i domænet
                 .maxAge(time)
                 .build();

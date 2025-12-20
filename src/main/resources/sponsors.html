@@ -74,13 +74,13 @@
                   <!-- Kontroller for sponsor: edit og delete -->
                   <div class="mt-2">
                     <button type="button" class="px-3 py-1 bg-gray-200 rounded" th:onclick="|toggleSponsorEdit(${stat.index})|">Rediger</button>
-                    <form th:action="@{/sponsors/delete}" method="POST" style="display:inline" th:onsubmit="return confirm('Delete sponsor and its contracts? This cannot be undone.')">
+                    <form th:action="@{/api/sponsor/delete}" method="POST" style="display:inline" th:onsubmit="return confirm('Delete sponsor and its contracts? This cannot be undone.')">
                       <input type="hidden" name="sponsorId" th:value="${sponsor.id}" />
                       <button type="submit" class="px-3 py-1 ml-2 bg-red-200 rounded">Slet</button>
                     </form>
                   </div>
 
-                  <form th:id="|sponsorEditForm-${stat.index}|" th:action="@{/update/sponsor}" method="POST" style="display:none;margin-top:8px" class="form">
+                  <form th:id="|sponsorEditForm-${stat.index}|" th:action="@{/api/sponsor/update}" method="POST" style="display:none;margin-top:8px" class="form">
                     <input type="hidden" name="id" th:value="${sponsor.id}" />
                     <label class="block text-sm mt-2">Sponsor Navn</label>
                     <input name="name" th:value="${sponsor.name}" required class="border rounded px-2 py-1 w-full" />
@@ -109,7 +109,7 @@
             <div>
               <section class="form mb-6">
                 <h2 class="text-lg font-medium mb-2">Tilføj Sponsor</h2>
-                <form action="/sponsors/add" method="POST" class="space-y-2">
+                <form action="/api/sponsor/add" method="POST" class="space-y-2">
                   <label class="block text-sm">Sponsor Navn</label>
                   <input id="name" name="name" required class="border rounded px-2 py-1 w-full" />
                   <label class="block text-sm">Kontaktperson</label>
@@ -182,7 +182,7 @@
             Genanvendelig modal: Tilføj kontrakt
             -------------------------------------
             Denne modal fyldes og vises af openAddModal(buttonEl). Formularen sender
-            POST til /sponsors/addContract (controller håndterer oprettelse og redirect).
+            POST til /api/contract/add (controller håndterer oprettelse og redirect).
           -->
           <div id="addContractModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display:none">
             <div class="bg-white rounded p-4 w-11/12 max-w-md">
@@ -190,7 +190,7 @@
                 <h3 class="font-semibold">Tilføj Kontrakt for <span id="addModalSponsorName"></span></h3>
                 <button type="button" class="text-gray-600" onclick="closeModal('addContractModal')">✕</button>
               </div>
-              <form action="/sponsors/addContract" method="POST" class="space-y-2" enctype="multipart/form-data">
+              <form action="/api/contract/add" method="POST" class="space-y-2" enctype="multipart/form-data">
                 <input id="addModalSponsorId" type="hidden" name="sponsorId" />
                 <label class="block text-sm">Kontrakt Navn:</label>
                 <input name="name" type="text" required class="border rounded px-2 py-1 w-full" />
@@ -228,7 +228,7 @@
                 <h3 class="font-semibold">Tilføj Tjeneste for <span id="addServiceContractName"></span></h3>
                 <button type="button" class="text-gray-600" onclick="closeModal('addServiceModal')">✕</button>
               </div>
-              <form action="/sponsors/addService" method="POST" class="space-y-2">
+              <form action="/api/service/add" method="POST" class="space-y-2">
                 <input id="addServiceContractId" type="hidden" name="contractId" />
                 <label class="block text-sm">Navn</label>
                 <input name="name" type="text" required class="border rounded px-2 py-1 w-full" />

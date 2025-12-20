@@ -3,7 +3,7 @@ function postDeleteService(serviceId, contractId) {
 	try {
 		const form 			= 	document.createElement('form');
 		form.method 		= 	'POST';
-		form.action 		= 	'/sponsors/deleteService';
+		form.action 		= 	'/api/service/delete';
 		form.style.display 	= 	'none';
 		const inputId 		= 	document.createElement('input');
 		inputId.type 		= 	'hidden';

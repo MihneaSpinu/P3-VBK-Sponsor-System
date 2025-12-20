@@ -1,38 +1,30 @@
 package p3project.controllers;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.hamcrest.Matchers;
-
-import p3project.functions.ContractFunctions;
-import p3project.functions.UserFunctions;
-import p3project.repositories.UserRepository;
-import p3project.classes.Token;
-import p3project.classes.User;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import jakarta.servlet.http.Cookie;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import p3project.classes.Token;
+import p3project.classes.User;
+import p3project.repositories.UserRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -73,7 +65,7 @@ class ContractControllerTest {
 
     @Test
     void addContract_redirectsWhenNoToken() throws Exception {
-        mockMvc.perform(multipart("/sponsors/addContract")
+        mockMvc.perform(multipart("/api/contract/add")
                 .file(new MockMultipartFile("pdffile", new byte[0]))
                 .param("name", "Demo"))
             .andExpect(status().is3xxRedirection())
@@ -84,7 +76,7 @@ class ContractControllerTest {
     void addContract_delegatesWhenAuthorized() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        MockHttpServletRequestBuilder req = multipart("/sponsors/addContract")
+        MockHttpServletRequestBuilder req = multipart("/api/contract/add")
                 .file(new MockMultipartFile("pdffile", "file.pdf", "application/pdf", "data".getBytes()))
                 .param("name", "Demo")
                 .param("payment", "100")
@@ -101,7 +93,7 @@ class ContractControllerTest {
     void addContract_withEmptyName_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(multipart("/sponsors/addContract")
+        mockMvc.perform(multipart("/api/contract/add")
                 .file(new MockMultipartFile("pdffile", "file.pdf", "application/pdf", "data".getBytes()))
                 .param("name", "")
                 .cookie(token))
@@ -113,7 +105,7 @@ class ContractControllerTest {
     void addContract_withNullPayment_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(multipart("/sponsors/addContract")
+        mockMvc.perform(multipart("/api/contract/add")
                 .file(new MockMultipartFile("pdffile", "file.pdf", "application/pdf", "data".getBytes()))
                 .param("name", "Contract")
                 .param("payment", "")
@@ -127,7 +119,7 @@ class ContractControllerTest {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
         byte[] largeData = new byte[1024 * 100]; // 100KB
-        mockMvc.perform(multipart("/sponsors/addContract")
+        mockMvc.perform(multipart("/api/contract/add")
                 .file(new MockMultipartFile("pdffile", "large.pdf", "application/pdf", largeData))
                 .param("name", "Large Contract")
                 .param("payment", "100")
@@ -143,7 +135,7 @@ class ContractControllerTest {
     void deleteContract_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/deleteContract")
+        mockMvc.perform(post("/api/contract/delete")
                 .param("contractId", "1")
                 .cookie(token))
             .andExpect(status().is3xxRedirection())
@@ -154,7 +146,7 @@ class ContractControllerTest {
     void deleteContract_withNonExistentId_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/deleteContract")
+        mockMvc.perform(post("/api/contract/delete")
                 .param("contractId", "99999")
                 .cookie(token))
             .andExpect(status().is3xxRedirection())
@@ -165,7 +157,7 @@ class ContractControllerTest {
     void updateContract_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(multipart("/update/contract")
+        mockMvc.perform(multipart("/api/contract/update")
                 .file(new MockMultipartFile("pdffile", new byte[0]))
                 .param("id", "1")
                 .param("name", "Updated Contract")
@@ -182,7 +174,7 @@ class ContractControllerTest {
     void updateContract_withoutPDF_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(multipart("/update/contract")
+        mockMvc.perform(multipart("/api/contract/update")
                 .file(new MockMultipartFile("pdffile", new byte[0]))
                 .param("id", "1")
                 .param("name", "Updated")
@@ -199,7 +191,7 @@ class ContractControllerTest {
     void addContract_withAllFields_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(multipart("/sponsors/addContract")
+        mockMvc.perform(multipart("/api/contract/add")
                 .file(new MockMultipartFile("pdffile", "contract.pdf", "application/pdf", "content".getBytes()))
                 .param("name", "Full Contract")
                 .param("payment", "10000")
@@ -216,7 +208,7 @@ class ContractControllerTest {
     void deleteContract_withZeroId_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/deleteContract")
+        mockMvc.perform(post("/api/contract/delete")
                 .param("contractId", "0")
                 .cookie(token))
             .andExpect(status().is3xxRedirection())
@@ -227,7 +219,7 @@ class ContractControllerTest {
     void updateContract_withEmptyName_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(multipart("/update/contract")
+        mockMvc.perform(multipart("/api/contract/update")
                 .file(new MockMultipartFile("pdffile", new byte[0]))
                 .param("id", "1")
                 .param("name", "")
@@ -242,7 +234,7 @@ class ContractControllerTest {
 
     @Test
     void deleteContract_redirectsToLoginWhenNoToken() throws Exception {
-        mockMvc.perform(post("/sponsors/deleteContract").param("contractId", "5"))
+        mockMvc.perform(post("/api/contract/delete").param("contractId", "5"))
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/login"));
     }
@@ -251,14 +243,14 @@ class ContractControllerTest {
     void deleteContract_redirectsToHomepageWhenNotAdmin() throws Exception {
         User nonAdmin = createNonAdminUser();
         Cookie token = buildValidTokenCookie(nonAdmin);
-        mockMvc.perform(post("/sponsors/deleteContract").param("contractId", "5").cookie(token))
+        mockMvc.perform(post("/api/contract/delete").param("contractId", "5").cookie(token))
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/homepage"));
     }
 
     @Test
     void updateContract_redirectsToLoginWhenNoToken() throws Exception {
-        mockMvc.perform(multipart("/update/contract")
+        mockMvc.perform(multipart("/api/contract/update")
                 .file(new MockMultipartFile("pdffile", new byte[0]))
                 .param("id", "1")
                 .param("name", "Updated"))
@@ -270,7 +262,7 @@ class ContractControllerTest {
     void updateContract_redirectsToHomepageWhenNotAdmin() throws Exception {
         User nonAdmin = createNonAdminUser();
         Cookie token = buildValidTokenCookie(nonAdmin);
-        mockMvc.perform(multipart("/update/contract")
+        mockMvc.perform(multipart("/api/contract/update")
                 .file(new MockMultipartFile("pdffile", new byte[0]))
                 .param("id", "1")
             .param("name", "Updated")
@@ -281,11 +273,11 @@ class ContractControllerTest {
 
     @Test
     void getFile_returnsOkWhenFunctionsReturnBody() throws Exception {
-        // Create a contract in DB to download
+        // Create a contract in database to download
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
         byte[] data = "content".getBytes();
-        mockMvc.perform(multipart("/sponsors/addContract")
+        mockMvc.perform(multipart("/api/contract/add")
                 .file(new MockMultipartFile("pdffile", "contract.pdf", "application/pdf", data))
                 .param("name", "Full Contract")
                 .param("payment", "10000")
@@ -296,8 +288,8 @@ class ContractControllerTest {
                 .cookie(token))
             .andExpect(status().is3xxRedirection());
 
-        // Assuming last inserted contract has id 1 in H2 for this test context
-        mockMvc.perform(get("/getFile/1"))
+        // Assuming contract has id 1 for this test
+        mockMvc.perform(get("/api/contract/getFile/1"))
             .andExpect(status().isOk())
             .andExpect(content().bytes(data));
     }

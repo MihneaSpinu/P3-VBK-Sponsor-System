@@ -22,7 +22,7 @@ class SponsorRepositoryTest {
 
     @Test
     void testSaveSponsor() {
-        // Given
+
         Sponsor sponsor = new Sponsor(
             "Tech Corp",
             "John Smith",
@@ -33,10 +33,8 @@ class SponsorRepositoryTest {
             "Premium sponsor"
         );
 
-        // When
         Sponsor savedSponsor = sponsorRepository.save(sponsor);
 
-        // Then
         assertThat(savedSponsor.getId()).isNotNull();
         assertThat(savedSponsor.getName()).isEqualTo("Tech Corp");
         assertThat(savedSponsor.getContactPerson()).isEqualTo("John Smith");
@@ -46,7 +44,7 @@ class SponsorRepositoryTest {
 
     @Test
     void testFindById() {
-        // Given
+
         Sponsor sponsor = new Sponsor(
             "Sports Inc",
             "Jane Doe",
@@ -58,10 +56,8 @@ class SponsorRepositoryTest {
         );
         Sponsor persistedSponsor = entityManager.persistAndFlush(sponsor);
 
-        // When
         Optional<Sponsor> foundSponsor = sponsorRepository.findById(persistedSponsor.getId());
 
-        // Then
         assertThat(foundSponsor).isPresent();
         assertThat(foundSponsor.get().getName()).isEqualTo("Sports Inc");
         assertThat(foundSponsor.get().getContactPerson()).isEqualTo("Jane Doe");
@@ -70,33 +66,29 @@ class SponsorRepositoryTest {
 
     @Test
     void testFindAll() {
-        // Given
+
         Sponsor sponsor1 = new Sponsor("Company A", "Contact A", "a@company.com", "11111111", "CVRA", true, "Comment A");
         Sponsor sponsor2 = new Sponsor("Company B", "Contact B", "b@company.com", "22222222", "CVRB", true, "Comment B");
         entityManager.persistAndFlush(sponsor1);
         entityManager.persistAndFlush(sponsor2);
 
-        // When
         List<Sponsor> sponsors = sponsorRepository.findAll();
 
-        // Then
         assertThat(sponsors).hasSize(2);
         assertThat(sponsors).extracting(Sponsor::getName).containsExactlyInAnyOrder("Company A", "Company B");
     }
 
     @Test
     void testUpdateSponsor() {
-        // Given
+
         Sponsor sponsor = new Sponsor("Original Corp", "Original Contact", "original@corp.com", "99999999", "CVRORG", true, "Original");
         Sponsor savedSponsor = entityManager.persistAndFlush(sponsor);
 
-        // When
         savedSponsor.setName("Updated Corp");
         savedSponsor.setContactPerson("Updated Contact");
         savedSponsor.setActive(false);
         Sponsor updatedSponsor = sponsorRepository.save(savedSponsor);
 
-        // Then
         assertThat(updatedSponsor.getId()).isEqualTo(savedSponsor.getId());
         assertThat(updatedSponsor.getName()).isEqualTo("Updated Corp");
         assertThat(updatedSponsor.getContactPerson()).isEqualTo("Updated Contact");
@@ -105,22 +97,20 @@ class SponsorRepositoryTest {
 
     @Test
     void testDeleteSponsor() {
-        // Given
+
         Sponsor sponsor = new Sponsor("Delete Corp", "Delete Contact", "delete@corp.com", "00000000", "CVRDEL", true, "To be deleted");
         Sponsor savedSponsor = entityManager.persistAndFlush(sponsor);
         Long sponsorId = savedSponsor.getId();
 
-        // When
         sponsorRepository.deleteById(sponsorId);
 
-        // Then
         Optional<Sponsor> deletedSponsor = sponsorRepository.findById(sponsorId);
         assertThat(deletedSponsor).isNotPresent();
     }
 
     @Test
     void testCount() {
-        // Given
+
         Sponsor sponsor1 = new Sponsor("Count Corp 1", "Contact 1", "count1@corp.com", "11111111", "CVR1", true, "Count 1");
         Sponsor sponsor2 = new Sponsor("Count Corp 2", "Contact 2", "count2@corp.com", "22222222", "CVR2", true, "Count 2");
         Sponsor sponsor3 = new Sponsor("Count Corp 3", "Contact 3", "count3@corp.com", "33333333", "CVR3", false, "Count 3");
@@ -128,16 +118,14 @@ class SponsorRepositoryTest {
         entityManager.persistAndFlush(sponsor2);
         entityManager.persistAndFlush(sponsor3);
 
-        // When
         long count = sponsorRepository.count();
 
-        // Then
         assertThat(count).isEqualTo(3);
     }
 
     @Test
     void testSaveSponsorWithEmptyConstructor() {
-        // Given
+
         Sponsor sponsor = new Sponsor();
         sponsor.setName("Empty Constructor Corp");
         sponsor.setContactPerson("Empty Contact");
@@ -147,10 +135,8 @@ class SponsorRepositoryTest {
         sponsor.setActive(true);
         sponsor.setComments("Created with empty constructor");
 
-        // When
         Sponsor savedSponsor = sponsorRepository.save(sponsor);
 
-        // Then
         assertThat(savedSponsor.getId()).isNotNull();
         assertThat(savedSponsor.getName()).isEqualTo("Empty Constructor Corp");
         assertThat(savedSponsor.getContactPerson()).isEqualTo("Empty Contact");

@@ -1,18 +1,17 @@
 package p3project.functions;
 
+import java.time.LocalDate;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.time.LocalDate;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -48,7 +47,7 @@ class ServiceFunctionsTest {
 
     @Test
     void serviceIsActive_deactivatesExpiredBanner() {
-        Service service = new Service(1L, "Name", "Banner", true, 0, LocalDate.now().minusDays(2), LocalDate.now().minusDays(1));
+        Service service = new Service(1L, "Name", "Banner", true, LocalDate.now().minusDays(2), LocalDate.now().minusDays(1), 0, 0);
 
         boolean active = serviceFunctions.serviceIsActive(service);
 
@@ -58,7 +57,7 @@ class ServiceFunctionsTest {
 
     @Test
     void serviceIsActive_leavesNonExpiringServiceUntouched() {
-        Service service = new Service(2L, "Name", "Expo", true, 0, null, null);
+        Service service = new Service(2L, "Name", "Expo", true, null, null, 0, 0);
 
         boolean active = serviceFunctions.serviceIsActive(service);
 
@@ -77,7 +76,7 @@ class ServiceFunctionsTest {
 
     @Test
     void setServiceArchived_updatesStatusAndLogs() {
-        Service service = new Service(5L, "Name", "Expo", true, 0, null, null);
+        Service service = new Service(5L, "Name", "Expo", true, null, null, 0, 0);
         when(serviceRepository.findById(5L)).thenReturn(java.util.Optional.of(service));
         when(userFunctions.getUserFromToken(request)).thenReturn(new User());
 
@@ -91,7 +90,7 @@ class ServiceFunctionsTest {
 
     @Test
     void addServiceForContract_rejectsInvalidService() {
-        Service service = new Service(6L, "", "Expo", true, 0, null, null);
+        Service service = new Service(6L, "", "Expo", true, null, null, 0, 0);
         RedirectAttributes attrs = new RedirectAttributesModelMap();
 
         when(userFunctions.getUserFromToken(request)).thenReturn(new User());
@@ -105,7 +104,7 @@ class ServiceFunctionsTest {
 
     @Test
     void addServiceForContract_savesValidService() {
-        Service service = new Service(7L, "Print", "Expo", true, 10, LocalDate.now(), LocalDate.now().plusDays(1));
+        Service service = new Service(7L, "Print", "Expo", true, LocalDate.now(), LocalDate.now().plusDays(1), 10, 0);
         RedirectAttributes attrs = new RedirectAttributesModelMap();
 
         when(userFunctions.getUserFromToken(request)).thenReturn(new User());
@@ -119,7 +118,7 @@ class ServiceFunctionsTest {
 
     @Test
     void updateServiceFields_returnsRedirectWhenMissingStoredService() {
-        Service service = new Service(9L, "Demo", "Expo", true, 1, null, null);
+        Service service = new Service(9L, "Demo", "Expo", true, null, null, 0, 1);
         service.setId(9L);
         RedirectAttributes attrs = new RedirectAttributesModelMap();
 
@@ -132,7 +131,7 @@ class ServiceFunctionsTest {
 
     @Test
     void serviceIsActive_deactivatesExpiredLogoTrojer() {
-        Service service = new Service(10L, "Logo", "LogoTrojer", true, 5, LocalDate.now().minusDays(5), LocalDate.now().minusDays(1));
+        Service service = new Service(10L, "Logo", "LogoTrojer", true, LocalDate.now().minusDays(5), LocalDate.now().minusDays(1), 0, 5);
 
         boolean active = serviceFunctions.serviceIsActive(service);
 
@@ -143,7 +142,7 @@ class ServiceFunctionsTest {
 
     @Test
     void serviceIsActive_deactivatesExpiredLogoBukser() {
-        Service service = new Service(11L, "Logo", "LogoBukser", true, 3, LocalDate.now().minusDays(3), LocalDate.now().minusDays(1));
+        Service service = new Service(11L, "Logo", "LogoBukser", true, LocalDate.now().minusDays(3), LocalDate.now().minusDays(1), 0, 5);
 
         boolean active = serviceFunctions.serviceIsActive(service);
 
@@ -154,7 +153,7 @@ class ServiceFunctionsTest {
 
     @Test
     void serviceIsActive_keepsActiveBannerWithFutureEndDate() {
-        Service service = new Service(12L, "Banner", "Banner", true, 0, LocalDate.now(), LocalDate.now().plusDays(10));
+        Service service = new Service(12L, "Banner", "Banner", true, LocalDate.now(), LocalDate.now().plusDays(10), 0, 0);
 
         boolean active = serviceFunctions.serviceIsActive(service);
 
@@ -165,7 +164,7 @@ class ServiceFunctionsTest {
 
     @Test
     void serviceIsActive_keepsActiveServiceWithNullEndDate() {
-        Service service = new Service(13L, "Logo", "LogoTrojer", true, 2, LocalDate.now(), null);
+        Service service = new Service(13L, "Logo", "LogoTrojer", true, LocalDate.now(), null, 0, 2);
 
         boolean active = serviceFunctions.serviceIsActive(service);
 
@@ -187,7 +186,7 @@ class ServiceFunctionsTest {
 
     @Test
     void deleteService_deletesServiceAndLogs() {
-        Service service = new Service(14L, "TestService", "Expo", true, 5, null, null);
+        Service service = new Service(14L, "TestService", "Expo", true, null, null, 0, 5);
         User user = new User();
         user.setName("Admin");
         RedirectAttributes attrs = new RedirectAttributesModelMap();
@@ -204,8 +203,8 @@ class ServiceFunctionsTest {
 
     @Test
     void addServiceForContract_validatesServiceName() {
-        Service service = new Service(15L, "ValidName", "Expo", true, 5, null, null);
-        service.setName(""); // Set empty after construction to avoid Eventlog issue
+        Service service = new Service(15L, "ValidName", "Expo", true, null, null, 0, 5);
+        service.setName("");
         RedirectAttributes attrs = new RedirectAttributesModelMap();
 
         when(userFunctions.getUserFromToken(request)).thenReturn(new User());
@@ -219,7 +218,7 @@ class ServiceFunctionsTest {
 
     @Test
     void addServiceForContract_rejectsServiceWithStartAfterEnd() {
-        Service service = new Service(16L, "Invalid", "Banner", true, 0, LocalDate.now().plusDays(5), LocalDate.now());
+        Service service = new Service(16L, "Invalid", "Banner", true, LocalDate.now().plusDays(5), LocalDate.now(), 0, 5);
         RedirectAttributes attrs = new RedirectAttributesModelMap();
 
         when(userFunctions.getUserFromToken(request)).thenReturn(new User());
@@ -233,7 +232,7 @@ class ServiceFunctionsTest {
 
     @Test
     void addServiceForContract_rejectsExpoWithNegativeAmount() {
-        Service service = new Service(19L, "Expo", "Expo", true, -10, null, null);
+        Service service = new Service(19L, "Expo", "Expo", true, null, null, -10, 0);
         RedirectAttributes attrs = new RedirectAttributesModelMap();
 
         when(userFunctions.getUserFromToken(request)).thenReturn(new User());
@@ -247,7 +246,7 @@ class ServiceFunctionsTest {
 
     @Test
     void addServiceForContract_savesValidLogoTrojerService() {
-        Service service = new Service(20L, "Logo Jerseys", "LogoTrojer", true, 2, LocalDate.now(), LocalDate.now().plusMonths(1));
+        Service service = new Service(20L, "Logo Jerseys", "LogoTrojer", true, LocalDate.now(), LocalDate.now().plusMonths(1), 0, 2);
         RedirectAttributes attrs = new RedirectAttributesModelMap();
 
         when(userFunctions.getUserFromToken(request)).thenReturn(new User());
@@ -261,7 +260,7 @@ class ServiceFunctionsTest {
 
     @Test
     void updateServiceFields_rejectsInvalidService() {
-        Service service = new Service(21L, "", "Expo", true, 1, null, null);
+        Service service = new Service(21L, "", "Expo", true, null, null, 0, 1);
         service.setId(21L);
         RedirectAttributes attrs = new RedirectAttributesModelMap();
 
@@ -274,9 +273,9 @@ class ServiceFunctionsTest {
 
     @Test
     void updateServiceFields_updatesValidService() {
-        Service storedService = new Service(22L, "Old Name", "Expo", true, 5, null, null);
+        Service storedService = new Service(22L, "Old Name", "Expo", true, null, null, 5, 0);
         storedService.setId(22L);
-        Service updatedService = new Service(22L, "New Name", "Expo", true, 10, null, null);
+        Service updatedService = new Service(22L, "New Name", "Expo", true, null, null, 10, 0);
         updatedService.setId(22L);
         RedirectAttributes attrs = new RedirectAttributesModelMap();
 
@@ -289,7 +288,7 @@ class ServiceFunctionsTest {
 
     @Test
     void setServiceArchived_activatesInactiveService() {
-        Service service = new Service(23L, "Inactive", "Expo", false, 0, null, null);
+        Service service = new Service(23L, "Inactive", "Expo", false, null, null, 0, 0);
         when(serviceRepository.findById(23L)).thenReturn(java.util.Optional.of(service));
         when(userFunctions.getUserFromToken(request)).thenReturn(new User());
 

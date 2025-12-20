@@ -1,8 +1,5 @@
 package p3project.controllers;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
@@ -13,7 +10,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import jakarta.servlet.http.Cookie;
 import p3project.classes.Token;
@@ -63,7 +62,7 @@ class SponsorControllerTest {
     void addSponsor_redirectsWhenAuthorized() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/add")
+        mockMvc.perform(post("/api/sponsor/add")
             .param("name", "Acme")
             .param("phoneNumber", "")
             .param("cvrNumber", "")
@@ -74,7 +73,7 @@ class SponsorControllerTest {
 
     @Test
     void deleteSponsor_requiresAuth_redirectsToLogin() throws Exception {
-        mockMvc.perform(post("/sponsors/delete").param("sponsorId", "1"))
+        mockMvc.perform(post("/api/sponsor/delete").param("sponsorId", "1"))
             .andExpect(status().is3xxRedirection())
             .andExpect(MockMvcResultMatchers.header().string("Location", Matchers.startsWith("/login")));
     }
@@ -83,7 +82,7 @@ class SponsorControllerTest {
     void updateSponsor_redirectsThroughFunction() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/update/sponsor")
+        mockMvc.perform(post("/api/sponsor/update")
             .param("name", "New")
                 .param("id", "99999")
             .param("phoneNumber", "")
@@ -97,7 +96,7 @@ class SponsorControllerTest {
     void addSponsor_withEmptyName_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/add")
+        mockMvc.perform(post("/api/sponsor/add")
             .param("name", "")
             .param("phoneNumber", "")
             .param("cvrNumber", "")
@@ -110,7 +109,7 @@ class SponsorControllerTest {
     void addSponsor_withValidData_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/add")
+        mockMvc.perform(post("/api/sponsor/add")
                 .param("name", "Test Sponsor")
                 .param("contactPerson", "John Doe")
                 .param("email", "test@example.com")
@@ -124,7 +123,7 @@ class SponsorControllerTest {
     void deleteSponsor_withNonExistentId_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/delete").param("sponsorId", "99999").cookie(token))
+        mockMvc.perform(post("/api/sponsor/delete").param("sponsorId", "99999").cookie(token))
             .andExpect(status().is3xxRedirection())
             .andExpect(MockMvcResultMatchers.header().string("Location", Matchers.startsWith("/sponsors")));
     }
@@ -133,7 +132,7 @@ class SponsorControllerTest {
     void updateSponsor_withMultipleFields_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/update/sponsor")
+        mockMvc.perform(post("/api/sponsor/update")
             .param("name", "Updated Name")
             .param("contactPerson", "Jane Doe")
             .param("email", "updated@example.com")
@@ -149,7 +148,7 @@ class SponsorControllerTest {
     void addSponsor_withInvalidEmail_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/add")
+        mockMvc.perform(post("/api/sponsor/add")
             .param("name", "Test Sponsor")
             .param("email", "invalid-email")
             .param("phoneNumber", "")
@@ -163,7 +162,7 @@ class SponsorControllerTest {
     void addSponsor_withInvalidCVR_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/add")
+        mockMvc.perform(post("/api/sponsor/add")
             .param("name", "Test Sponsor")
             .param("cvrNumber", "123")
             .param("phoneNumber", "")
@@ -176,7 +175,7 @@ class SponsorControllerTest {
     void addSponsor_withInvalidPhoneNumber_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/add")
+        mockMvc.perform(post("/api/sponsor/add")
                 .param("name", "Test Sponsor")
                 .param("phoneNumber", "123")
                 .param("cvrNumber", "")
@@ -189,7 +188,7 @@ class SponsorControllerTest {
     void updateSponsor_withEmptyName_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/update/sponsor")
+        mockMvc.perform(post("/api/sponsor/update")
             .param("name", "")
             .param("id", "1")
             .param("phoneNumber", "")
@@ -203,7 +202,7 @@ class SponsorControllerTest {
     void deleteSponsor_withZeroId_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/delete").param("sponsorId", "0").cookie(token))
+        mockMvc.perform(post("/api/sponsor/delete").param("sponsorId", "0").cookie(token))
             .andExpect(status().is3xxRedirection())
             .andExpect(MockMvcResultMatchers.header().string("Location", Matchers.startsWith("/sponsors")));
     }
@@ -212,7 +211,7 @@ class SponsorControllerTest {
     void addSponsor_withAllFieldsPopulated_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/add")
+        mockMvc.perform(post("/api/sponsor/add")
                 .param("name", "Complete Sponsor")
                 .param("contactPerson", "John Smith")
                 .param("email", "john@example.com")
@@ -228,7 +227,7 @@ class SponsorControllerTest {
     void updateSponsor_withNullId_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/update/sponsor")
+        mockMvc.perform(post("/api/sponsor/update")
             .param("name", "Updated")
             .param("id", "99999")
             .param("phoneNumber", "")
@@ -242,7 +241,7 @@ class SponsorControllerTest {
     void addSponsor_withLongName_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/add")
+        mockMvc.perform(post("/api/sponsor/add")
             .param("name", "A".repeat(255))
             .param("phoneNumber", "")
             .param("cvrNumber", "")
@@ -255,7 +254,7 @@ class SponsorControllerTest {
     void deleteSponsor_withNegativeId_redirects() throws Exception {
         User admin = createAdminUser();
         Cookie token = buildValidTokenCookie(admin);
-        mockMvc.perform(post("/sponsors/delete").param("sponsorId", "-1").cookie(token))
+        mockMvc.perform(post("/api/sponsor/delete").param("sponsorId", "-1").cookie(token))
             .andExpect(status().is3xxRedirection())
             .andExpect(MockMvcResultMatchers.header().string("Location", Matchers.startsWith("/sponsors")));
     }

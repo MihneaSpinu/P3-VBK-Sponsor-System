@@ -1,5 +1,5 @@
 
-// Common sponsor-page helpers: filters, modals, input validation
+
 function toggleSponsorEdit(i) {
 	const id = 'sponsorEditForm-' + i;
 	const element = document.getElementById(id);
@@ -8,7 +8,7 @@ function toggleSponsorEdit(i) {
 }
 
 
-// filter function
+
 function applySponsorFilter() {
 	const select = document.getElementById('sponsorFilter');
 	if (!select) return;

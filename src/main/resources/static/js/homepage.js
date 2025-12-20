@@ -8,7 +8,7 @@
         const sponsorId = button.getAttribute('data-sponsor-id');
         const template = document.getElementById('sponsor-modal-' + sponsorId);
 
-        // Clear existing content safely and clone template children
+ 
         if (modalContent) modalContent.textContent = '';
         Array.from(template.children).forEach(child => { 
 			if (modalContent) modalContent.appendChild(child.cloneNode(true)); 
@@ -92,7 +92,7 @@ saveButton.addEventListener('click', () => {
 	body.append('serviceId', id);
 	body.append('active', active.toString());
 
-	fetch('/sponsors/setServiceArchived', {
+	fetch('/api/service/update/active', {
 		method: 'POST',
 		body: body
 	})

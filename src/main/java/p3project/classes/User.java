@@ -20,7 +20,7 @@ public class User {
 	private boolean isAdmin;
 
 	public Long getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(Long id) {
@@ -28,7 +28,7 @@ public class User {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
@@ -36,7 +36,7 @@ public class User {
 	}
 
 	public String getPassword() {
-		return password;
+		return this.password;
 	}
 
 	public void setPassword(String password) {

@@ -1,10 +1,9 @@
 package p3project.classes;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
 import org.junit.jupiter.api.Test;
 
 /**
@@ -40,7 +39,7 @@ public class TokenTest {
 
     @Test
     public void testTokenHashIs64CharactersLong() {
-        // Arrange - SHA-256 produces 64 hex characters
+        // Arrange
         String userId = "789";
         
         // Act
@@ -80,7 +79,7 @@ public class TokenTest {
 
     @Test
     public void testTokensWithSameIdProduceDifferentHashesDueToSecret() {
-        // Note: This test assumes SECRET is null in test environment
+
         // Arrange
         String userId = "300";
         
@@ -88,7 +87,7 @@ public class TokenTest {
         Token token1 = Token.sign(userId);
         Token token2 = Token.sign(userId);
         
-        // Assert - Should produce same hash for same input
+        // Assert
         assertEquals(token1.getHash(), token2.getHash());
     }
 

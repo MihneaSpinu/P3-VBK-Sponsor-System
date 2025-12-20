@@ -111,7 +111,7 @@ class ContractFunctionsTest {
         Contract contract = new Contract();
         contract.setId(1L);
         contract.setEndDate(LocalDate.now().plusDays(1));
-        Service service = new Service(1L, "Name", "Banner", true, 0, LocalDate.now(), LocalDate.now().plusDays(1));
+        Service service = new Service(1L, "Name", "Banner", true, LocalDate.now(), LocalDate.now().plusDays(1), 0, 0);
 
         when(serviceRepository.findAll()).thenReturn(List.of(service));
         when(serviceFunctions.serviceIsActive(service)).thenReturn(true);
@@ -129,7 +129,7 @@ class ContractFunctionsTest {
         Contract contract = new Contract();
         contract.setId(2L);
         contract.setEndDate(LocalDate.now().plusDays(1));
-        Service service = new Service(2L, "Name", "Banner", true, 0, LocalDate.now(), LocalDate.now().plusDays(1));
+        Service service = new Service(2L, "Name", "Banner", true, LocalDate.now(), LocalDate.now().plusDays(1), 0, 0);
 
         when(serviceRepository.findAll()).thenReturn(List.of(service));
         when(serviceFunctions.serviceIsActive(service)).thenReturn(false);
@@ -224,7 +224,6 @@ class ContractFunctionsTest {
 
         contractFunctions.parseContract(contract, emptyFile);
 
-        // Empty files don't set pdfData
         assertEquals(null, contract.getPdfData());
     }
 
@@ -267,8 +266,8 @@ class ContractFunctionsTest {
         contract.setId(contractId);
         contract.setName("Contract");
         
-        Service service = new Service(100L, "Service", "Expo", true, 0, null, null);
-        service.setId(100L); // Explicitly set the ID after construction
+        Service service = new Service(100L, "Service", "Expo", true, null, null, 0, 0);
+        service.setId(100L); // eksplicit sæt id da hibernate ellers gør det
         service.setContractId(contractId);
         
         User user = new User();
@@ -407,7 +406,7 @@ class ContractFunctionsTest {
         Contract contract = new Contract();
         contract.setId(1L);
         contract.setEndDate(LocalDate.now().minusDays(1));
-        Service service = new Service(100L, "Service", "Expo", true, 0, null, null);
+        Service service = new Service(100L, "Service", "Expo", true, null, null, 0, 0);
         service.setContractId(1L);
 
         when(serviceRepository.findAll()).thenReturn(List.of(service));

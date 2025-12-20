@@ -79,12 +79,12 @@ public class SponsorFunctions {
 
         for (Sponsor sponsor : sponsors) {
 
-            boolean sponsorActive = false; // default
+            boolean sponsorActive = false;
 
             for (Contract contract : contracts) {
                 if (sponsor.getId().equals(contract.getSponsorId()) && cF.contractIsActive(contract)) {
-                    sponsorActive = true; // found an active one
-                    break;                // stop checking further contracts
+                    sponsorActive = true;
+                    break;
                 }
             }
 
