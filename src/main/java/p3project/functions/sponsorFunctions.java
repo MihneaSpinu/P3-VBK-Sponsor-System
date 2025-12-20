@@ -26,7 +26,7 @@ public class SponsorFunctions {
     private SponsorRepository sponsorRepository;
 
     @Autowired
-    private EventlogFunctions eventlogFunctions;
+    private EventlogFunctions eF;
 
     @Autowired
     private LogRepository logRepository;
@@ -38,24 +38,11 @@ public class SponsorFunctions {
     private ServiceRepository serviceRepository;
 
     @Autowired
-    private ContractFunctions contractFunctions;
+    private ContractFunctions cF;
 
     @Autowired
-    private UserFunctions userFunctions;
+    private UserFunctions uF;
 
-    //Wrappers
-    public boolean contractIsActive(Contract contract) {  
-        return contractFunctions.contractIsActive(contract);
-    }
-
-    public User getUserFromToken(HttpServletRequest request) throws RuntimeException {
-        return userFunctions.getUserFromToken(request);
-    }
-    
-
-    private <T> String handleUpdateRequest(T requestObject, T storedObject, HttpServletRequest request, RedirectAttributes redirectAttributes){
-        return eventlogFunctions.handleUpdateRequest(requestObject, storedObject, request, redirectAttributes);
-    }
 
     public String updateSponsor(Sponsor sponsor, HttpServletRequest request, RedirectAttributes redirectAttributes){
 
@@ -71,7 +58,7 @@ public class SponsorFunctions {
             return "redirect:/sponsors";
         }
 
-        return handleUpdateRequest(sponsor, storedSponsor, request, redirectAttributes);
+        return eF.handleUpdateRequest(sponsor, storedSponsor, request, redirectAttributes);
     }
     
     public boolean sponsorIsValid(Sponsor sponsor) {
@@ -95,7 +82,7 @@ public class SponsorFunctions {
             boolean sponsorActive = false; // default
 
             for (Contract contract : contracts) {
-                if (sponsor.getId().equals(contract.getSponsorId()) && contractIsActive(contract)) {
+                if (sponsor.getId().equals(contract.getSponsorId()) && cF.contractIsActive(contract)) {
                     sponsorActive = true; // found an active one
                     break;                // stop checking further contracts
                 }
@@ -112,7 +99,7 @@ public class SponsorFunctions {
             return "redirect:/sponsors";
         }
         
-        User user = getUserFromToken(request);
+        User user = uF.getUserFromToken(request);
         Eventlog log = new Eventlog(user, sponsor, "Oprettede");
         logRepository.save(log);
         
@@ -130,7 +117,7 @@ public class SponsorFunctions {
             return "redirect:/sponsors";
         }
 
-        User user = getUserFromToken(request);
+        User user = uF.getUserFromToken(request);
         Eventlog log = new Eventlog(user, sponsor, "Slettede");
         logRepository.save(log);
 

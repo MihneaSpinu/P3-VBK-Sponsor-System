@@ -1,4 +1,4 @@
-/*
+
 package p3project.repositories;
 
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ private LogRepository logRepository;
         // Given
         User user = new User();
         user.setName("Test User");
-        user.setEmail("test@example.com");
+        user.setPassword("test123");
         entityManager.persistAndFlush(user);
         
         Object testObject = new Object();
@@ -38,7 +38,7 @@ private LogRepository logRepository;
         Eventlog savedLog = logRepository.save(log);
         
         // Then
-        assertThat(savedLog.getId()).isNotNull();
+        assertThat(savedLog).isNotNull();
     }
     
     @Test
@@ -46,19 +46,21 @@ private LogRepository logRepository;
         // Given
         User user = new User();
         user.setName("Find User");
-        user.setEmail("find@example.com");
+        user.setPassword("find123");
         entityManager.persistAndFlush(user);
         
         Object testObject = new String("Test String");
-        Eventlog log = Eventlog.create(user, testObject, "Test String Object");
+        Eventlog log = new Eventlog(user, testObject, "Test String Object");
         Eventlog persistedLog = entityManager.persistAndFlush(log);
         
         // When
-        Optional<Eventlog> foundLog = logRepository.findById(persistedLog.getId());
+        Optional<Eventlog> foundLog = logRepository.findById(entityManager.getId(persistedLog, Long.class));
         
         // Then
         assertThat(foundLog).isPresent();
-        assertThat(foundLog.get().getId()).isEqualTo(persistedLog.getId());
+        Long persistedId = entityManager.getId(persistedLog, Long.class);
+        Long foundId = entityManager.getId(foundLog.get(), Long.class);
+        assertThat(foundId).isEqualTo(persistedId);
     }
     
     @Test
@@ -66,18 +68,18 @@ private LogRepository logRepository;
         // Given
         User user1 = new User();
         user1.setName("User One");
-        user1.setEmail("user1@example.com");
+        // No email field on User in domain model
         entityManager.persistAndFlush(user1);
         
         User user2 = new User();
         user2.setName("User Two");
-        user2.setEmail("user2@example.com");
+        // No email field on User in domain model
         entityManager.persistAndFlush(user2);
         
         Object obj1 = new Object();
         Object obj2 = new Object();
-        Eventlog log1 = Eventlog.create(user1, obj1, "Object 1");
-        Eventlog log2 = Eventlog.create(user2, obj2, "Object 2");
+        Eventlog log1 = new Eventlog(user1, obj1, "Object 1");
+        Eventlog log2 = new Eventlog(user2, obj2, "Object 2");
         entityManager.persistAndFlush(log1);
         entityManager.persistAndFlush(log2);
         
@@ -93,13 +95,13 @@ private LogRepository logRepository;
         // Given
         User user = new User();
         user.setName("Delete User");
-        user.setEmail("delete@example.com");
+        // No email field on User in domain model
         entityManager.persistAndFlush(user);
         
         Object testObject = new Object();
-        Eventlog log = Eventlog.create(user, testObject, "To Delete");
+        Eventlog log = new Eventlog(user, testObject, "To Delete");
         Eventlog savedLog = entityManager.persistAndFlush(log);
-        Integer logId = savedLog.getId();
+        Long logId = entityManager.getId(savedLog, Long.class);
         
         // When
         logRepository.deleteById(logId);
@@ -114,15 +116,15 @@ private LogRepository logRepository;
         // Given
         User user = new User();
         user.setName("Count User");
-        user.setEmail("count@example.com");
+        // No email field on User in domain model
         entityManager.persistAndFlush(user);
         
         Object obj1 = new Object();
         Object obj2 = new Object();
         Object obj3 = new Object();
-        Eventlog log1 = Eventlog.create(user, obj1, "Log 1");
-        Eventlog log2 = Eventlog.create(user, obj2, "Log 2");
-        Eventlog log3 = Eventlog.create(user, obj3, "Log 3");
+        Eventlog log1 = new Eventlog(user, obj1, "Log 1");
+        Eventlog log2 = new Eventlog(user, obj2, "Log 2");
+        Eventlog log3 = new Eventlog(user, obj3, "Log 3");
         entityManager.persistAndFlush(log1);
         entityManager.persistAndFlush(log2);
         entityManager.persistAndFlush(log3);
@@ -139,22 +141,24 @@ private LogRepository logRepository;
         // Given
         User user = new User();
         user.setName("Multi Type User");
-        user.setEmail("multitype@example.com");
+        // No email field on User in domain model
         entityManager.persistAndFlush(user);
         
         String stringObj = "Test String";
         Integer intObj = 42;
         
-        Eventlog log1 = Eventlog.create(user, stringObj, "String Object");
-        Eventlog log2 = Eventlog.create(user, intObj, "Integer Object");
+        Eventlog log1 = new Eventlog(user, stringObj, "String Object");
+        Eventlog log2 = new Eventlog(user, intObj, "Integer Object");
         
         // When
         Eventlog savedLog1 = logRepository.save(log1);
         Eventlog savedLog2 = logRepository.save(log2);
         
         // Then
-        assertThat(savedLog1.getId()).isNotNull();
-        assertThat(savedLog2.getId()).isNotNull();
+        Long id1 = entityManager.getId(savedLog1, Long.class);
+        Long id2 = entityManager.getId(savedLog2, Long.class);
+        assertThat(id1).isNotNull();
+        assertThat(id2).isNotNull();
     }
     
     @Test
@@ -162,16 +166,16 @@ private LogRepository logRepository;
         // Given
         User user = new User();
         user.setName("Active User");
-        user.setEmail("active@example.com");
+        // No email field on User in domain model
         entityManager.persistAndFlush(user);
         
         Object obj1 = new Object();
         Object obj2 = new Object();
         Object obj3 = new Object();
         
-        Eventlog log1 = Eventlog.create(user, obj1, "Action 1");
-        Eventlog log2 = Eventlog.create(user, obj2, "Action 2");
-        Eventlog log3 = Eventlog.create(user, obj3, "Action 3");
+        Eventlog log1 = new Eventlog(user, obj1, "Action 1");
+        Eventlog log2 = new Eventlog(user, obj2, "Action 2");
+        Eventlog log3 = new Eventlog(user, obj3, "Action 3");
         
         // When
         logRepository.save(log1);
@@ -188,13 +192,13 @@ private LogRepository logRepository;
         // Given
         User user = new User();
         user.setName("Action User");
-        user.setEmail("action@example.com");
+        // No email field on User in domain model
         entityManager.persistAndFlush(user);
         
         Object obj = new Object();
-        Eventlog createLog = Eventlog.create(user, obj, "Test Object"); // CREATE action
-        Eventlog updateLog = Eventlog.create(user, obj, "Test Object"); // UPDATE action
-        Eventlog deleteLog = Eventlog.create(user, obj, "Test Object"); // DELETE action
+        Eventlog createLog = new Eventlog(user, obj, "CREATE");
+        Eventlog updateLog = new Eventlog(user, obj, "UPDATE");
+        Eventlog deleteLog = new Eventlog(user, obj, "DELETE");
         
         // When
         Eventlog savedCreate = logRepository.save(createLog);
@@ -202,11 +206,8 @@ private LogRepository logRepository;
         Eventlog savedDelete = logRepository.save(deleteLog);
         
         // Then
-        assertThat(savedCreate.getId()).isNotNull();
-        assertThat(savedUpdate.getId()).isNotNull();
-        assertThat(savedDelete.getId()).isNotNull();
+        assertThat(entityManager.getId(savedCreate, Long.class)).isNotNull();
+        assertThat(entityManager.getId(savedUpdate, Long.class)).isNotNull();
+        assertThat(entityManager.getId(savedDelete, Long.class)).isNotNull();
     }
 }
-
-
-*/

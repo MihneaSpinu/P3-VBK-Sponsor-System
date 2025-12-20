@@ -25,7 +25,7 @@ import p3project.repositories.LogRepository;
 import p3project.repositories.ServiceRepository;
 
 @Component
-public class ContractFunctions{
+public class ContractFunctions {
 
     @Autowired
     private ServiceRepository serviceRepository;
@@ -37,25 +37,15 @@ public class ContractFunctions{
     private LogRepository logRepository;
 
     @Autowired
-    private ServiceFunctions serviceFunctions;
+    private ServiceFunctions seF;
 
     @Autowired
-    private UserFunctions userFunctions;
+    private UserFunctions uF;
 
     @Autowired
-    private EventlogFunctions eventlogFunctions;
+    private EventlogFunctions eF;
 
-    //Wrappers
-    public boolean serviceIsActive(Service service) {
-        return serviceFunctions.serviceIsActive(service);
-    }
-    public User getUserFromToken(HttpServletRequest request) throws RuntimeException {
-        return userFunctions.getUserFromToken(request);
-    }
 
-    private <T> String handleUpdateRequest(T requestObject, T storedObject, HttpServletRequest request, RedirectAttributes redirectAttributes){
-        return eventlogFunctions.handleUpdateRequest(requestObject, storedObject, request, redirectAttributes);
-    }
 
     // del op i 2 funktioner
     public boolean contractIsActive(Contract contract) {  
@@ -69,7 +59,7 @@ public class ContractFunctions{
                     continue;
                 }
 
-                if(serviceIsActive(service)) {
+                if(seF.serviceIsActive(service)) {
                     contract.setActive(true);
                     contractRepository.save(contract);
                     return true;
@@ -89,7 +79,8 @@ public class ContractFunctions{
 
         LocalDate start = contract.getStartDate();
         LocalDate end = contract.getEndDate();
-        if(start != null && end != null && start.isAfter(end)) return false;
+        if(start == null || end == null) return false;
+        if(start.isAfter(end)) return false;
 
         return true;
     }
@@ -116,7 +107,7 @@ public class ContractFunctions{
             return "redirect:/sponsors";
         }
         
-        User user = getUserFromToken(request);
+        User user = uF.getUserFromToken(request);
         Eventlog log = new Eventlog(user, contract, "Slettede");
         logRepository.save(log);
         
@@ -137,17 +128,17 @@ public class ContractFunctions{
             return "redirect:/sponsors";
         }
         
-        User user = getUserFromToken(request);
+        User user = uF.getUserFromToken(request);
         Eventlog log = new Eventlog(user, contract, "Oprettede");
         logRepository.save(log);
         
         try {
             parseContract(contract, pdffile);
             contractRepository.save(contract);
-            redirectAttributes.addAttribute("responseMessage", "Tilføjet kontrakt: " + contract.getName());
+            redirectAttributes.addFlashAttribute("responseMessage", "Tilføjet kontrakt: " + contract.getName());
             return "redirect:/sponsors";
         } catch (IllegalArgumentException ex) {
-            redirectAttributes.addAttribute("responseMessage","Intern serverfejl, prøv igen");
+            redirectAttributes.addFlashAttribute("responseMessage","Intern serverfejl, prøv igen");
             return "redirect:/sponsors";
         }
     }
@@ -160,7 +151,7 @@ public class ContractFunctions{
 
         Contract storedContract = contractRepository.findById(contract.getId()).orElse(null);
         if(storedContract == null) {
-            redirectAttributes.addAttribute("responseMessage", "Intern serverfejl, prøv igen");
+            redirectAttributes.addFlashAttribute("responseMessage", "Intern serverfejl, prøv igen");
             return "redirect:/sponsors";
         }
         //If a file is sent parse the data
@@ -171,7 +162,7 @@ public class ContractFunctions{
             contract.setPdfData(storedContract.getPdfData());
             contract.setFileName(storedContract.getFileName());
         }
-        return handleUpdateRequest(contract, storedContract, request, redirectAttributes);
+        return eF.handleUpdateRequest(contract, storedContract, request, redirectAttributes);
     }
 
     public ResponseEntity<byte[]> getFile(long contractId) {

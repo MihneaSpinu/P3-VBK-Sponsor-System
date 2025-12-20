@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import p3project.classes.Contract;
 
 public interface ContractRepository extends JpaRepository<Contract, Long> {
-    // Spring will auto-implement this
+
 }

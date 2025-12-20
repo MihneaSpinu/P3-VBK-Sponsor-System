@@ -17,12 +17,12 @@ public class UserTest {
         
         // Act - Set properties
         user.setName("John Doe");
-        //user.setEmail("john@example.com");
+        user.setPassword("john123");
         user.setId(1L);
         
         // Assert - Check that properties were set correctly
         assertEquals("John Doe", user.getName());
-        //assertEquals("john@example.com", user.getEmail());
+        assertEquals("john123", user.getPassword());
         assertEquals(1L, user.getId());
     }
     
@@ -37,18 +37,5 @@ public class UserTest {
         assertNull(user.getName());
         //assertNull(user.getEmail());
         assertNull(user.getId());
-    }
-    
-    @Test
-    public void testUserEmailValidation() {
-        // Arrange
-        User user = new User();
-        
-        // Act
-        //user.setEmail("valid@email.com");
-        
-        // Assert
-        //assertTrue(user.getEmail().contains("@"));
-        //assertTrue(user.getEmail().contains("."));
     }
 }

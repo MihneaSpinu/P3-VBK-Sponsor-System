@@ -34,21 +34,17 @@ public class EventlogFunctions {
     private ContractRepository contractRepository;
 
     @Autowired
-    private UserFunctions userFunctions;
+    private UserFunctions uF;
     
-    //Wrappers
-    private User getUserFromToken(HttpServletRequest request) {
-        return userFunctions.getUserFromToken(request);
-    }
 
     public <T> String handleUpdateRequest(T requestObject, T storedObject, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         Integer fieldsChanged;
         try {
             fieldsChanged = compareFields(requestObject, storedObject, request);
             String message;
-            if(fieldsChanged == 0) message = "Ingen felter ændret";
+            if(fieldsChanged == 0)      message = "Ingen felter ændret";
             else if(fieldsChanged == 1) message = "Opdateret 1 felt";
-            else message = "Opdateret " + fieldsChanged + " felter";
+            else                        message = "Opdateret " + fieldsChanged + " felter";
             
             redirectAttributes.addFlashAttribute("responseMessage", message);
             return "redirect:/sponsors";
@@ -70,7 +66,7 @@ public class EventlogFunctions {
                 Object after = field.get(requestObject);
                 if (!Objects.equals(before, after)) {
                     if(fieldShouldBeLogged(field)) {
-                        User user = getUserFromToken(request);
+                        User user = uF.getUserFromToken(request);
                         Changelog log = new Changelog(user, requestObject, field, before, after);
                         logRepository.save(log);
                         fieldsChanged++;
@@ -90,7 +86,7 @@ public class EventlogFunctions {
         return fieldsChanged;
     }
 
-    public boolean fieldShouldBeLogged(Field field) { // jank
+    public boolean fieldShouldBeLogged(Field field) {
         String fieldName = field.getName();
         switch(fieldName) {
             case "pdfData":

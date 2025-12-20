@@ -5,9 +5,6 @@ document.getElementById("loginForm").addEventListener("submit", event => {
     let password = document.getElementById("password").value;
     let rememberMe = document.getElementById("rememberMe").checked;
     let errorMessage = document.getElementById("errorMessage");
-
-
-
     let formData = new FormData();
 
     formData.append("username", username);

@@ -16,7 +16,7 @@ import p3project.repositories.ServiceRepository;
 
 
 @Component
-public class ServiceFunctions{
+public class ServiceFunctions {
 
     @Autowired
     private ServiceRepository serviceRepository;
@@ -25,19 +25,11 @@ public class ServiceFunctions{
     private LogRepository logRepository;
 
     @Autowired
-    private UserFunctions userFunctions;
+    private UserFunctions uF;
 
     @Autowired
-    private EventlogFunctions eventlogFunctions;
+    private EventlogFunctions eF;
     
-    public User getUserFromToken(HttpServletRequest request) throws RuntimeException {
-        return userFunctions.getUserFromToken(request);
-    }
-
-    private <T> String handleUpdateRequest(T requestObject, T storedObject, HttpServletRequest request, RedirectAttributes redirectAttributes){
-        return eventlogFunctions.handleUpdateRequest(requestObject, storedObject, request, redirectAttributes);
-    }
-
     public boolean serviceIsActive(Service service) {
         if((service.getType().equals("Banner")      || 
             service.getType().equals("LogoTrojer")  || 
@@ -60,7 +52,7 @@ public class ServiceFunctions{
         serviceRepository.save(service);
 
         try {
-            User user = getUserFromToken(request);
+            User user = uF.getUserFromToken(request);
             Eventlog log = new Eventlog(user, service, "Opdaterede");
             logRepository.save(log);
         } catch (RuntimeException ex) {
@@ -79,7 +71,7 @@ public class ServiceFunctions{
         if(start != null && end != null && start.isAfter(end)) return false;
         // Validate amount/division depending on service type
         String t = service.getType() == null ? "" : service.getType();
-        if (t.equals("LogoTrojler") || t.equals("LogoBukser")) {
+        if (t.equals("LogoTrojer") || t.equals("LogoBukser")) {
             if (service.getDivision() < 0) return false;
         } else {
             if (service.getAmount() < 0) return false;
@@ -95,7 +87,7 @@ public class ServiceFunctions{
             return "redirect:/sponsors";
         }
 
-        User user = getUserFromToken(request);
+        User user = uF.getUserFromToken(request);
         Eventlog log = new Eventlog(user, service, "Slettede");
         logRepository.save(log);
 
@@ -105,19 +97,17 @@ public class ServiceFunctions{
 
 
     public String addServiceForContract(Service service, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        User user = getUserFromToken(request);
+        User user = uF.getUserFromToken(request);
         Eventlog log = new Eventlog(user, service, "Oprettede");
         logRepository.save(log);
 
-        System.out.println("\n\nACTIVE: " + service.getActive());
-
         if(!serviceIsValid(service)){
-            redirectAttributes.addFlashAttribute("responseMessage", "Tjenesten er ikke valid");
+            redirectAttributes.addFlashAttribute("responseMessage", "Ugyldig information indtastet");
             return "redirect:/sponsors";
         }
         try {
             serviceRepository.save(service);
-            redirectAttributes.addFlashAttribute("responseMessage", "Tilføjet service: " + service.getName());
+            redirectAttributes.addFlashAttribute("responseMessage", "Tilføjet tjeneste: " + service.getName());
             return "redirect:/sponsors";
         } catch (IllegalArgumentException ex) {
             redirectAttributes.addFlashAttribute("responseMessage", "Intern serverfejl, prøv igen");
@@ -128,18 +118,16 @@ public class ServiceFunctions{
     public String updateServiceFields(Service service, HttpServletRequest request, RedirectAttributes redirectAttributes) {
 
         if(!serviceIsValid(service)){
-            redirectAttributes.addFlashAttribute("responseMessage", "Tjenesten er ikke valid");
+            redirectAttributes.addFlashAttribute("responseMessage", "Ugyldig information indtastet");
             return "redirect:/sponsors";
         }
 
         Service storedService = serviceRepository.findById(service.getId()).orElse(null);
         
-        service.setActive(true);
-        service.setActive(serviceIsActive(service));
         if(storedService == null) {
             redirectAttributes.addAttribute("responseMessage", "Intern serverfejl, prøv igen");
             return "redirect:/sponsors";
         }
-        return handleUpdateRequest(service, storedService, request, redirectAttributes);
+        return eF.handleUpdateRequest(service, storedService, request, redirectAttributes);
     }
 }

@@ -12,81 +12,53 @@ import p3project.functions.ViewFunctions;;
 public class ViewController {
 
     @Autowired
-    private UserFunctions userFunctions;
+    private UserFunctions uF;
 
     @Autowired 
-    ViewFunctions viewFunctions;
+    ViewFunctions vF;
 
-  
-    private boolean userHasValidToken(HttpServletRequest request) {
-        return userFunctions.userHasValidToken(request);
-    }
-
-    private boolean userIsAdmin(HttpServletRequest request) {
-        return userFunctions.userIsAdmin(request);
-    }
-
-    private String showAdminPanelPage(Model model, HttpServletRequest request) {
-        return viewFunctions.showAdminPanelPage(model, request);
-    }
-
-    public String showArchivePage(Model model, HttpServletRequest request) {
-        return viewFunctions.showArchivePage(model, request);
-    }
-
-    public String changelogPage(Model model, HttpServletRequest request) {
-        return viewFunctions.changelogPage(model, request);
-    }
-
-    public String showhomepage(Model model, HttpServletRequest request) {
-        return viewFunctions.showhomepage(model, request);
-    }
-
-    private String returnSponsorPage(Model model) {
-        return viewFunctions.returnSponsorPage(model);
-    }
     
     @GetMapping("/AdminPanel")
     public String showAdminPanelPageMapping(Model model, HttpServletRequest request) {
-        if(!userHasValidToken(request)) return "redirect:/login";
-        if(!userIsAdmin(request))       return "redirect:/homepage";
-        return showAdminPanelPage(model, request);
+        if(!uF.userHasValidToken(request)) return "redirect:/login";
+        if(!uF.userIsAdmin(request))       return "redirect:/homepage";
+        return vF.showAdminPanelPage(model, request);
     }
 
 
     @GetMapping("/archive")
     public String showArchivePageMapping(Model model, HttpServletRequest request) {
-        if(!userHasValidToken(request)) return "redirect:/login";
-        return showArchivePage(model, request);
+        if(!uF.userHasValidToken(request)) return "redirect:/login";
+        return vF.showArchivePage(model, request);
     }
 
 
     @GetMapping("/changelog")
     public String changelogPageMapping(Model model, HttpServletRequest request) {
-        if(!userHasValidToken(request)) return "redirect:/login";
-        if(!userIsAdmin(request))       return "redirect:/homepage";
+        if(!uF.userHasValidToken(request)) return "redirect:/login";
+        if(!uF.userIsAdmin(request))       return "redirect:/homepage";
 
-        return changelogPage(model, request);
+        return vF.changelogPage(model, request);
     }
 
     
     @GetMapping("/homepage")
     public String showhomepageMapping(Model model, HttpServletRequest request) {
-        if(!userHasValidToken(request)) return "redirect:/login";
+        if(!uF.userHasValidToken(request)) return "redirect:/login";
         
-        return showhomepage(model, request);
+        return vF.showhomepage(model, request);
     }
 
     @GetMapping("/sponsors")
     public String showSponsors(Model model, HttpServletRequest request) {
-        if(!userHasValidToken(request)) return "redirect:/login";
-        if(!userIsAdmin(request))       return "redirect:/homepage";
-        return returnSponsorPage(model);
+        if(!uF.userHasValidToken(request)) return "redirect:/login";
+        if(!uF.userIsAdmin(request))       return "redirect:/homepage";
+        return vF.returnSponsorPage(model);
     }
 
     @GetMapping("/") 
     public String defaultMapping(HttpServletRequest request) {
-        if(userHasValidToken(request)) {
+        if(uF.userHasValidToken(request)) {
             return "redirect:/homepage";
         }
         return "redirect:/login";

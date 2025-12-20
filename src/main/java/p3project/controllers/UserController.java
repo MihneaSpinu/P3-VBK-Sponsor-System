@@ -16,33 +16,20 @@ import p3project.functions.UserFunctions;
 public class UserController {
 
     @Autowired
-    private UserFunctions userFunctions;
-
-    
-    //Wrappers
-    private  String addUser(String name, String password, boolean isAdmin, RedirectAttributes redirectAttributes) {
-        return userFunctions.addUser(name, password, isAdmin, redirectAttributes);
-    }
-    private String deleteUserById(Long id){
-        return userFunctions.deleteUserById(id);
-    }
-
-    private String testUser(HttpServletResponse response) {
-        return userFunctions.testUser(response);
-    }
+    private UserFunctions uF;
 
     @PostMapping("/users/add")
     public String addUserFromMapping(@RequestParam String name, @RequestParam String password, boolean isAdmin, Model model, RedirectAttributes redirectAttributes) {
-        return addUser(name, password, isAdmin, redirectAttributes);
+        return uF.addUser(name, password, isAdmin, redirectAttributes);
     }
 
     @PostMapping("/users/delete/{id}")
     public String deleteUserByIdMapping(@PathVariable Long id){
-        return deleteUserById(id);
+        return uF.deleteUserById(id);
     }    
 
     @GetMapping("/testuser")
     public String testUserMapping(HttpServletResponse response) {
-        return testUser(response);
+        return uF.testUser(response);
     }
 }
