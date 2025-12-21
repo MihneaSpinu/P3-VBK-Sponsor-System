@@ -24,11 +24,11 @@ public class Contract {
     private String name;
 
     @Lob
-    @Column(columnDefinition = "LONGBLOB") /* Longblob to have enough storage for .pdf's */
+    @Column(columnDefinition = "LONGBLOB") // longblob 4gb
     private byte[] pdfData;
     private String fileName;
 
-    // Constructor
+
     public Contract(LocalDate startDate, LocalDate endDate, String payment, boolean active, String typeName) {
         this.startDate = startDate;
         this.endDate = endDate;
@@ -37,11 +37,8 @@ public class Contract {
         this.type = typeName;
     }
 
-    public Contract() {
-        // required by JPA
-    }
+    public Contract() {}
 
-    // Returns the ID of the entity
     public Long getId() {
         return this.id;
     }
@@ -51,7 +48,7 @@ public class Contract {
     }
 
     public Long getSponsorId() {
-        return sponsorId;
+        return this.sponsorId;
     }
 
 
@@ -69,19 +66,18 @@ public class Contract {
     }
 
     public LocalDate getStartDate() {
-        return startDate;
+        return this.startDate;
     }
 
     public void setStartDate(LocalDate startDate) {
-        // Hvis endDate allerede er sat, sørg for at startDate ikke er efter den
         if (startDate != null && this.endDate != null && startDate.isAfter(this.endDate)) {
-            throw new IllegalArgumentException("Contract start date cannot be after end date");
+            throw new IllegalArgumentException("Kontraktens slutdato kan ikke være før startdatoen");
         }
         this.startDate = startDate;
     }
 
     public LocalDate getEndDate() {
-        return endDate;
+        return this.endDate;
     }
 
     public byte[] getPdfData() {
@@ -93,7 +89,6 @@ public class Contract {
     }
 
     public void setEndDate(LocalDate endDate) {
-        // Hvis startDate allerede er sat, sørg for at endDate ikke er før den
         if (endDate != null && this.startDate != null && endDate.isBefore(this.startDate)) {
             throw new IllegalArgumentException("Kontraktens slutdato kan ikke være før startdatoen");
         }
@@ -101,7 +96,7 @@ public class Contract {
     }
 
     public String getPayment() {
-        return payment;
+        return this.payment;
     }
 
 
@@ -124,7 +119,7 @@ public class Contract {
     }
 
     public boolean getActive() {
-        return active;
+        return this.active;
     }
 
     public void setActive(boolean active) {
@@ -132,7 +127,7 @@ public class Contract {
     }
 
     public String getType() {
-        return type;
+        return this.type;
     }
 
     public void setType(String type) {

@@ -69,7 +69,7 @@ function populateViewContracts(sponsorId) {
 		downloadButton.onclick = () => {
 			const pdfAvailable = field.getAttribute('data-has-pdf');
 			if (pdfAvailable === 'true') {
-				window.open(`/getFile/${id}`, '_blank'); // jank
+				window.open(`/api/contract/getFile/getFile/${id}`, '_blank'); // jank
 			} else {
 				alert('Ingen PDF tilgængelig for denne kontrakt.');
 			}
@@ -219,7 +219,7 @@ function populateViewContracts(sponsorId) {
 						serviceEditBlock.style.display = 'none';
 						serviceEditBlock.className = 'mt-2';
 						const updateServiceForm = document.createElement('form');
-						updateServiceForm.action = '/update/service';
+						updateServiceForm.action = '/api/service/update';
 						updateServiceForm.method = 'POST';
 						const serviceIdInput = document.createElement('input'); 
 						serviceIdInput.type = 'hidden'; 
@@ -391,7 +391,7 @@ function populateViewContracts(sponsorId) {
 		editBlock.className 			= 	'mt-2 text-sm text-gray-700 border-t pt-2';
 
 		const updateContractForm 		= 	document.createElement('form');
-		updateContractForm.action 		= 	'/update/contract';
+		updateContractForm.action 		= 	'/api/contract/update';
 		updateContractForm.method 		= 	'POST';
 		updateContractForm.className 	= 	'space-y-2';
 		updateContractForm.enctype 		= 	'multipart/form-data';
@@ -580,7 +580,7 @@ function postDeleteContract(contractId, sponsorId) {
 	try {
 		const form 			= 	document.createElement('form');
 		form.method 		= 	'POST';
-		form.action 		= 	'/sponsors/deleteContract';
+		form.action 		= 	'/api/contract/delete';
 		form.style.display 	= 	'none';
 
 		const inputId 		= 	document.createElement('input'); 

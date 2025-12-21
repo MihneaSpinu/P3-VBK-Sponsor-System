@@ -4,23 +4,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.Test;
 
-/**
- * Unit tests for the User class
- * These test the basic functionality of User objects
- */
+
 public class UserTest {
 
     @Test
     public void testUserCreation() {
-        // Arrange - Create a new user
+        // Arrange
         User user = new User();
         
-        // Act - Set properties
+        // Act
         user.setName("John Doe");
         user.setPassword("john123");
         user.setId(1L);
         
-        // Assert - Check that properties were set correctly
+        // Assert
         assertEquals("John Doe", user.getName());
         assertEquals("john123", user.getPassword());
         assertEquals(1L, user.getId());
@@ -30,12 +27,9 @@ public class UserTest {
     public void testUserWithNullValues() {
         // Arrange
         User user = new User();
-        
-        // Act - Don't set any properties
-        
-        // Assert - Should handle null values gracefully
+                
+        // Assert
         assertNull(user.getName());
-        //assertNull(user.getEmail());
         assertNull(user.getId());
     }
 }

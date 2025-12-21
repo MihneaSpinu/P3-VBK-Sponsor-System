@@ -19,7 +19,6 @@ import p3project.classes.Contract;
 import p3project.classes.Service;
 import p3project.classes.Sponsor;
 import p3project.repositories.ContractRepository;
-import p3project.repositories.LogRepository;
 import p3project.repositories.ServiceRepository;
 import p3project.repositories.SponsorRepository;
 import p3project.repositories.UserRepository;
@@ -32,7 +31,6 @@ class ViewFunctionsTest {
     @Mock private ContractRepository contractRepository;
     @Mock private SponsorRepository sponsorRepository;
     @Mock private SponsorFunctions sponsorFunctions;
-    @Mock private LogRepository logRepository;
     @Mock private UserFunctions userFunctions;
     @Mock private HttpServletRequest request;
 
@@ -85,7 +83,7 @@ class ViewFunctionsTest {
         doNothing().when(sponsorFunctions).updateActiveFields();
         when(sponsorRepository.findAll()).thenReturn(List.of(active, inactive));
         when(contractRepository.findAll()).thenReturn(List.of(new Contract()));
-        when(serviceRepository.findAll()).thenReturn(List.of(new Service(1L, "svc", "Banner", true, 0, null, null)));
+        when(serviceRepository.findAll()).thenReturn(List.of(new Service(1L, "svc", "Banner", true, null, null, 0, 0)));
 
         String view = viewFunctions.showhomepage(model, request);
 

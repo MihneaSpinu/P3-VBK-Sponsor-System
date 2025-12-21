@@ -1,20 +1,19 @@
 package p3project.functions;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.lang.reflect.Field;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import jakarta.servlet.http.HttpServletRequest;
 import p3project.classes.Contract;
@@ -25,10 +24,6 @@ import p3project.repositories.ContractRepository;
 import p3project.repositories.LogRepository;
 import p3project.repositories.ServiceRepository;
 import p3project.repositories.SponsorRepository;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
-
-import java.time.LocalDate;
 
 @ExtendWith(MockitoExtension.class)
 class EventlogFunctionsTest {
@@ -179,8 +174,8 @@ class EventlogFunctionsTest {
 
     @Test
     void compareFields_savesServiceCorrectly() throws Exception {
-        Service stored = new Service(1L, "Service", "Old", true, 0, null, null);
-        Service incoming = new Service(1L, "Service", "New", true, 0, null, null);
+        Service stored = new Service(1L, "Service", "Old", true, null, null, 0, 0);
+        Service incoming = new Service(1L, "Service", "New", true, null, null, 0, 0);
         User user = new User();
         user.setName("TestUser");
 

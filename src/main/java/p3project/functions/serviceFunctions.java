@@ -69,9 +69,9 @@ public class ServiceFunctions {
         LocalDate start = service.getStartDate();
         LocalDate end = service.getEndDate();
         if(start != null && end != null && start.isAfter(end)) return false;
-        // Validate amount/division depending on service type
-        String t = service.getType() == null ? "" : service.getType();
-        if (t.equals("LogoTrojer") || t.equals("LogoBukser")) {
+
+        String type = service.getType() == null ? "" : service.getType();
+        if (type.equals("LogoTrojer") || type.equals("LogoBukser")) {
             if (service.getDivision() < 0) return false;
         } else {
             if (service.getAmount() < 0) return false;

@@ -51,7 +51,7 @@ public class UserFunctions {
     }
 
 
-    public String[] parseCookie(HttpServletRequest request) throws RuntimeException{ // find anden exception?
+    public String[] parseCookie(HttpServletRequest request) throws RuntimeException{
         Cookie cookie = WebUtils.getCookie(request, "token");
         if (cookie == null) throw new RuntimeException();
         

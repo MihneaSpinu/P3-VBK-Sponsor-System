@@ -54,3 +54,7 @@
 .logout-btn:hover {
     background-color: #d1d5db;
 }
+
+.onPage {
+    background-color: #c3f7d5 !important;
+}

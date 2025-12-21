@@ -41,14 +41,5 @@ public class Changelog extends Eventlog {
         return this.after;
     }
 
-    /* legacy kode
-    public static <T> Changelog create(User user, T changedObject, Field field, Object before, Object after) {
-        Changelog log = (Changelog)Eventlog.create(user, changedObject, "UPDATE");
-        log.field = field.getName();
-        log.before = before.toString();
-        log.after = after.toString();
-        return log;
-    }
-    */
 
 }

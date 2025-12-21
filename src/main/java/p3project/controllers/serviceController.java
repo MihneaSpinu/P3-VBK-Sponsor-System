@@ -22,7 +22,7 @@ public class ServiceController {
     @Autowired
     private UserFunctions uF;
 
-    @PostMapping("/sponsors/setServiceArchived")
+    @PostMapping("/api/service/update/active")
     public ResponseEntity<String> setServiceArchivedMapping(@RequestParam Long serviceId, @RequestParam boolean active, HttpServletRequest request) {
         if(!uF.userHasValidToken(request)) return ResponseEntity.status(403).body("forbidden");
         if(!uF.userIsAdmin(request))       return ResponseEntity.status(403).body("forbidden");
@@ -31,7 +31,7 @@ public class ServiceController {
     }
 
 
-    @PostMapping("/sponsors/deleteService")
+    @PostMapping("/api/service/delete")
     public String deleteServiceMapping(@RequestParam Long serviceId, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(!uF.userHasValidToken(request)) return "redirect:/login";
         if(!uF.userIsAdmin(request))       return "redirect:/homepage";
@@ -40,7 +40,7 @@ public class ServiceController {
     }
 
 
-    @PostMapping("/sponsors/addService")
+    @PostMapping("/api/service/add")
     public String addServiceForContractMapping(@ModelAttribute Service service, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(!uF.userHasValidToken(request)) return "redirect:/login";
         if(!uF.userIsAdmin(request))       return "redirect:/homepage";
@@ -48,7 +48,7 @@ public class ServiceController {
         return seF.addServiceForContract(service, request, redirectAttributes);
     }
 
-    @PostMapping("/update/service")
+    @PostMapping("/api/service/update")
     public String updateServiceFieldsMapping(@ModelAttribute Service service, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(!uF.userHasValidToken(request)) return "redirect:/login";
         if(!uF.userIsAdmin(request))       return "redirect:/homepage";

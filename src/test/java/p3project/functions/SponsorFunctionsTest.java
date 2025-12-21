@@ -313,8 +313,8 @@ class SponsorFunctionsTest {
         contract.setId(10L);
         contract.setSponsorId(sponsorId);
         
-        Service service = new Service(100L, "Service", "Expo", true, 0, null, null);
-        service.setId(100L); // Explicitly set the ID after construction
+        Service service = new Service(100L, "Service", "Expo", true, null, null, 0, 0);
+        service.setId(100L); // eksplicit sæt id da hibernate ellers gør det
         service.setContractId(10L);
         
         User user = new User();

@@ -19,7 +19,6 @@ public class Sponsor {
     private boolean active;
     private String comments;
 
-    // Constructor
     public Sponsor(String name, String contactPerson, String email,
                     String phoneNumber, String cvrNumber, boolean active, String comments) {
         this.name = name;
@@ -31,9 +30,7 @@ public class Sponsor {
         this.comments = comments;
     }
 
-    public Sponsor() {
-    // Required by JPA
-    }
+    public Sponsor() {}
 
     public Long getId() {
         return this.id;
@@ -44,7 +41,7 @@ public class Sponsor {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -52,7 +49,7 @@ public class Sponsor {
     }
 
     public String getContactPerson() {
-        return contactPerson;
+        return this.contactPerson;
     }
 
     public void setContactPerson(String contactPerson) {
@@ -60,7 +57,7 @@ public class Sponsor {
     }
 
     public String getEmail() {
-        return email;
+        return this.email;
     }
 
     public void setEmail(String email) {
@@ -68,7 +65,7 @@ public class Sponsor {
     }
 
     public String getPhoneNumber() {
-        return phoneNumber;
+        return this.phoneNumber;
     }
 
     public void setPhoneNumber(String phoneNumber) {
@@ -76,7 +73,7 @@ public class Sponsor {
     }
 
     public String getCvrNumber() {
-        return cvrNumber;
+        return this.cvrNumber;
     }
 
     public void setCvrNumber(String cvrNumber) {
@@ -88,11 +85,11 @@ public class Sponsor {
     }
 
     public boolean getActive(){
-        return active;
+        return this.active;
     }
 
     public String getComments() {
-        return comments;
+        return this.comments;
     }
 
     public void setComments(String comments) {

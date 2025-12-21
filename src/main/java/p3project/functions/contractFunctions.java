@@ -47,7 +47,6 @@ public class ContractFunctions {
 
 
 
-    // del op i 2 funktioner
     public boolean contractIsActive(Contract contract) {  
         List<Service> services = serviceRepository.findAll();
         for(Service service : services) {
@@ -124,7 +123,7 @@ public class ContractFunctions {
 
     public String addContractForSponsor(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, HttpServletRequest request, RedirectAttributes redirectAttributes) {        
         if (!contractIsValid(contract)){
-            redirectAttributes.addFlashAttribute("responseMessage", "Sponsor is invalid");
+            redirectAttributes.addFlashAttribute("responseMessage", "Ugyldigt input");
             return "redirect:/sponsors";
         }
         
@@ -145,7 +144,7 @@ public class ContractFunctions {
 
     public String updateContractFields(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if (!contractIsValid(contract)){
-            redirectAttributes.addFlashAttribute("responseMessage", "Sponsor is invalid");
+            redirectAttributes.addFlashAttribute("responseMessage", "Ugyldigt input");
             return "redirect:/sponsors";
         }
 
@@ -154,11 +153,10 @@ public class ContractFunctions {
             redirectAttributes.addFlashAttribute("responseMessage", "Intern serverfejl, prøv igen");
             return "redirect:/sponsors";
         }
-        //If a file is sent parse the data
-        if(!pdffile.isEmpty()){
+        
+        if(!pdffile.isEmpty()){ //If a file is sent parse the data
             parseContract(contract, pdffile);
-        } else {
-            //if no pdf sent, get the stored values.
+        } else { //if no pdf sent, get the stored values.
             contract.setPdfData(storedContract.getPdfData());
             contract.setFileName(storedContract.getFileName());
         }

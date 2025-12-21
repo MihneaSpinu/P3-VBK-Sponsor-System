@@ -9,7 +9,7 @@ public class SponsorTest{
 
     @Test
     public void testSponsorCreation(){
-        //set the variables
+
         String sponsorName = "sponsorName";
         String contactPerson = "contactPerson";
         String email = "email";
@@ -27,7 +27,6 @@ public class SponsorTest{
         sponsor.setActive(status);
         sponsor.setComments(comments);
 
-        //check the variables
         assertEquals(sponsorName, sponsor.getName());
         assertEquals(contactPerson, sponsor.getContactPerson());
         assertEquals(email, sponsor.getEmail());
@@ -39,18 +38,15 @@ public class SponsorTest{
 
     @Test
     public void testSponsorWithNullValues(){
-        //create sponsor
+
         Sponsor sponsor = new Sponsor();
 
-        //no values set
-
-        //check the variables
         assertNull(sponsor.getName());
         assertNull(sponsor.getContactPerson());
         assertNull(sponsor.getEmail());
         assertNull(sponsor.getPhoneNumber());
         assertNull(sponsor.getCvrNumber());
-        assertFalse(sponsor.getActive()); //Default for a boolean is false
+        assertFalse(sponsor.getActive()); // Boolean default = false
         assertNull(sponsor.getComments());
     }
 

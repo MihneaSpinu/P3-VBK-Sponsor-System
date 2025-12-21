@@ -47,7 +47,7 @@ public class SponsorFunctions {
     public String updateSponsor(Sponsor sponsor, HttpServletRequest request, RedirectAttributes redirectAttributes){
 
         if (!sponsorIsValid(sponsor)){
-            redirectAttributes.addFlashAttribute("responseMessage", "Sponsor is invalid");
+            redirectAttributes.addFlashAttribute("responseMessage", "Ugyldigt input");
             return "redirect:/sponsors";
         }
 
@@ -79,12 +79,12 @@ public class SponsorFunctions {
 
         for (Sponsor sponsor : sponsors) {
 
-            boolean sponsorActive = false; // default
+            boolean sponsorActive = false;
 
             for (Contract contract : contracts) {
                 if (sponsor.getId().equals(contract.getSponsorId()) && cF.contractIsActive(contract)) {
-                    sponsorActive = true; // found an active one
-                    break;                // stop checking further contracts
+                    sponsorActive = true;
+                    break;
                 }
             }
 
@@ -95,7 +95,7 @@ public class SponsorFunctions {
 
     public String addSponsor(@ModelAttribute Sponsor sponsor, HttpServletRequest request, RedirectAttributes redirectAttributes){
         if (!sponsorIsValid(sponsor)){
-            redirectAttributes.addFlashAttribute("responseMessage", "Sponsor is invalid");
+            redirectAttributes.addFlashAttribute("responseMessage", "Ugyldigt input");
             return "redirect:/sponsors";
         }
         

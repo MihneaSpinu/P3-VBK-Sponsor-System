@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Forside</title>
+  <title th:text="${isHomepage} ? 'Forside' : 'Arkiv'"></title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script th:src="@{/js/filter.js}" defer></script>
   <script th:src="@{/js/homepage.js}" defer></script>
@@ -25,8 +25,8 @@
         <div class="logo">VBK Sponsor System</div>
 
         <div class="menu">
-          <button class="menu-btn" onclick="location.href='/homepage'">Forside</button>
-          <button class="menu-btn" onclick="location.href='/archive'">Arkiv</button>
+          <button class="menu-btn" th:classappend="${isHomepage} ? onPage : ''" onclick="location.href='/homepage'">Forside</button>
+          <button class="menu-btn" th:classappend="${isHomepage} ? '' : onPage" onclick="location.href='/archive'">Arkiv</button>
           <button th:if="${userIsAdmin}" class="menu-btn" onclick="location.href='/sponsors'">Sponsor Administration</button>
           <button th:if="${userIsAdmin}" class="menu-btn" onclick="location.href='/changelog'">Hændelses log</button>
           <button th:if="${userIsAdmin}" class="menu-btn" onclick="location.href='/AdminPanel'">Bruger Administration</button>
@@ -181,8 +181,6 @@
       </div>
 
       <input type="hidden" id="filterDescription" name="filterDescription" value="">
-      <input type="hidden" id="filterMinPayment" name="filterMinPayment" value="">
-      <input type="hidden" id="filterMaxPayment" name="filterMaxPayment" value="">
 
       <div class="col-span-2 flex justify-between mt-4">
         <div>

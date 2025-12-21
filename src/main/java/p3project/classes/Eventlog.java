@@ -18,8 +18,7 @@ import jakarta.persistence.InheritanceType;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE) // Én tabel til hele klasse hierarkiet
 
-// Laver kolonnen "logType" i databasen, der gør at Hibernate kan kende forskel
-// på de to klasser
+// Laver kolonnen "logType" i databasen, der gør at Hibernate kan kende forskel på de to klasser
 @DiscriminatorColumn(name = "logType", discriminatorType = DiscriminatorType.STRING)
 @DiscriminatorValue("Eventlog") // "Eventlog" bliver værdien til "logType" kolonnen
 public class Eventlog {
@@ -50,7 +49,7 @@ public class Eventlog {
         this.action = action;
     }
 
-    // Getters used exclusively for dynamic Thymeleaf view generation
+
     public String getUsername() {
         return this.username;
     }

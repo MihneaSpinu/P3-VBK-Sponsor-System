@@ -3,7 +3,7 @@ const openFilterButton = document.getElementById("openFilterBtn");
 const filterModal = document.getElementById("filterModal");
 const closeFilterButton = document.getElementById("closeFilterBtn");
 const closeFilterButtonBottom = document.getElementById("closeFilterBtnBottom");
-// Modal open/close
+
 function openModal() {
   if (!filterModal) return;
   filterModal.classList.remove("hidden");
@@ -24,7 +24,7 @@ filterModal.addEventListener("click", event => {
   if (event.target === filterModal) closeModal();
 });
 
-// Filtering logic
+
 const applyFilterButton = document.getElementById("applyFilterBtn");
 const clearFilterButton = document.getElementById("clearFilterBtn");
 
@@ -90,20 +90,6 @@ function cardMatchesFilters(card, filters) {
       return false;
   }
 
-  // Payment filters: check any payment satisfies the range
-  if (filters.minPayment != null || filters.maxPayment != null) {
-    const payments = paymentTexts
-      .map(text => parsePaymentText(text))
-      .filter(payment => payment != null);
-    if (payments.length === 0) return false;
-    const meets = payments.some(payment => {
-      if (filters.minPayment != null && payment < filters.minPayment) return false;
-      if (filters.maxPayment != null && payment > filters.maxPayment) return false;
-      return true;
-    });
-    if (!meets) return false;
-  }
-
 
   if (filters.dateFrom || filters.dateTo) {
     const ranges = dateTexts
@@ -129,16 +115,12 @@ function cardMatchesFilters(card, filters) {
 function applyFilters() {
   const name = document.getElementById("filterName").value.trim();
   const description = document.getElementById("filterDescription").value.trim();
-  const minPaymentString = document.getElementById("filterMinPayment").value;
-  const maxPaymentString = document.getElementById("filterMaxPayment").value;
   const dateFrom = document.getElementById("filterDateFrom").value;
   const dateTo = document.getElementById("filterDateTo").value;
 
   const filters = {
     name: name || null,
     description: description || null,
-    minPayment: minPaymentString ? Number(minPaymentString) : null,
-    maxPayment: maxPaymentString ? Number(maxPaymentString) : null,
     dateFrom: dateFrom || null,
     dateTo: dateTo || null,
   };
@@ -182,15 +164,6 @@ function getCardName(card) {
     .toLowerCase();
 }
 
-function getCardMaxPayment(card) {
-  const paymentElements = Array.from(
-    card.querySelectorAll(".grid > div:nth-child(3) div > div, .grid > div:nth-child(3) .bg-gray-200")
-  );
-  const texts = paymentElements.map(element => element.textContent || element.innerText);
-  const nums = texts.map(text => parsePaymentText(text)).filter(num => num != null);
-  if (nums.length === 0) return -Infinity;
-  return Math.max(...nums);
-}
 
 function getCardEarliestStart(card) {
   const dateElements = Array.from(
@@ -221,10 +194,6 @@ function applyCurrentSort() {
 
     case "name-desc":
       comparator = (a, b) => getCardName(b).localeCompare(getCardName(a));
-      break;
-
-    case "payment-desc":
-      comparator = (a, b) => getCardMaxPayment(b) - getCardMaxPayment(a);
       break;
 
     case "date-asc":

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Bruger Administration</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" th:href="@{/css/Sidebar.css}" href="static/css/Sidebar.css">
     <link rel="stylesheet" th:ref="@{/css/AdminPanel.css}" href="static/css/AdminPanel.css">
@@ -26,7 +26,7 @@
                     <button class="menu-btn" onclick="location.href='/archive'">Arkiv</button>
                     <button class="menu-btn" onclick="location.href='/sponsors'">Sponsor Administration</button>
                     <button class="menu-btn" onclick="location.href='/changelog'">Hændelses log</button>
-                    <button class="menu-btn" onclick="location.href='/AdminPanel'">Bruger Administration</button>
+                    <button class="menu-btn onPage" onclick="location.href='/AdminPanel'">Bruger Administration</button>
                 </div>
             </div>
             
@@ -71,7 +71,7 @@
                                         </div>
 
                                         <div style="text-align:right;">
-                                            <form th:action="@{/users/delete/{id}(id=${user.id})}" method="post" th:onsubmit="return confirm('Er du sikker på at du vil slette denne bruger?')">
+                                            <form th:action="@{/api/user/delete/{id}(id=${user.id})}" method="post" th:onsubmit="return confirm('Er du sikker på at du vil slette denne bruger?')">
                                                 <button type="submit" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">
                                                     Slet
                                                 </button>
@@ -86,7 +86,7 @@
 
                 <!-- Add user -->
                 <section class="bg-white rounded shadow p-4">
-                    <form th:action="@{/users/add}" method="post" class="space-y-4">
+                    <form th:action="@{/api/user/add}" method="post" class="space-y-4">
                         <!--Username-->
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Brugernavn</label>
