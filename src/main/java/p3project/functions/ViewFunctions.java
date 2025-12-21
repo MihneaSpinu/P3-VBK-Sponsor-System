@@ -65,7 +65,7 @@ public class ViewFunctions {
         Iterable<Contract> contracts = contractRepository.findAll();
         Iterable<Service> services = serviceRepository.findAll();
 
-        model.addAttribute("pageTitle", "Arkiv");
+        model.addAttribute("isHomepage", false);
         model.addAttribute("sponsors", archivedSponsors);
         model.addAttribute("contracts", contracts);
         model.addAttribute("services", services);
@@ -98,7 +98,7 @@ public class ViewFunctions {
             }
         }
 
-        model.addAttribute("pageTitle", "Forside");
+        model.addAttribute("isHomepage", true);
         model.addAttribute("sponsors", activeSponsors);
         model.addAttribute("contracts", contracts);
         model.addAttribute("services", services);
