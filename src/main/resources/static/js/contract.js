@@ -69,7 +69,7 @@ function populateViewContracts(sponsorId) {
 		downloadButton.onclick = () => {
 			const pdfAvailable = field.getAttribute('data-has-pdf');
 			if (pdfAvailable === 'true') {
-				window.open(`/api/contract/getFile/getFile/${id}`, '_blank'); // jank
+				window.open(`/api/contract/getFile/${id}`, '_blank'); // jank
 			} else {
 				alert('Ingen PDF tilgængelig for denne kontrakt.');
 			}
