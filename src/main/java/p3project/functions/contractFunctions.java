@@ -123,7 +123,7 @@ public class ContractFunctions {
 
     public String addContractForSponsor(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, HttpServletRequest request, RedirectAttributes redirectAttributes) {        
         if (!contractIsValid(contract)){
-            redirectAttributes.addFlashAttribute("responseMessage", "Sponsor is invalid");
+            redirectAttributes.addFlashAttribute("responseMessage", "Ugyldigt input");
             return "redirect:/sponsors";
         }
         
@@ -144,7 +144,7 @@ public class ContractFunctions {
 
     public String updateContractFields(@ModelAttribute Contract contract, @RequestParam MultipartFile pdffile, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if (!contractIsValid(contract)){
-            redirectAttributes.addFlashAttribute("responseMessage", "Sponsor is invalid");
+            redirectAttributes.addFlashAttribute("responseMessage", "Ugyldigt input");
             return "redirect:/sponsors";
         }
 

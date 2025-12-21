@@ -47,7 +47,7 @@ public class SponsorFunctions {
     public String updateSponsor(Sponsor sponsor, HttpServletRequest request, RedirectAttributes redirectAttributes){
 
         if (!sponsorIsValid(sponsor)){
-            redirectAttributes.addFlashAttribute("responseMessage", "Sponsor is invalid");
+            redirectAttributes.addFlashAttribute("responseMessage", "Ugyldigt input");
             return "redirect:/sponsors";
         }
 
@@ -95,7 +95,7 @@ public class SponsorFunctions {
 
     public String addSponsor(@ModelAttribute Sponsor sponsor, HttpServletRequest request, RedirectAttributes redirectAttributes){
         if (!sponsorIsValid(sponsor)){
-            redirectAttributes.addFlashAttribute("responseMessage", "Sponsor is invalid");
+            redirectAttributes.addFlashAttribute("responseMessage", "Ugyldigt input");
             return "redirect:/sponsors";
         }
         
